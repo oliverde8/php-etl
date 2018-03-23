@@ -37,6 +37,7 @@ class RuleTransformOperation extends AbstractChainOperation implements DataChain
     {
         $this->ruleApplier = $ruleApplier;
         $this->rules = $rules;
+        $this->add = $add;
     }
 
     /**
@@ -58,7 +59,7 @@ class RuleTransformOperation extends AbstractChainOperation implements DataChain
         }
 
         foreach ($this->rules as $column => $rule) {
-            $newData[$column] = $this->ruleApplier->apply($data, $newData, $rule, []);
+            $newData[$column] = $this->ruleApplier->apply($data, $newData, $rule['rules'], []);
         }
 
         return new DataItem($newData);

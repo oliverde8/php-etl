@@ -52,6 +52,8 @@ class ChainProcessor
      * @param \Iterator $items
      * @param int $startAt
      * @param array $context
+     *
+     * @return ItemInterface
      */
     protected function processItems(\Iterator $items, $startAt, &$context)
     {
@@ -60,7 +62,10 @@ class ChainProcessor
             $this->processItem($dataItem, $startAt, $context);
         }
 
-        while ($this->processItem(new StopItem(), $startAt, $context) != PHP_INT_MAX);
+        $stopItem = new StopItem();
+        while ($this->processItem($stopItem, $startAt, $context) !== $stopItem);
+
+        return $stopItem;
     }
 
     /**
@@ -70,7 +75,7 @@ class ChainProcessor
      * @param int $startAt
      * @param array $context
      *
-     * @return int
+     * @return ItemInterface
      */
     protected function processItem(ItemInterface $item, $startAt, &$context)
     {
@@ -80,12 +85,12 @@ class ChainProcessor
             if ($item instanceof GroupedItemInterface) {
                 $this->processItems($item->getIterator(), $chainNumber + 1, $context);
 
-                return PHP_INT_MAX;
+                return new StopItem();
             } else if ($item instanceof ChainBreakItem) {
-                return PHP_INT_MAX;
+                return $item;
             }
         }
 
-        return $chainNumber;
+        return $item;
     }
 }

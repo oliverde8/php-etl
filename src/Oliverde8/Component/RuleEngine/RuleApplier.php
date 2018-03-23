@@ -39,8 +39,11 @@ class RuleApplier
     public function __construct(LoggerInterface $logger, array $rules, $validate = false)
     {
         $this->logger = $logger;
-        $this->rules = $rules;
         $this->validate = $validate;
+
+        foreach ($rules as $rule) {
+            $this->registerRule($rule);
+        }
     }
 
     /**

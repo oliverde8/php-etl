@@ -22,6 +22,8 @@ class SimpleGroupingOperation extends AbstractChainOperation implements DataChai
 {
     public $groupKey = [];
 
+    public $groupIdentifierKey = [];
+
     public $data = [];
 
     /**
@@ -29,22 +31,37 @@ class SimpleGroupingOperation extends AbstractChainOperation implements DataChai
      *
      * @param array $groupKey
      */
-    public function __construct(array $groupKey)
+    public function __construct(array $groupKey, array $groupIdentifierKey = [])
     {
         $this->groupKey = $groupKey;
+        $this->groupIdentifierKey = $groupIdentifierKey;
     }
 
 
     public function processData(DataItemInterface $item, array &$context): ItemInterface
     {
         $groupingValue = AssociativeArray::getFromKey($item->getData(), $this->groupKey);
-        $this->data[$groupingValue][] = $item->getData();
+
+        if (!empty($this->groupIdentifierKey)) {
+            $groupIdValue = AssociativeArray::getFromKey($item->getData(), $this->groupIdentifierKey);
+            $this->data[$groupingValue][$groupIdValue] = $item->getData();
+        } else {
+            $this->data[$groupingValue][] = $item->getData();
+        }
+
 
         return new ChainBreakItem();
     }
 
     public function processStop(StopItem $stopItem, array &$context): ItemInterface
     {
-        return new GroupedItem(new \ArrayIterator($this->data));
+        if (empty($this->data)) {
+            return $stopItem;
+        }
+
+        $data = $this->data;
+        $this->data = [];
+
+        return new GroupedItem(new \ArrayIterator($data));
     }
 }
