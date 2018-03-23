@@ -234,6 +234,8 @@ This was originally done as a pock, but ended up being a nice reusable idea.
 
 * More cleanup & comment
 
+* Add some logs to the ETL & error handling.
+
 * Rule Engine : 
     * Think of a way to have generic dynamic columns, for handling multi locales for example. This might not needed
     as in the ETL it can be handle with a custom operation applying the ruleset for each locale.
