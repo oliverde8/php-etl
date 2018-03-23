@@ -23,13 +23,17 @@ class RuleTransformOperation extends AbstractChainOperation implements DataChain
     /** @var array */
     protected $rules;
 
+    /** @var boolean */
+    protected $add;
+
     /**
      * RuleTransformOperation constructor.
      *
      * @param RuleApplier $ruleApplier
      * @param array $rules
+     * @param boolean $add
      */
-    public function __construct(RuleApplier $ruleApplier, array $rules)
+    public function __construct(RuleApplier $ruleApplier, array $rules, $add)
     {
         $this->ruleApplier = $ruleApplier;
         $this->rules = $rules;
@@ -47,6 +51,11 @@ class RuleTransformOperation extends AbstractChainOperation implements DataChain
     {
         $data = $item->getData();
         $newData = [];
+
+        // We add data and don't send new data.
+        if ($this->add) {
+            $newData = $data;
+        }
 
         foreach ($this->rules as $column => $rule) {
             $newData[$column] = $this->ruleApplier->apply($data, $newData, $rule, []);
