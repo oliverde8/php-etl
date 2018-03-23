@@ -11,7 +11,7 @@ use Oliverde8\Component\RuleEngine\Exceptions\RuleOptionMissingException;
  * @copyright 2018 Oliverde8
  * @package Oliverde8\Component\RuleEngine\Rules
  */
-class StrToUper extends AbstractRule
+class StrToUpper extends AbstractRule
 {
     /**
      * @inheritdoc

@@ -19,7 +19,7 @@
 
     <testsuites>
         <testsuite name="Project Test Suite">
-            <directory>tests</directory>
+            <directory>src/*/*/*/Tests</directory>
         </testsuite>
     </testsuites>
 
@@ -28,4 +28,9 @@
             <directory>src</directory>
         </whitelist>
     </filter>
+
+    <logging>
+        <log type="coverage-html" target="build/logs/coverage" charset="UTF-8" yui="true" highlight="true"/>
+        <log type="coverage-clover" target="build/logs/clover.xml"/>
+    </logging>
 </phpunit>

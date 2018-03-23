@@ -226,16 +226,9 @@ This was originally done as a pock, but ended up being a nice reusable idea.
 
 * More cleanup & comment
 
-* Rule Engine 
-    * Have a rule `Constant` to send constant values. 
-        * This is possible for string values as if a rule is a string it considers it's a constant. but when we wish to have
-            constant arrays it's not possible.
-            
-    * Have a variable pool, 
-        * Instead of using the generated values as variables, let's have a dedicated pool where we can push the values to. 
-        
-    * Think of a way to have generic dynamic columns, for handling multi locales for exemple. 
+* Rule Engine : 
+    * Think of a way to have generic dynamic columns, for handling multi locales for example. This might not needed
+    as in the ETL it can be handle with a custom operation applying the ruleset for each locale.
 
-* **Unit test !**
-
-* Make a builder to build the `chain` description easily in yaml or so.
+* Make a builder to build the `chain` description easily in yaml or so. 
+It might be a better idea to do this in the SF Bundle rather then here. Requires some thinking.

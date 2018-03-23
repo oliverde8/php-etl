@@ -2,6 +2,7 @@
 
 namespace Oliverde8\Component\RuleEngine\Tests;
 
+use Oliverde8\Component\RuleEngine\Exceptions\RuleException;
 use Oliverde8\Component\RuleEngine\Exceptions\UnknownRuleException;
 use Oliverde8\Component\RuleEngine\RuleApplier;
 use Oliverde8\Component\RuleEngine\Rules\RuleInterface;
