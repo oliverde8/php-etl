@@ -5,7 +5,7 @@
         "php": "^7.1.3",
         "oliverde8/associative-array-simplified": "^1.0",
         "psr/log": "^1.0",
-        "symfony/yaml": "^4.0"
+        "symfony/yaml": "^3.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^7.0"
