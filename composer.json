@@ -1,6 +1,8 @@
 {
-    "type": "project",
-    "license": "proprietary",
+    "name": "oliverde8/php-etl",
+    "type": "library",
+    "license": "MIT",
+    "description": "A small etl coded in php, to extract/transform/load Edit with ease.",
     "require": {
         "php": "^7.1.3",
         "oliverde8/associative-array-simplified": "^1.0",
