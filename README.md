@@ -9,7 +9,7 @@ It comes in 2 components :
 The rule engine allows to have configuration based transformations to transform a particular data. 
 This is integrated inside the ETL with the `RuleTransformOperation`. 
 
-The rule engine can be used in standalone, [see docs](docs/RuleEngineStandalone.md)
+The rule engine can be used in standalone, [see docs](docs/RuleEngine.md)
 
 ## Creating a chain. 
 
@@ -224,15 +224,18 @@ If an operation don't have the appropriate method to handle a particular Item, t
 
 This was originally done as a pock, but ended up being a nice reusable idea.
 
-* The RuleEngine : 
-    * Missing rules, there are very few, can add quite a few generic rules.
-
-* The ETL : 
-    * The naming of some methods/class has been done quite fast, needs to be refractored. 
-    * Items has `signal` property, maybe name it better. 
-
 * More cleanup & comment
+
+* Rule Engine 
+    * Have a rule `Constant` to send constant values. 
+        * This is possible for string values as if a rule is a string it considers it's a constant. but when we wish to have
+            constant arrays it's not possible.
+            
+    * Have a variable pool, 
+        * Instead of using the generated values as variables, let's have a dedicated pool where we can push the values to. 
+        
+    * Think of a way to have generic dynamic columns, for handling multi locales for exemple. 
 
 * **Unit test !**
 
-* Make a builder to build the `chain` description easily 
+* Make a builder to build the `chain` description easily in yaml or so.
