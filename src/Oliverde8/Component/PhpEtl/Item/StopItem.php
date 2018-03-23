@@ -12,7 +12,7 @@ namespace Oliverde8\Component\PhpEtl\Item;
 class StopItem implements ItemInterface
 {
 
-    public function getSignal(): string
+    public function getMethod(): string
     {
         return 'stop';
     }

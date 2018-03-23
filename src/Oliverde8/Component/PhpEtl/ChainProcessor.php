@@ -35,28 +35,52 @@ class ChainProcessor
         $this->chainLinks = array_values($chainLinks);
     }
 
+    /**
+     * Process items.
+     *
+     * @param \Iterator $items
+     * @param $context
+     */
     public function process(\Iterator $items, $context)
     {
         $this->processItems($items, 0, $context);
     }
 
-    public function processItems(\Iterator $items, $startAt, &$context)
+    /**
+     * Process list of items with chain starting at $startAt.
+     *
+     * @param \Iterator $items
+     * @param int $startAt
+     * @param array $context
+     */
+    protected function processItems(\Iterator $items, $startAt, &$context)
     {
         foreach ($items as $item) {
             $dataItem = new DataItem($item);
             $this->processItem($dataItem, $startAt, $context);
         }
 
-        $last = $this->processItem(new StopItem(), $startAt, $context);
+        while ($this->processItem(new StopItem(), $startAt, $context) != PHP_INT_MAX);
     }
 
-    public function processItem(ItemInterface $item, $startAt, &$context)
+    /**
+     * Process an item, with chains starting at.
+     *
+     * @param ItemInterface $item
+     * @param int $startAt
+     * @param array $context
+     *
+     * @return int
+     */
+    protected function processItem(ItemInterface $item, $startAt, &$context)
     {
         for ($chainNumber = $startAt; $chainNumber < count($this->chainLinks); $chainNumber++) {
             $item = $this->chainLinks[$chainNumber]->process($item, $context);
 
             if ($item instanceof GroupedItemInterface) {
-                return $this->processItems($item->getIterator(), $chainNumber + 1, $context);
+                $this->processItems($item->getIterator(), $chainNumber + 1, $context);
+
+                return PHP_INT_MAX;
             } else if ($item instanceof ChainBreakItem) {
                 return PHP_INT_MAX;
             }

@@ -12,9 +12,12 @@ use Oliverde8\Component\PhpEtl\Item\ItemInterface;
  */
 class AbstractChainOperation implements ChainOperationInterface
 {
+    /**
+     * @inheritdoc
+     */
     public function process(ItemInterface $item, array &$context): ItemInterface
     {
-        $method = 'process' . ucfirst($item->getSignal());
+        $method = 'process' . ucfirst($item->getMethod());
 
         if (method_exists($this, $method)) {
             return $this->$method($item, $context);

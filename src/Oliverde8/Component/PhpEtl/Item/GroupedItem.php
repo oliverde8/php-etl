@@ -30,7 +30,7 @@ class GroupedItem implements GroupedItemInterface
         return $this->iterator;
     }
 
-    public function getSignal(): string
+    public function getMethod(): string
     {
         return DataItemInterface::SIGNAL_DATA;
     }
