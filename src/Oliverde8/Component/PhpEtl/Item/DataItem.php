@@ -29,7 +29,7 @@ class DataItem implements DataItemInterface
     /**
      * @inheritdoc
      */
-    public function getMethod(): string
+    public function getMethod()
     {
         return 'data';
     }

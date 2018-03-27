@@ -28,7 +28,10 @@ class CallbackTransformerOperation extends AbstractChainOperation implements Dat
         $this->callback = $callback;
     }
 
-    public function processData(DataItemInterface $item, array &$context): ItemInterface
+    /**
+     * @inheritdoc
+     */
+    public function processData(DataItemInterface $item, array &$context)
     {
         $method = $this->callback;
         return $method($item, $context);

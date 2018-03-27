@@ -11,5 +11,5 @@ namespace Oliverde8\Component\PhpEtl\Item;
  */
 interface ItemInterface
 {
-    public function getMethod(): string;
+    public function getMethod();
 }

@@ -31,7 +31,10 @@ class FileWriterOperation extends AbstractChainOperation implements DataChainOpe
     }
 
 
-    public function processData(DataItemInterface $item, array &$context): ItemInterface
+    /**
+     * @inheritdoc
+     */
+    public function processData(DataItemInterface $item, array &$context)
     {
         $this->writer->write($item->getData());
 

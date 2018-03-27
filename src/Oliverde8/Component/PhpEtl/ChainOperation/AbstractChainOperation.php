@@ -15,7 +15,7 @@ class AbstractChainOperation implements ChainOperationInterface
     /**
      * @inheritdoc
      */
-    public function process(ItemInterface $item, array &$context): ItemInterface
+    public function process(ItemInterface $item, array &$context)
     {
         $method = 'process' . ucfirst($item->getMethod());
 

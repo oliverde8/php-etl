@@ -20,6 +20,7 @@ use Oliverde8\Component\PhpEtl\Item\StopItem;
  */
 class SimpleGroupingOperation extends AbstractChainOperation implements DataChainOperationInterface
 {
+
     public $groupKey = [];
 
     public $groupIdentifierKey = [];
@@ -27,9 +28,10 @@ class SimpleGroupingOperation extends AbstractChainOperation implements DataChai
     public $data = [];
 
     /**
-     * SimpleGrouping constructor.
+     * SimpleGroupingOperation constructor.
      *
-     * @param array $groupKey
+     * @param array $groupKey Key to use for grouping, if array it will be used to read recursively inside the array.
+     * @param array $groupIdentifierKey key to identify each individual data inside the group.
      */
     public function __construct(array $groupKey, array $groupIdentifierKey = [])
     {
@@ -38,7 +40,10 @@ class SimpleGroupingOperation extends AbstractChainOperation implements DataChai
     }
 
 
-    public function processData(DataItemInterface $item, array &$context): ItemInterface
+    /**
+     * @inheritdoc
+     */
+    public function processData(DataItemInterface $item, array &$context)
     {
         $groupingValue = AssociativeArray::getFromKey($item->getData(), $this->groupKey);
 
@@ -53,7 +58,10 @@ class SimpleGroupingOperation extends AbstractChainOperation implements DataChai
         return new ChainBreakItem();
     }
 
-    public function processStop(StopItem $stopItem, array &$context): ItemInterface
+    /**
+     * @inheritdoc
+     */
+    public function processStop(StopItem $stopItem, array &$context)
     {
         if (empty($this->data)) {
             return $stopItem;

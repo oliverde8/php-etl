@@ -1,6 +1,7 @@
 <?php
 
 namespace Oliverde8\Component\PhpEtl\ChainOperation\Transformer;
+
 use Oliverde8\Component\PhpEtl\ChainOperation\AbstractChainOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\DataChainOperationInterface;
 use Oliverde8\Component\PhpEtl\Item\DataItem;
@@ -48,7 +49,7 @@ class RuleTransformOperation extends AbstractChainOperation implements DataChain
      * @throws \Oliverde8\Component\RuleEngine\Exceptions\RuleException
      * @throws \Oliverde8\Component\RuleEngine\Exceptions\UnknownRuleException
      */
-    public function processData(DataItemInterface $item, array &$context): ItemInterface
+    public function processData(DataItemInterface $item, array &$context)
     {
         $data = $item->getData();
         $newData = [];

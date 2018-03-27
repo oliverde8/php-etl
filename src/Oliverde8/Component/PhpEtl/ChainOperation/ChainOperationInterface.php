@@ -12,5 +12,13 @@ use Oliverde8\Component\PhpEtl\Item\ItemInterface;
  */
 interface ChainOperationInterface
 {
-    public function process(ItemInterface $item, array &$context) : ItemInterface;
+    /**
+     * Generic processor for all type of Items.
+     *
+     * @param ItemInterface $item
+     * @param array $context
+     *
+     * @return mixed
+     */
+    public function process(ItemInterface $item, array &$context);
 }

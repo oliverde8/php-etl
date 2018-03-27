@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Oliverde8\Component\PhpEtl\Item;
-
 
 /**
  * Interface GroupedItemInterface
@@ -13,5 +11,10 @@ namespace Oliverde8\Component\PhpEtl\Item;
  */
 interface GroupedItemInterface extends ItemInterface
 {
-    public function getIterator() : \Iterator;
+    /**
+     * Get iterator returning list of grouped data that needs to be processed individually.
+     *
+     * @return mixed
+     */
+    public function getIterator();
 }

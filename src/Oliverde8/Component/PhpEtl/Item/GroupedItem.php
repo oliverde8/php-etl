@@ -24,13 +24,15 @@ class GroupedItem implements GroupedItemInterface
         $this->iterator = $iterator;
     }
 
-
-    public function getIterator(): \Iterator
+    /**
+     * @inheritdoc
+     */
+    public function getIterator()
     {
         return $this->iterator;
     }
 
-    public function getMethod(): string
+    public function getMethod()
     {
         return DataItemInterface::SIGNAL_DATA;
     }

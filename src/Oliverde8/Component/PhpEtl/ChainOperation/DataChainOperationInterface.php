@@ -14,5 +14,13 @@ use Oliverde8\Component\PhpEtl\Item\ItemInterface;
  */
 interface DataChainOperationInterface
 {
-    public function processData(DataItemInterface $item, array &$context) : ItemInterface;
+    /**
+     * Process DataItems.
+     *
+     * @param DataItemInterface $item
+     * @param array $context
+     *
+     * @return ItemInterface
+     */
+    public function processData(DataItemInterface $item, array &$context);
 }
