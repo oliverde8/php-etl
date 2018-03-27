@@ -11,6 +11,7 @@ namespace Oliverde8\Component\PhpEtl\Tests;
 use Oliverde8\Component\PhpEtl\ChainOperation\Grouping\SimpleGroupingOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\CallbackTransformerOperation;
 use Oliverde8\Component\PhpEtl\ChainProcessor;
+use Oliverde8\Component\PhpEtl\Exception\ChainOperationException;
 use Oliverde8\Component\PhpEtl\Item\ChainBreakItem;
 use Oliverde8\Component\PhpEtl\Item\DataItem;
 use Oliverde8\Component\PhpEtl\Item\ItemInterface;
@@ -153,5 +154,21 @@ class ChainProcessorTest extends TestCase
         $this->assertEquals(2, $count2);
         $this->assertEquals(1, $count3);
     }
+
+    public function testException()
+    {
+        $mock1 = new CallbackTransformerOperation(function (ItemInterface $item) use (&$count1) {
+            throw new \Exception('Test exception');
+        });
+
+        try {
+            $chainProcessor = new ChainProcessor(["op1" => $mock1]);
+            $chainProcessor->process(new \ArrayIterator(['test']), ['toto']);
+        } catch (ChainOperationException $exception) {
+            $this->assertEquals('op1', $exception->getChainOperationName());
+            $this->assertContains('1', $exception->getMessage());
+        }
+    }
+
 
 }
