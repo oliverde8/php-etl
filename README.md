@@ -31,7 +31,7 @@ a standard php `\Iterator`.
 Each operation in the ETL Chain will take a `ItemInterface` in input and will need to return 
 the same or another `ItemInterface`. 
 
-### Callback Transformer Operation
+### Transform - Callback Transformer Operation
 
 This allows to have a method that will be called with the data that needs to be transformed.
 
@@ -57,7 +57,7 @@ $operation = new CallbackTransformerOperation(function (DataItemInterface $item,
 ?>
 ```
 
-### Rule Transform Operation
+### Transform - Rule Transform Operation
 
 This allows us to describe simple transformations using a configuration. So let's do the same we did on. 
 
@@ -102,7 +102,7 @@ The third parameter tells us to add the new `uid` field to the existing data, in
 
 [See more in the RuleTransformer docs](docs/RuleEngine.md)
 
-### Simple Grouping operation
+### Transform - Simple Grouping operation
 
 This will allow multiple lines to be combined in one single line.
 
@@ -146,7 +146,35 @@ $item2 = [
 > A operation will always have an Item in entry and output an Item. GroupedItems will 
 > always be split apart automatically.
 
-### File Writer Operation
+### Transform - Chain Split
+
+Chain split allows to redirect the result at a certain step of the chain towars a new chain. 
+
+**Exemple :** The input file we are reading needs to be split into 2 files. 
+Columns A, B, C goes to file1 and columns B, C, D to file 2.
+
+The columns B & C are in common, it is therefore not logical to read the file 2 times and to the transformations 2 times.
+Multiple operations in our chain will transform the data, and prepare columns A, B, C, and D. 
+
+Here we will split the chain, the original chain will receive the 4 columns as if there was no split. The new chain will
+get in input the 4 columns as well. Now both chains can do specific transformations. 
+
+```php
+<?php
+
+// Execute multiple common operations.
+$mainOp['main_1'] = new RuleTransformOperation($ruleApplier, Yaml::parse('transform1.yml'), true);
+$mainOp['main_2'] = new RuleTransformOperation($ruleApplier, Yaml::parse('transform2.yml'), true);
+//....
+
+// Split at this point to get a second result.
+$mainOp['split'] = new ChainSplitOperation([new ChainProcessor([/* List of other operations ... */])]);
+
+// Continue processing data.
+$mainOp['main_2'] = new RuleTransformOperation($ruleApplier, Yaml::parse('transform3.yml'), true);
+```
+
+### Load - File Operation
 
 Can be used to write the data into a file, using the `FileWriterInterface`. 
 
@@ -206,6 +234,13 @@ $operations[] = new RuleTransformOperation($ruleApplier, Yaml::parse('transform2
 $operations[] = new FileWriterOperation(new Writer(__DIR__ . '/exemples/output.csv'));
 
 // We can continue doing other transformations and writing results.
+// ....
+
+
+// Let's process our input file..
+$chainProcessor = new ChainProcessor($operations);
+$context = [];
+$chainProcessor->process($inputIterator, $context);
 ```
 
 ## Creating you own operations. 
@@ -227,18 +262,21 @@ It will trigger the `processStop` method.
 
 If an operation don't have the appropriate method to handle a particular Item, the item will simply skip the Operation.
 
+# FAQ
+
+* **Why isn't there a database extract ?**
+PHP-Etl is a library, not meant to be used standalone, it is meant to be used inside symfony, or magento projects. 
+Each of these framework/cms's have their own way of handling the database. I do plan to make a Symfony bundle at one 
+point which could have doctrine extractor. 
+
+* **Will there be a config system to describe the operations ?**
+I do plan to have one, but it will probably be part of a symfony bundle.
+
 
 # TODO
 
 This was originally done as a pock, but ended up being a nice reusable idea.
 
-* More cleanup & comment
-
-* Add some logs to the ETL & error handling.
-
 * Rule Engine : 
     * Think of a way to have generic dynamic columns, for handling multi locales for example. This might not needed
     as in the ETL it can be handle with a custom operation applying the ruleset for each locale.
-
-* Make a builder to build the `chain` description easily in yaml or so. 
-It might be a better idea to do this in the SF Bundle rather then here. Requires some thinking.

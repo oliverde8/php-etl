@@ -29,7 +29,7 @@ class AbstractCsvFile
     /**
      * Reader constructor.
      *
-     * @param string  $filePath Path to the csv file.
+     * @param string $filePath  Path to the csv file.
      * @param string $delimiter Delimiter to use for the csv file.
      * @param string $enclosure Enclosure to use for the csv file.
      * @param string $escape    Escape to use for the csv file.
