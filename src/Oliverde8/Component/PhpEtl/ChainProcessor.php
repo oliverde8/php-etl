@@ -17,7 +17,7 @@ use Oliverde8\Component\PhpEtl\Item\StopItem;
  * @copyright 2018 Oliverde8
  * @package Oliverde8\Component\PhpEtl
  */
-class ChainProcessor
+class ChainProcessor implements ChainProcessorInterface
 {
     /** @var ChainOperationInterface[] */
     protected $chainLinks = [];

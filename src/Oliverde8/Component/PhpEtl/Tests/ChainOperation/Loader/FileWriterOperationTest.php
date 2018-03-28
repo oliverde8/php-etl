@@ -10,13 +10,12 @@ namespace Oliverde8\Component\PhpEtl\Tests\ChainOperation\Loader;
 
 use Oliverde8\Component\PhpEtl\ChainOperation\Loader\FileWriterOperation;
 use Oliverde8\Component\PhpEtl\Item\DataItem;
-use Oliverde8\Component\PhpEtl\Model\File\FileWriterInterface;
-use PHPUnit\Framework\MockObject\MockObject;
+use Oliverde8\Component\PhpEtl\Load\File\FileWriterInterface;
 use PHPUnit\Framework\TestCase;
 
 class FileWriterOperationTest extends TestCase
 {
-    /** @var MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $writerMock;
 
     /** @var FileWriterOperation */
