@@ -1,8 +1,8 @@
 <?php
 
-namespace Oliverde8\Component\PhpEtl\Loader\File;
+namespace Oliverde8\Component\PhpEtl\Extract\File;
 
-use Oliverde8\Component\PhpEtl\Model\File\AbstractFile;
+use Oliverde8\Component\PhpEtl\Model\File\AbstractCsvFile;
 
 /**
  * Class Csv
@@ -11,7 +11,7 @@ use Oliverde8\Component\PhpEtl\Model\File\AbstractFile;
  * @copyright 2018 Oliverde8
  * @package Oliverde8\Component\PhpEtl\Loader\File
  */
-class Csv extends AbstractFile implements \Iterator
+class Csv extends AbstractCsvFile implements \Iterator
 {
     /** @var string[] Current line */
     protected $current;

@@ -5,8 +5,7 @@ namespace Oliverde8\Component\PhpEtl\ChainOperation\Loader;
 use Oliverde8\Component\PhpEtl\ChainOperation\AbstractChainOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\DataChainOperationInterface;
 use Oliverde8\Component\PhpEtl\Item\DataItemInterface;
-use Oliverde8\Component\PhpEtl\Item\ItemInterface;
-use Oliverde8\Component\PhpEtl\Model\File\FileWriterInterface;
+use Oliverde8\Component\PhpEtl\Load\File\FileWriterInterface;
 
 /**
  * Class FileWriter

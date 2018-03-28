@@ -91,7 +91,7 @@ class ChainProcessor
      * @return mixed|ItemInterface|StopItem
      * @throws ChainOperationException
      */
-    protected function processItem(ItemInterface $item, $startAt, &$context)
+    public function processItem(ItemInterface $item, $startAt, &$context)
     {
         for ($chainNumber = $startAt; $chainNumber < count($this->chainLinks); $chainNumber++) {
             $item = $this->processItemWithOperation($item, $chainNumber, $context);

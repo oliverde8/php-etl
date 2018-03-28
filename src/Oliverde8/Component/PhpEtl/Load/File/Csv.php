@@ -1,9 +1,8 @@
 <?php
 
-namespace Oliverde8\Component\PhpEtl\Model\File\Csv;
+namespace Oliverde8\Component\PhpEtl\Load\File;
 
-use Oliverde8\Component\PhpEtl\Model\File\AbstractFile;
-use Oliverde8\Component\PhpEtl\Model\File\FileWriterInterface;
+use Oliverde8\Component\PhpEtl\Model\File\AbstractCsvFile;
 
 /**
  * Class Writer
@@ -12,7 +11,7 @@ use Oliverde8\Component\PhpEtl\Model\File\FileWriterInterface;
  * @copyright 2018 Oliverde8
  * @package Oliverde8\Component\PhpEtl\Model\File\Csv
  */
-class Writer extends AbstractFile implements FileWriterInterface
+class Csv extends AbstractCsvFile implements FileWriterInterface
 {
     /** @var bool */
     protected $hasHeader;

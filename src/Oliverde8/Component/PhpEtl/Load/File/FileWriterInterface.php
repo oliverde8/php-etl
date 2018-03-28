@@ -1,6 +1,6 @@
 <?php
 
-namespace Oliverde8\Component\PhpEtl\Model\File;
+namespace Oliverde8\Component\PhpEtl\Load\File;
 
 /**
  * Class FileWriterInterface
