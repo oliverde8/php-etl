@@ -20,18 +20,24 @@ use Oliverde8\Component\PhpEtl\Item\StopItem;
  */
 class SimpleGroupingOperation extends AbstractChainOperation implements DataChainOperationInterface
 {
+    /** @var string[] Key to use for grouping, if array it will be used to read recursively inside the array.  */
+    protected $groupKey = [];
 
-    public $groupKey = [];
+    /** @var string[] Key to identify each individual data inside the group. */
+    protected $groupIdentifierKey = [];
 
-    public $groupIdentifierKey = [];
-
-    public $data = [];
+    /**
+     * Grouped data kept in memory.
+     *
+     * @var array
+     */
+    protected $data = [];
 
     /**
      * SimpleGroupingOperation constructor.
      *
-     * @param array $groupKey Key to use for grouping, if array it will be used to read recursively inside the array.
-     * @param array $groupIdentifierKey key to identify each individual data inside the group.
+     * @param string[] $groupKey Key to use for grouping, if array it will be used to read recursively inside the array.
+     * @param string[] $groupIdentifierKey key to identify each individual data inside the group.
      */
     public function __construct(array $groupKey, array $groupIdentifierKey = [])
     {
