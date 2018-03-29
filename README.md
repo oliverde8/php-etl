@@ -90,6 +90,14 @@ rules:
             with: "_"
 ```
 
+We can have nested columns using `/` in the key : 
+
+```yaml
+rules:
+    label/fr_FR:
+        - [{get : {field: ['fr_FR', 'label']}]
+```
+
 We can now create our operation. 
 
 ```php

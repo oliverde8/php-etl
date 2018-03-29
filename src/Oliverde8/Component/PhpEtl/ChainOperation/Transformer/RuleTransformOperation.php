@@ -2,6 +2,7 @@
 
 namespace Oliverde8\Component\PhpEtl\ChainOperation\Transformer;
 
+use oliverde8\AssociativeArraySimplified\AssociativeArray;
 use Oliverde8\Component\PhpEtl\ChainOperation\AbstractChainOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\DataChainOperationInterface;
 use Oliverde8\Component\PhpEtl\Item\DataItem;
@@ -60,7 +61,7 @@ class RuleTransformOperation extends AbstractChainOperation implements DataChain
         }
 
         foreach ($this->rules as $column => $rule) {
-            $newData[$column] = $this->ruleApplier->apply($data, $newData, $rule['rules'], []);
+            AssociativeArray::setFromKey($newData, $column, $this->ruleApplier->apply($data, $newData, $rule['rules'], []));
         }
 
         return new DataItem($newData);
