@@ -18,7 +18,16 @@ class Get extends AbstractRule
      */
     public function apply($rowData, &$transformedData, $options = [])
     {
-        return AssociativeArray::getFromKey($rowData, $options['field']);
+        if (!is_array($options['field'])) {
+            $options['field'] = [$options['field']];
+        }
+
+        $fields = [];
+        foreach ($options['field'] as $field) {
+            $fields[] = AssociativeArray::getFromKey($rowData, '@column.' . $field, $field, '.');
+        }
+
+        return AssociativeArray::getFromKey($rowData, $fields);
     }
 
     /**
