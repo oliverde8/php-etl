@@ -35,7 +35,7 @@ class Implode extends AbstractRule
             }
         }
 
-        return implode($options['with'], array_unique($data));
+        return implode($options['with'], $data);
     }
 
     /**
