@@ -1,86 +1,64 @@
-#Rule Engine - Data Transformation
+# Rule Engine - Data Transformation
  
 Is a mini transformation engine that transform an associative array into another associative array 
 using various sets of rules.
- 
-## Example usage :
 
-Let's consider the fallowing data : 
-```php
-<?php
-$data = [
-    'country' => 'Fr',
-    'locale' => 'fr',
-    'identifier' => 'myID',
-    'name' => 'Label of product'  
-];
-```
+It is meant to be used in the ETL, with the RuleTransformOperation.
 
-and we would like to import it in akeneo, we therefore need the end data to look like this :
-```php
-<?php
-$finalData = [
-    'sku' => 'myID',
-    'name-fr_FR' => 'Label of product',
-    'name-en_US' => ''
-];
-```
+## List of available rules
 
-This is a edge case but the transformer can still handle it. 
+### Condition (condition)
 
-```yaml
-# We will need to generate this column even if we don't use it.
-locale:
-    rules:
-        - implode:
-            values:
-              - [{str_lower: {value: [{get : {field: "locale"}}]}}]
-              - [{str_upper: {value: [{get : {field: "country"}}]}}]
-            with: "_"
+As it names indicates it allows to add conditioning. 
 
-sku: 
-    rules:
-        - strtolower: 
-            value: [{value_getter : {field: "identifier"}}]  
+| param name     |     type    | description |
+|----------------|-------------|-------------|
+|**if**          | rule        | Value to be compared |
+|**value**       | rule        | Value to be compared with |
+|**operation**   | rule        | Operation for the comparaison.  Supported operations are (eq, neq, in) |
+|**then**        | rule        | Value to send back when the condition is true |
+|**else**        | rule        | Value to send back when the condition is false |
 
-name-fr_FR:
-    rules:
-        - condition:
-          if: [{get: {field: locale}}]
-          value: fr_FR
-          then:  [{get : {field: "name"}}]
-          else: ""
-          
-name-en_US:
-  rules:
-      - condition:
-        if: [{get: {field: locale}}]
-        value: "en_US"
-        then:  [{get : {field: "name"}}]
-        else: ""    
-```
+### Value fetcher (get)
 
->Let's note that the `value` of conditions should be a rule, but if the rule engine receives a string it considers it's a 
-constant. 
+Fetch data from the input.
 
-> Also, let's note that rules takes an array, of rules. Basially it will iterate over each rule until a not empty 
-response is returned.
+| param name     |     type    | description |
+|----------------|-------------|-------------|
+|**field**       | string        | The name of the field to fetch the data from |
 
-We can now put it all together. 
+### Implode (implode)
 
-```php
-<?php
+As it names indicates it allows to imlode an array into a string
 
-$rules = [
-    new Oliverde8\Component\RuleEngine\Rules\Condition(new \Psr\Log\NullLogger()),
-    new Oliverde8\Component\RuleEngine\Rules\Implode(new \Psr\Log\NullLogger()),
-    new Oliverde8\Component\RuleEngine\Rules\StrToLower(new \Psr\Log\NullLogger()),
-    new Oliverde8\Component\RuleEngine\Rules\Get(new \Psr\Log\NullLogger()),
-];
+| param name     |     type    | description |
+|----------------|-------------|-------------|
+|**value**       | rule        | the value that will be imploded, fetched using rule |
+|**with**        | string      | Glue to use |
 
-$columns = \Symfony\Component\Yaml\Yaml::parse('my-rules.yml');
+### String To Lower (str_lower)
 
-$ruleApplier = new Oliverde8\Component\RuleEngine\RuleApplier(new \Psr\Log\NullLogger(), $rules, true);
+Allow to lower case a string.
 
-$finalData = $ruleApplier->apply($data, ['id' => 'myCustomId']);
-``` 
+| param name     |     type    | description |
+|----------------|-------------|-------------|
+|**value**       | rule        | Value to lowercased fetched using rules. |
+
+
+### String To Upper (str_upper)
+
+Allow to upper case a string.
+
+| param name     |     type    | description |
+|----------------|-------------|-------------|
+|**value**       | rule        | Value to upercase fetched using rules. |
+
+
+### Constant (constant)
+
+Have a constant value
+
+| param name     |     type    | description |
+|----------------|-------------|-------------|
+|**value**       | mixed       | Constant value to be returned |
+

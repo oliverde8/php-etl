@@ -98,7 +98,32 @@ rules:
         - [{get : {field: ['fr_FR', 'label']}]
 ```
 
-We can now create our operation. 
+We can also have dynamic columns. 
+
+```yaml
+rules:
+    label-{@context/locales}:
+        - [{get : {field: ['@context/locales', 'label']}]
+```
+
+Basically a column will be generated for each `locale` in the context.
+
+So if we have `[fr_FR, 'en_GB]` in our context, it will do the equivalent of the fallowing code.
+```php
+<?php
+$result['label-fr_FR'] = $data['fr_FR']['label'];
+$result['label-en_GB'] = $data['en_GB']['label'];
+```
+
+We can have multiple variables in our dynamic columns.
+
+```yaml
+rules:
+    label-{@context/scopes}/{@context/locales}:
+        - [{get : {field: ['@context/locales', 'label']}]
+```
+
+To use these rules in our ETL chain we will need to create our RuleTransformationOperation : 
 
 ```php
 <?php
@@ -283,8 +308,8 @@ I do plan to have one, but it will probably be part of a symfony bundle.
 
 # TODO
 
-This was originally done as a pock, but ended up being a nice reusable idea.
-
-* Rule Engine : 
-    * Think of a way to have generic dynamic columns, for handling multi locales for example. This might not needed
-    as in the ETL it can be handle with a custom operation applying the ruleset for each locale.
+* Create a few more generic rules. 
+    * Data formatting 
+    * Numeric formatter
+    * ...
+* The Condition rules has very few operations.

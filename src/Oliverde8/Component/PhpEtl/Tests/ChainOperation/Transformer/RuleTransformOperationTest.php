@@ -61,4 +61,64 @@ class RuleTransformOperationTest extends TestCase
 
         $this->assertEquals(['test1' => 1, 'test2' => 1, 'test3' => 1], $data->getData());
     }
+
+    public function testDynamicColumn()
+    {
+        $this->ruleApplierMock->expects($this->exactly(2))->method('apply')->willReturn(1);
+
+
+        $context = ['locales' => ['fr_FR', 'en_GB']];
+        $transform = new RuleTransformOperation(
+            $this->ruleApplierMock,
+            ['test1-{@context/locales}' => ['rules' => '']],
+            false
+        );
+
+        $data = new DataItem(['test' => 'test']);
+        $data = $transform->process($data,$context);
+
+        $this->assertEquals(['test1-fr_FR' => 1, 'test1-en_GB' => 1], $data->getData());
+    }
+
+    public function testMultipleDynamic()
+    {
+        $this->ruleApplierMock->expects($this->exactly(4))->method('apply')->willReturn(1);
+
+
+        $context = ['locales' => ['fr_FR', 'en_GB'], 'scopes' => ['master', 'mobile']];
+        $transform = new RuleTransformOperation(
+            $this->ruleApplierMock,
+            ['test1-{@context/scopes}-{@context/locales}' => ['rules' => '']],
+            false
+        );
+
+        $data = new DataItem(['test' => 'test']);
+        $data = $transform->process($data,$context);
+
+        $this->assertEquals(
+            ['test1-master-fr_FR' => 1, 'test1-master-en_GB' => 1, 'test1-mobile-fr_FR' => 1, 'test1-mobile-en_GB' => 1],
+            $data->getData()
+        );
+    }
+
+    public function testSimpleDynamic()
+    {
+        $this->ruleApplierMock->expects($this->exactly(1))->method('apply')->willReturn(1);
+
+
+        $context = ['locales' => 'fr_FR'];
+        $transform = new RuleTransformOperation(
+            $this->ruleApplierMock,
+            ['test1-{@context/locales}' => ['rules' => '']],
+            false
+        );
+
+        $data = new DataItem(['test' => 'test']);
+        $data = $transform->process($data,$context);
+
+        $this->assertEquals(
+            ['test1-fr_FR' => 1],
+            $data->getData()
+        );
+    }
 }
