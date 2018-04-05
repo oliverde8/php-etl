@@ -3,6 +3,11 @@
 namespace Oliverde8\Component\PhpEtl\Builder\Factories;
 
 use Oliverde8\Component\PhpEtl\ChainOperation\ChainOperationInterface;
+use Oliverde8\Component\PhpEtl\Exception\ChainBuilderValidationException;
+use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Validation;
+
 
 /**
  * Class AbstractFactory
@@ -38,10 +43,11 @@ abstract class AbstractFactory
      * @param array $options
      *
      * @return ChainOperationInterface
+     * @throws ChainBuilderValidationException
      */
     public function getOperation($operation, $options)
     {
-        $this->validateOptions($this, $options);
+        $this->validateOptions($operation, $options);
         return $this->build($operation, $options);
     }
 
@@ -53,7 +59,17 @@ abstract class AbstractFactory
      *
      * @return ChainOperationInterface
      */
-    abstract protected function build($type, $options);
+    abstract protected function build($operation, $options);
+
+    /**
+     * Configure validation.
+     *
+     * @return Constraint
+     */
+    protected function configureValidator()
+    {
+        return new Assert\Collection([]);
+    }
 
     /**
      * Create the operation object.
@@ -71,12 +87,18 @@ abstract class AbstractFactory
     /**
      * Validate the options.
      *
-     * @param $operation
      * @param $options
+     * @throws ChainBuilderValidationException
      */
     protected function validateOptions($operation, $options)
     {
-        // Does nothing for not. TODO validation.
+        $constraints = $this->configureValidator();
+        $violations = Validation::createValidator()->validate($options, $constraints);
+
+        if ($violations->count() != 0) {
+            throw new ChainBuilderValidationException($operation, $violations);
+        }
+
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace Oliverde8\Component\PhpEtl\Builder\Factories\Grouping;
 
 use Oliverde8\Component\PhpEtl\Builder\Factories\AbstractFactory;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Class SimpleGroupingFactory
@@ -20,4 +21,16 @@ class SimpleGroupingFactory extends AbstractFactory
     {
         return $this->create($options['grouping-key'], $options['group-identifier']);
     }
+
+    /**
+     * @inheritdoc
+     */
+    protected function configureValidator()
+    {
+        return new Assert\Collection([
+             'grouping-key' => new Assert\NotBlank(),
+             'group-identifier' => new Assert\Optional()
+         ]);
+    }
+
 }

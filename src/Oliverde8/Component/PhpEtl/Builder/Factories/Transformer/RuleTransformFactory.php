@@ -4,6 +4,7 @@ namespace Oliverde8\Component\PhpEtl\Builder\Factories\Transformer;
 
 use Oliverde8\Component\PhpEtl\Builder\Factories\AbstractFactory;
 use Oliverde8\Component\RuleEngine\RuleApplier;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Class RuleTransformFactory
@@ -27,10 +28,8 @@ class RuleTransformFactory extends AbstractFactory
     public function __construct($operation, $class, RuleApplier $ruleApplier)
     {
         parent::__construct($operation, $class);
-
         $this->ruleApplier = $ruleApplier;
     }
-
 
     /**
      * @inheritdoc
@@ -38,5 +37,19 @@ class RuleTransformFactory extends AbstractFactory
     public function build($operation, $options)
     {
         return $this->create($this->ruleApplier, $options['columns'], $options['add']);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function configureValidator()
+    {
+        return new Assert\Collection([
+            'columns' => [
+                new Assert\Type(["type" => "array"]),
+                new Assert\NotBlank(),
+            ],
+            'add' => new Assert\Type(["type" => "boolean"])
+        ]);
     }
 }

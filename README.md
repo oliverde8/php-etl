@@ -309,7 +309,6 @@ It's currently in progress. You will be able to describe the whole ETL chain in 
 
 * ChainBuilder
     * Finaliza and add documentation on usage.
-    * Have option validation to validate the yml file.
     
 * Create a few more generic rules. 
     * Data formatting 
