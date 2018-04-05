@@ -303,13 +303,17 @@ Each of these framework/cms's have their own way of handling the database. I do 
 point which could have doctrine extractor. 
 
 * **Will there be a config system to describe the operations ?**
-I do plan to have one, but it will probably be part of a symfony bundle.
-
+It's currently in progress. You will be able to describe the whole ETL chain in yml files.
 
 # TODO
 
+* ChainBuilder
+    * Finaliza and add documentation on usage.
+    * Have option validation to validate the yml file.
+    
 * Create a few more generic rules. 
     * Data formatting 
     * Numeric formatter
     * ...
+    
 * The Condition rules has very few operations.
