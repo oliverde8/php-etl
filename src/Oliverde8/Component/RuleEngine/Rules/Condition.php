@@ -11,6 +11,7 @@ use Oliverde8\Component\RuleEngine\Exceptions\RuleException;
  * @author    de Cramer Oliver<oiverde8@gmail.com>
  * @copyright 2018 Oliverde8
  * @package Oliverde8\Component\RuleEngine\Rules
+ * @deprecated ExpressionLanguage can do equivalent better.
  */
 class Condition extends AbstractRule
 {

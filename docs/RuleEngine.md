@@ -7,17 +7,15 @@ It is meant to be used in the ETL, with the RuleTransformOperation.
 
 ## List of available rules
 
-### Condition (condition)
+### Expression Langauge (expression_language)
 
-As it names indicates it allows to add conditioning. 
+Uses the [Symfony expression langauge](https://symfony.com/doc/3.4/components/expression_language/syntax.html) to 
+generate values.
 
 | param name     |     type    | description |
 |----------------|-------------|-------------|
-|**if**          | rule        | Value to be compared |
-|**value**       | rule        | Value to be compared with |
-|**operation**   | rule        | Operation for the comparaison.  Supported operations are (eq, neq, in) |
-|**then**        | rule        | Value to send back when the condition is true |
-|**else**        | rule        | Value to send back when the condition is false |
+|**expression**  | string      | The sf expression. RawData is available in the `rowData` variable |
+|**values**      | array       | Can be empty, if not empty adds more variables to be used in the expression |
 
 ### Value fetcher (get)
 
@@ -62,3 +60,19 @@ Have a constant value
 |----------------|-------------|-------------|
 |**value**       | mixed       | Constant value to be returned |
 
+
+## Deprecated Rules : 
+
+### Condition (condition)
+
+**Deprecated : expression_language can do equivalent and better**
+
+As it names indicates it allows to add conditioning. 
+
+| param name     |     type    | description |
+|----------------|-------------|-------------|
+|**if**          | rule        | Value to be compared |
+|**value**       | rule        | Value to be compared with |
+|**operation**   | rule        | Operation for the comparaison.  Supported operations are (eq, neq, in) |
+|**then**        | rule        | Value to send back when the condition is true |
+|**else**        | rule        | Value to send back when the condition is false |
