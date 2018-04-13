@@ -7,6 +7,7 @@
         "php": ">=5.6.0",
         "oliverde8/associative-array-simplified": "^1.0",
         "psr/log": "^1.0",
+        "symfony/expression-language": "^3.4",
         "symfony/validator": "2.7.*",
         "symfony/yaml": "^3.0"
     },

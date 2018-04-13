@@ -43,6 +43,7 @@ $ruleApplier = new \Oliverde8\Component\RuleEngine\RuleApplier(
         new \Oliverde8\Component\RuleEngine\Rules\Implode(new \Psr\Log\NullLogger()),
         new \Oliverde8\Component\RuleEngine\Rules\StrToLower(new \Psr\Log\NullLogger()),
         new \Oliverde8\Component\RuleEngine\Rules\StrToUpper(new \Psr\Log\NullLogger()),
+        new \Oliverde8\Component\RuleEngine\Rules\ExpressionLanguage(new \Psr\Log\NullLogger()),
     ]
 );
 
@@ -52,7 +53,6 @@ $builder->registerFactory(new RuleTransformFactory('rule-engine-transformer', Ru
 $builder->registerFactory(new SimpleGroupingFactory('simple-grouping', SimpleGroupingOperation::class));
 $builder->registerFactory(new CsvFileWriterFactory('csv-write', FileWriterOperation::class));
 ```
-
 
 ### Coding a ETL Chain
 
@@ -70,6 +70,14 @@ rules:
               - [{get : {field: 'ID_PART1'}}]
               - [{get : {field: "ID_PART2"}}]
             with: "_"
+```
+
+> You can also use the symfony expression language to write a similar rule. (This wont behave the same way if one if the fields are empty)
+> ```php
+rules:
+    uid:
+        - expression_language:
+            expression: '"PREFIX_"~rowData["ID_PART1"]~"_"~rowData["ID_PART2"]'
 ```
 
 And now the second one to finalize the data.
@@ -216,6 +224,4 @@ There was an error building the operation 'simple-grouping' :
     * Numeric formatter
     * ...
     
-* The Condition rules has very few operations.
-
 * Improve docs.
