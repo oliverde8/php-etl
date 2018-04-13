@@ -3,6 +3,8 @@
 namespace Oliverde8\Component\PhpEtl;
 
 use Oliverde8\Component\PhpEtl\Builder\Factories\AbstractFactory;
+use Oliverde8\Component\PhpEtl\ChainOperation\ChainOperationInterface;
+use Oliverde8\Component\PhpEtl\Exception\UnknownOperationException;
 
 /**
  * Class ChainBuilder
@@ -27,9 +29,13 @@ class ChainBuilder
     }
 
     /**
+     * Get chain processor from configs.
+     *
      * @param $configs
      *
-     * @return ChainProcessorInterface
+     * @return ChainProcessor
+     * @throws Exception\ChainBuilderValidationException
+     * @throws UnknownOperationException
      */
     public function buildChainProcessor($configs)
     {
@@ -42,9 +48,14 @@ class ChainBuilder
     }
 
     /**
+     * Get chain operation instance from config.
+     *
      * @param $config
      *
-     * @return null|ChainOperation\ChainOperationInterface
+     * @return ChainOperationInterface
+     *
+     * @throws Exception\ChainBuilderValidationException
+     * @throws UnknownOperationException
      */
     protected function getOperationFromConfig($config)
     {
@@ -54,7 +65,6 @@ class ChainBuilder
             }
         }
 
-        // TODO handle as error.
-        return null;
+       throw new UnknownOperationException("No compatible factories were found for operation '{$config['operation']}'");
     }
 }
