@@ -13,8 +13,9 @@ use Oliverde8\Component\PhpEtl\ChainProcessor;
 use Oliverde8\Component\PhpEtl\ChainProcessorInterface;
 use Oliverde8\Component\PhpEtl\Item\DataItem;
 use Oliverde8\Component\PhpEtl\Item\StopItem;
+use PHPUnit\Framework\TestCase;
 
-class ChainSplitOperationTest extends \PHPUnit_Framework_TestCase
+class ChainSplitOperationTest extends TestCase
 {
     public function testDataProcessing()
     {
