@@ -12,8 +12,9 @@ namespace Oliverde8\Component\PhpEtl\Tests\Item;
 use Oliverde8\Component\PhpEtl\Item\ChainBreakItem;
 use Oliverde8\Component\PhpEtl\Item\DataItemInterface;
 use Oliverde8\Component\PhpEtl\Item\GroupedItem;
+use PHPUnit\Framework\TestCase;
 
-class GetMethodTest extends \PHPUnit_Framework_TestCase
+class GetMethodTest extends TestCase
 {
 
     public function testGroupedItem()
