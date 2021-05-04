@@ -4,7 +4,7 @@
     "license": "MIT",
     "description": "A small etl coded in php, to extract/transform/load Edit with ease.",
     "require": {
-        "php": ">=7.1.0",
+        "php": ">=7.3.0",
         "oliverde8/associative-array-simplified": "^1.0",
         "psr/log": "^1.0",
         "symfony/expression-language": "^3.4|^4.3",
@@ -12,12 +12,9 @@
         "symfony/yaml": "^3.0|^4.3"
     },
     "require-dev": {
-        "phpunit/phpunit": "^5.7"
+        "phpunit/phpunit": "9.*"
     },
     "config": {
-        "platform": {
-            "php": "7.2.0"
-        },
         "preferred-install": {
             "*": "dist"
         },
