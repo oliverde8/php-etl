@@ -19,7 +19,7 @@ class RuleTransformOperationTest extends TestCase
     /** @var MockObject */
     protected $ruleApplierMock;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

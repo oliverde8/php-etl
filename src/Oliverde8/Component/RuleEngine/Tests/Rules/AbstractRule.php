@@ -19,7 +19,7 @@ abstract class AbstractRule extends TestCase
     /** @var RuleInterface */
     protected $rule;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

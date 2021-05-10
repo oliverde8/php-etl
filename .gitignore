@@ -2,3 +2,4 @@
 exemples
 vendor
 build
+./composer.lock

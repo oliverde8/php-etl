@@ -19,7 +19,7 @@ class ConditionTest extends AbstractRule
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $mockRuleApplier;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->mockRuleApplier = new TestRuleApplier(new NullLogger(), [], false);
 

@@ -166,7 +166,7 @@ class ChainProcessorTest extends TestCase
             $chainProcessor->process(new \ArrayIterator(['test']), ['toto']);
         } catch (ChainOperationException $exception) {
             $this->assertEquals('op1', $exception->getChainOperationName());
-            $this->assertContains('1', $exception->getMessage());
+            $this->assertStringContainsString('1', $exception->getMessage());
         }
     }
 
