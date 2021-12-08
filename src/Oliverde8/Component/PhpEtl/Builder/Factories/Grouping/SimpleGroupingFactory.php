@@ -1,8 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Oliverde8\Component\PhpEtl\Builder\Factories\Grouping;
 
 use Oliverde8\Component\PhpEtl\Builder\Factories\AbstractFactory;
+use Oliverde8\Component\PhpEtl\ChainOperation\ChainOperationInterface;
+use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -17,7 +21,7 @@ class SimpleGroupingFactory extends AbstractFactory
     /**
      * @inheritdoc
      */
-    public function build($operation, $options)
+    public function build(string $operation, array $options): ChainOperationInterface
     {
         return $this->create($options['grouping-key'], $options['group-identifier']);
     }
@@ -25,12 +29,11 @@ class SimpleGroupingFactory extends AbstractFactory
     /**
      * @inheritdoc
      */
-    protected function configureValidator()
+    protected function configureValidator(): Constraint
     {
         return new Assert\Collection([
              'grouping-key' => new Assert\NotBlank(),
              'group-identifier' => new Assert\Optional()
          ]);
     }
-
 }

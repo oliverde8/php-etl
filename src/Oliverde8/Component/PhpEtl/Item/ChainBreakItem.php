@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Oliverde8\Component\PhpEtl\Item;
 
 /**
@@ -12,7 +14,7 @@ namespace Oliverde8\Component\PhpEtl\Item;
 class ChainBreakItem implements ItemInterface
 {
 
-    public function getMethod()
+    public function getMethod(): string
     {
         return 'chainBreak';
     }

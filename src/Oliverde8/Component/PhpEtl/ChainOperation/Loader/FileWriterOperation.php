@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Oliverde8\Component\PhpEtl\ChainOperation\Loader;
 
 use Oliverde8\Component\PhpEtl\ChainOperation\AbstractChainOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\DataChainOperationInterface;
 use Oliverde8\Component\PhpEtl\Item\DataItemInterface;
 use Oliverde8\Component\PhpEtl\Load\File\FileWriterInterface;
+use Oliverde8\Component\PhpEtl\Model\ExecutionContext;
 
 /**
  * Class FileWriter
@@ -33,7 +36,7 @@ class FileWriterOperation extends AbstractChainOperation implements DataChainOpe
     /**
      * @inheritdoc
      */
-    public function processData(DataItemInterface $item, array &$context)
+    public function processData(DataItemInterface $item, ExecutionContext $context): DataItemInterface
     {
         $this->writer->write($item->getData());
 

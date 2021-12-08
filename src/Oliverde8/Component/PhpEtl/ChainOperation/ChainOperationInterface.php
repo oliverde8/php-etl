@@ -1,7 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Oliverde8\Component\PhpEtl\ChainOperation;
+
 use Oliverde8\Component\PhpEtl\Item\ItemInterface;
+use Oliverde8\Component\PhpEtl\Model\ExecutionContext;
 
 /**
  * Class ChainLinkInterface
@@ -18,7 +22,7 @@ interface ChainOperationInterface
      * @param ItemInterface $item
      * @param array $context
      *
-     * @return mixed
+     * @return ItemInterface
      */
-    public function process(ItemInterface $item, array &$context);
+    public function process(ItemInterface $item, ExecutionContext $context);
 }

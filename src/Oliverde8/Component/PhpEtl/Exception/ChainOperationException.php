@@ -1,6 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Oliverde8\Component\PhpEtl\Exception;
+
 use Throwable;
 
 /**
@@ -13,27 +16,19 @@ use Throwable;
 class ChainOperationException extends \Exception
 {
     /** @var string */
-    protected $chainOperationName;
+    protected string $chainOperationName;
 
     /**
      * ChainOperationException constructor.
-     *
-     * @param string $message
-     * @param int $code
-     * @param Throwable|null $previous
-     * @param string $chainOperationName
      */
-    public function __construct($message = "", $code = 0, \Exception $previous = null, $chainOperationName = '')
+    public function __construct(string $message = "", int $code = 0, \Exception $previous = null, string $chainOperationName = '')
     {
         $this->chainOperationName = $chainOperationName;
 
         parent::__construct($message, $code, $previous);
     }
 
-    /**
-     * @return string
-     */
-    public function getChainOperationName()
+    public function getChainOperationName(): string
     {
         return $this->chainOperationName;
     }

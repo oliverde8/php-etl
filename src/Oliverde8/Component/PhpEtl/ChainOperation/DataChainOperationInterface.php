@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Oliverde8\Component\PhpEtl\ChainOperation;
 
 use Oliverde8\Component\PhpEtl\Item\DataItemInterface;
 use Oliverde8\Component\PhpEtl\Item\ItemInterface;
+use Oliverde8\Component\PhpEtl\Model\ExecutionContext;
 
 /**
  * Class DataChainOperationInterface
@@ -18,9 +21,9 @@ interface DataChainOperationInterface
      * Process DataItems.
      *
      * @param DataItemInterface $item
-     * @param array $context
+     * @param ExecutionContext $context
      *
      * @return ItemInterface
      */
-    public function processData(DataItemInterface $item, array &$context);
+    public function processData(DataItemInterface $item, ExecutionContext $context);
 }

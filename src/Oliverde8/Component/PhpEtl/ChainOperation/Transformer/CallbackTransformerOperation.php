@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Oliverde8\Component\PhpEtl\ChainOperation\Transformer;
 
 use Oliverde8\Component\PhpEtl\ChainOperation\AbstractChainOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\DataChainOperationInterface;
 use Oliverde8\Component\PhpEtl\Item\DataItemInterface;
 use Oliverde8\Component\PhpEtl\Item\ItemInterface;
+use Oliverde8\Component\PhpEtl\Model\ExecutionContext;
 
 /**
  * Class CallbackTransformerOperation
@@ -31,7 +34,7 @@ class CallbackTransformerOperation extends AbstractChainOperation implements Dat
     /**
      * @inheritdoc
      */
-    public function processData(DataItemInterface $item, array &$context)
+    public function processData(DataItemInterface $item, ExecutionContext $context): ItemInterface
     {
         $method = $this->callback;
         return $method($item, $context);

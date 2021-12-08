@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Oliverde8\Component\PhpEtl\Builder\Factories;
 
 use Oliverde8\Component\PhpEtl\ChainOperation\ChainOperationInterface;
@@ -7,7 +9,6 @@ use Oliverde8\Component\PhpEtl\Exception\ChainBuilderValidationException;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Validation;
-
 
 /**
  * Class AbstractFactory
@@ -30,7 +31,7 @@ abstract class AbstractFactory
      * @param string $operation
      * @param string $class
      */
-    public function __construct($operation, $class)
+    public function __construct(string $operation, string $class)
     {
         $this->operation = $operation;
         $this->class = $class;
@@ -39,13 +40,13 @@ abstract class AbstractFactory
     /**
      * Validate and Build an operation of a certain type with the options.
      *
-     * @param String $operation
+     * @param string $operation
      * @param array $options
      *
      * @return ChainOperationInterface
      * @throws ChainBuilderValidationException
      */
-    public function getOperation($operation, $options)
+    public function getOperation(string $operation, array $options): ChainOperationInterface
     {
         $this->validateOptions($operation, $options);
         return $this->build($operation, $options);
@@ -59,26 +60,23 @@ abstract class AbstractFactory
      *
      * @return ChainOperationInterface
      */
-    abstract protected function build($operation, $options);
+    abstract protected function build(string $operation, array $options): ChainOperationInterface;
 
     /**
      * Configure validation.
      *
      * @return Constraint
      */
-    protected function configureValidator()
+    protected function configureValidator(): Constraint
     {
         return new Assert\Collection([]);
     }
 
     /**
-     * Create the operation object.
-     *
-     * @param array ...$arguments
-     *
+     * @param mixed ...$arguments
      * @return ChainOperationInterface
      */
-    protected function create(...$arguments)
+    protected function create(...$arguments): ChainOperationInterface
     {
         $class = $this->class;
         return new $class(...$arguments);
@@ -87,29 +85,29 @@ abstract class AbstractFactory
     /**
      * Validate the options.
      *
-     * @param $options
+     * @param string $operation
+     * @param array $options
      * @throws ChainBuilderValidationException
      */
-    protected function validateOptions($operation, $options)
+    protected function validateOptions(string $operation, array $options): void
     {
         $constraints = $this->configureValidator();
         $violations = Validation::createValidator()->validate($options, $constraints);
 
         if ($violations->count() != 0) {
-            throw new ChainBuilderValidationException($operation, $violations);
+            throw new ChainBuilderValidationException($operation, iterator_to_array($violations));
         }
-
     }
 
     /**
      * Check if the factory supports this operation declaration.
      *
-     * @param $operation
-     * @param $options
+     * @param string $operation
+     * @param array $options
      *
      * @return bool
      */
-    public function supports($operation, $options)
+    public function supports(string $operation, array $options)
     {
         return $this->operation == $operation;
     }

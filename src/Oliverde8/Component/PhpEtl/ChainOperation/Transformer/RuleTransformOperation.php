@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Oliverde8\Component\PhpEtl\ChainOperation\Transformer;
 
 use oliverde8\AssociativeArraySimplified\AssociativeArray;
@@ -8,6 +10,7 @@ use Oliverde8\Component\PhpEtl\ChainOperation\DataChainOperationInterface;
 use Oliverde8\Component\PhpEtl\Item\DataItem;
 use Oliverde8\Component\PhpEtl\Item\DataItemInterface;
 use Oliverde8\Component\PhpEtl\Item\ItemInterface;
+use Oliverde8\Component\PhpEtl\Model\ExecutionContext;
 use Oliverde8\Component\RuleEngine\RuleApplier;
 
 /**
@@ -21,41 +24,26 @@ class RuleTransformOperation extends AbstractChainOperation implements DataChain
 {
     const VARIABLE_MATCH_REGEX = '/{(?<variables>[^{}]+)}/';
 
-    /** @var string */
-    protected $parsedColums = [];
+    /** @var string[] */
+    protected array $parsedColumns = [];
 
     /** @var RuleApplier */
-    protected $ruleApplier;
+    protected RuleApplier $ruleApplier;
 
     /** @var array */
-    protected $rules;
+    protected array $rules;
 
     /** @var boolean */
-    protected $add;
+    protected bool $add;
 
-    /**
-     * RuleTransformOperation constructor.
-     *
-     * @param RuleApplier $ruleApplier
-     * @param array $rules
-     * @param boolean $add
-     */
-    public function __construct(RuleApplier $ruleApplier, array $rules, $add)
+    public function __construct(RuleApplier $ruleApplier, array $rules, bool $add)
     {
         $this->ruleApplier = $ruleApplier;
         $this->rules = $rules;
         $this->add = $add;
     }
 
-    /**
-     * @param DataItemInterface $item
-     * @param array $context
-     *
-     * @return ItemInterface
-     * @throws \Oliverde8\Component\RuleEngine\Exceptions\RuleException
-     * @throws \Oliverde8\Component\RuleEngine\Exceptions\UnknownRuleException
-     */
-    public function processData(DataItemInterface $item, array &$context)
+    public function processData(DataItemInterface $item, ExecutionContext $context): DataItemInterface
     {
         $data = $item->getData();
         $newData = [];
@@ -67,11 +55,12 @@ class RuleTransformOperation extends AbstractChainOperation implements DataChain
 
         foreach ($this->rules as $column => $rule) {
             // Add context to the data.
-            $data['@context'] = array_merge($context, isset($rule['context']) ? $rule['context'] : []);
+            $data['@context'] = array_merge($context->getParameters(), $rule['context'] ?? []);
+//            var_dump($data);
 
-            $columnsValues = $this->resolveColumnVariables($column, $data, $newData);
+            $columnsValues = $this->resolveColumnVariables((string) $column, $data, $newData);
             $possibleColumns = [];
-            $this->getColumnPosssibleValues($column, $columnsValues, [], $possibleColumns);
+            $this->getColumnPossibleValues($column, $columnsValues, [], $possibleColumns);
 
             foreach ($possibleColumns as $column => $values) {
                 $data['@column'] = $values;
@@ -82,16 +71,7 @@ class RuleTransformOperation extends AbstractChainOperation implements DataChain
         return new DataItem($newData);
     }
 
-    /**
-     * Resolve list of variables.
-     *
-     * @param $columnString
-     * @param $data
-     * @param $newData
-     *
-     * @return array
-     */
-    protected function resolveColumnVariables($columnString, $data, $newData)
+    protected function resolveColumnVariables(string $columnString, array $data, array $newData): array
     {
         $variables = $this->getColumnVariables($columnString);
         $variableValues = [];
@@ -104,16 +84,12 @@ class RuleTransformOperation extends AbstractChainOperation implements DataChain
         return $variableValues;
     }
 
-    /**
-     * Get all possible values for the column.
-     *
-     * @param $columnString
-     * @param $variableValues
-     * @param $preparedValues
-     * @param $valueCombinations
-     */
-    protected function getColumnPosssibleValues($columnString, $variableValues, $preparedValues, &$valueCombinations)
-    {
+    protected function getColumnPossibleValues(
+        string $columnString,
+        array $variableValues,
+        array $preparedValues,
+        array &$valueCombinations
+    ): void {
         if (empty($variableValues)) {
             $key = $this->getColumnName($columnString, $preparedValues);
             $valueCombinations[$key] = $preparedValues;
@@ -130,23 +106,15 @@ class RuleTransformOperation extends AbstractChainOperation implements DataChain
                 $currentPreparedValues = $preparedValues;
                 $currentPreparedValues[$firsVariable['variable']] = $value;
 
-                $this->getColumnPosssibleValues($columnString, $variableValues, $currentPreparedValues, $valueCombinations);
+                $this->getColumnPossibleValues($columnString, $variableValues, $currentPreparedValues, $valueCombinations);
             }
         } else {
             $currentPreparedValues[$firsVariable['variable']] = $firsVariable['value'];
-            $this->getColumnPosssibleValues($columnString, $variableValues, $currentPreparedValues, $valueCombinations);
+            $this->getColumnPossibleValues($columnString, $variableValues, $currentPreparedValues, $valueCombinations);
         }
     }
 
-    /**
-     * Get the name final name of the column
-     *
-     * @param $columnString
-     * @param $values
-     *
-     * @return mixed
-     */
-    protected function getColumnName($columnString, $values)
+    protected function getColumnName(string $columnString, array $values): string
     {
         $variables = [];
         $varValues = [];
@@ -161,24 +129,20 @@ class RuleTransformOperation extends AbstractChainOperation implements DataChain
 
     /**
      * Get variables in a column.
-     *
-     * @param $columnsString
-     *
-     * @return mixed
      */
-    protected function getColumnVariables($columnsString)
+    protected function getColumnVariables(string $columnsString): array
     {
-        if (!isset($this->parsedColums[$columnsString])) {
+        if (!isset($this->parsedColumns[$columnsString])) {
             $matches = [];
             preg_match_all(self::VARIABLE_MATCH_REGEX, $columnsString, $matches);
 
             if (isset($matches['variables'])) {
-                $this->parsedColums[$columnsString] = $matches['variables'];
+                $this->parsedColumns[$columnsString] = $matches['variables'];
             } else {
-                $this->parsedColums[$columnsString] = [];
+                $this->parsedColumns[$columnsString] = [];
             }
         }
 
-        return $this->parsedColums[$columnsString];
+        return $this->parsedColumns[$columnsString];
     }
 }

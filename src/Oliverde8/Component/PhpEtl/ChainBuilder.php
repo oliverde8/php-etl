@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Oliverde8\Component\PhpEtl;
 
 use Oliverde8\Component\PhpEtl\Builder\Factories\AbstractFactory;
@@ -16,7 +18,7 @@ use Oliverde8\Component\PhpEtl\Exception\UnknownOperationException;
 class ChainBuilder
 {
     /** @var AbstractFactory[] */
-    protected $operationFactories;
+    protected array $operationFactories;
 
     /**
      * Register a operation factory.
@@ -31,13 +33,10 @@ class ChainBuilder
     /**
      * Get chain processor from configs.
      *
-     * @param $configs
-     *
-     * @return ChainProcessor
      * @throws Exception\ChainBuilderValidationException
      * @throws UnknownOperationException
      */
-    public function buildChainProcessor($configs)
+    public function buildChainProcessor(array $configs): ChainProcessorInterface
     {
         $chainOperations = [];
         foreach ($configs as $id => $operation) {
@@ -50,14 +49,10 @@ class ChainBuilder
     /**
      * Get chain operation instance from config.
      *
-     * @param $config
-     *
-     * @return ChainOperationInterface
-     *
      * @throws Exception\ChainBuilderValidationException
      * @throws UnknownOperationException
      */
-    protected function getOperationFromConfig($config)
+    protected function getOperationFromConfig(array $config): ChainOperationInterface
     {
         foreach ($this->operationFactories as $factory) {
             if ($factory->supports($config['operation'], $config['options'])) {

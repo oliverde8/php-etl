@@ -11,11 +11,13 @@ namespace Oliverde8\Component\PhpEtl\Tests\ChainOperation\Loader;
 use Oliverde8\Component\PhpEtl\ChainOperation\Loader\FileWriterOperation;
 use Oliverde8\Component\PhpEtl\Item\DataItem;
 use Oliverde8\Component\PhpEtl\Load\File\FileWriterInterface;
+use Oliverde8\Component\PhpEtl\Model\ExecutionContext;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class FileWriterOperationTest extends TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var MockObject */
     protected $writerMock;
 
     /** @var FileWriterOperation */
@@ -37,8 +39,8 @@ class FileWriterOperationTest extends TestCase
             ->expects($this->exactly(1))
             ->method('write')
             ->with(['test']);
+        $context = $this->getMockBuilder(ExecutionContext::class)->disableOriginalConstructor()->getMock();
 
-        $data = [];
-        $this->writerOperation->process(new DataItem(['test']), $data);
+        $this->writerOperation->process(new DataItem(['test']), $context);
     }
 }

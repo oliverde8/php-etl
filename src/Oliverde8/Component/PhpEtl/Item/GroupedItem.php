@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Oliverde8\Component\PhpEtl\Item;
 
 /**
@@ -12,14 +14,14 @@ namespace Oliverde8\Component\PhpEtl\Item;
 class GroupedItem implements GroupedItemInterface
 {
 
-    protected $iterator;
+    protected \Iterator $iterator;
 
     /**
      * GroupedItem constructor.
      *
      * @param $iterator
      */
-    public function __construct($iterator)
+    public function __construct(\Iterator $iterator)
     {
         $this->iterator = $iterator;
     }
@@ -27,12 +29,12 @@ class GroupedItem implements GroupedItemInterface
     /**
      * @inheritdoc
      */
-    public function getIterator()
+    public function getIterator(): \Iterator
     {
         return $this->iterator;
     }
 
-    public function getMethod()
+    public function getMethod(): string
     {
         return DataItemInterface::SIGNAL_DATA;
     }

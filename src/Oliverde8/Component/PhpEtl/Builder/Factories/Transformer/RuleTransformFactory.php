@@ -1,9 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Oliverde8\Component\PhpEtl\Builder\Factories\Transformer;
 
 use Oliverde8\Component\PhpEtl\Builder\Factories\AbstractFactory;
+use Oliverde8\Component\PhpEtl\ChainOperation\ChainOperationInterface;
 use Oliverde8\Component\RuleEngine\RuleApplier;
+use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -25,7 +29,7 @@ class RuleTransformFactory extends AbstractFactory
      * @param string $class
      * @param RuleApplier $ruleApplier
      */
-    public function __construct($operation, $class, RuleApplier $ruleApplier)
+    public function __construct(string $operation, string $class, RuleApplier $ruleApplier)
     {
         parent::__construct($operation, $class);
         $this->ruleApplier = $ruleApplier;
@@ -34,7 +38,7 @@ class RuleTransformFactory extends AbstractFactory
     /**
      * @inheritdoc
      */
-    public function build($operation, $options)
+    public function build(string $operation, array $options): ChainOperationInterface
     {
         return $this->create($this->ruleApplier, $options['columns'], $options['add']);
     }
@@ -42,7 +46,7 @@ class RuleTransformFactory extends AbstractFactory
     /**
      * @inheritdoc
      */
-    protected function configureValidator()
+    protected function configureValidator(): Constraint
     {
         return new Assert\Collection([
             'columns' => [

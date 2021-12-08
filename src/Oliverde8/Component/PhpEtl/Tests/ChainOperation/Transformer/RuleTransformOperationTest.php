@@ -10,6 +10,8 @@ namespace Oliverde8\Component\PhpEtl\Tests\ChainOperation\Transformer;
 
 use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\RuleTransformOperation;
 use Oliverde8\Component\PhpEtl\Item\DataItem;
+use Oliverde8\Component\PhpEtl\Model\ExecutionContext;
+use Oliverde8\Component\PhpEtl\Model\File\FileSystem;
 use Oliverde8\Component\RuleEngine\RuleApplier;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -19,6 +21,9 @@ class RuleTransformOperationTest extends TestCase
     /** @var MockObject */
     protected $ruleApplierMock;
 
+    /** @var MockObject */
+    protected $context;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -26,12 +31,12 @@ class RuleTransformOperationTest extends TestCase
         $this->ruleApplierMock = $this->getMockBuilder(RuleApplier::class)
             ->disableOriginalConstructor()
             ->getMock();
+        $this->context = new ExecutionContext([], new FileSystem());
     }
 
     public function testMultiColumnRulesAddingData()
     {
         $this->ruleApplierMock->expects($this->exactly(3))->method('apply')->willReturn(1);
-        $context = [];
 
         $transform = new RuleTransformOperation(
             $this->ruleApplierMock,
@@ -40,7 +45,7 @@ class RuleTransformOperationTest extends TestCase
         );
 
         $data = new DataItem(['test' => 'test']);
-        $data = $transform->process($data,$context);
+        $data = $transform->process($data, $this->context);
 
         $this->assertEquals(['test' => 'test', 'test1' => 1, 'test2' => 1, 'test3' => 1], $data->getData());
     }
@@ -48,7 +53,6 @@ class RuleTransformOperationTest extends TestCase
     public function testMultiColumnRulesReplacingData()
     {
         $this->ruleApplierMock->expects($this->exactly(3))->method('apply')->willReturn(1);
-        $context = [];
 
         $transform = new RuleTransformOperation(
             $this->ruleApplierMock,
@@ -57,7 +61,7 @@ class RuleTransformOperationTest extends TestCase
         );
 
         $data = new DataItem(['test' => 'test']);
-        $data = $transform->process($data,$context);
+        $data = $transform->process($data, $this->context);
 
         $this->assertEquals(['test1' => 1, 'test2' => 1, 'test3' => 1], $data->getData());
     }
@@ -66,8 +70,8 @@ class RuleTransformOperationTest extends TestCase
     {
         $this->ruleApplierMock->expects($this->exactly(2))->method('apply')->willReturn(1);
 
-
-        $context = ['locales' => ['fr_FR', 'en_GB']];
+        $context = clone $this->context;
+        $context->setParameter('locales', ['fr_FR', 'en_GB']);
         $transform = new RuleTransformOperation(
             $this->ruleApplierMock,
             ['test1-{@context/locales}' => ['rules' => '']],
@@ -84,8 +88,10 @@ class RuleTransformOperationTest extends TestCase
     {
         $this->ruleApplierMock->expects($this->exactly(4))->method('apply')->willReturn(1);
 
+        $context = clone $this->context;
+        $context->setParameter('locales', ['fr_FR', 'en_GB']);
+        $context->setParameter('scopes', ['master', 'mobile']);
 
-        $context = ['locales' => ['fr_FR', 'en_GB'], 'scopes' => ['master', 'mobile']];
         $transform = new RuleTransformOperation(
             $this->ruleApplierMock,
             ['test1-{@context/scopes}-{@context/locales}' => ['rules' => '']],
@@ -106,7 +112,8 @@ class RuleTransformOperationTest extends TestCase
         $this->ruleApplierMock->expects($this->exactly(1))->method('apply')->willReturn(1);
 
 
-        $context = ['locales' => 'fr_FR'];
+        $context = clone $this->context;
+        $context->setParameter('locales', ['fr_FR']);
         $transform = new RuleTransformOperation(
             $this->ruleApplierMock,
             ['test1-{@context/locales}' => ['rules' => '']],
