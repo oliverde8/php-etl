@@ -12,6 +12,7 @@ use Oliverde8\Component\PhpEtl\ChainOperation\Grouping\SimpleGroupingOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\CallbackTransformerOperation;
 use Oliverde8\Component\PhpEtl\ChainProcessor;
 use Oliverde8\Component\PhpEtl\Exception\ChainOperationException;
+use Oliverde8\Component\PhpEtl\ExecutionContextFactory;
 use Oliverde8\Component\PhpEtl\Item\ChainBreakItem;
 use Oliverde8\Component\PhpEtl\Item\DataItem;
 use Oliverde8\Component\PhpEtl\Item\ItemInterface;
@@ -36,7 +37,7 @@ class ChainProcessorTest extends TestCase
             return $item;
         });
 
-        $chainProcessor = new ChainProcessor([$mock1, $mock2]);
+        $chainProcessor = new ChainProcessor([$mock1, $mock2], new ExecutionContextFactory());
         $chainProcessor->process(new \ArrayIterator([1,2]), ['toto']);
 
         $this->assertEquals(2, $count1);
@@ -59,7 +60,7 @@ class ChainProcessorTest extends TestCase
             return $item;
         });
 
-        $chainProcessor = new ChainProcessor([$mock1, $mock2]);
+        $chainProcessor = new ChainProcessor([$mock1, $mock2], new ExecutionContextFactory());
         $chainProcessor->process(new \ArrayIterator([1,2]), ['toto']);
 
         $this->assertEquals(2, $count1);
@@ -101,7 +102,7 @@ class ChainProcessorTest extends TestCase
             ['group' => 101, 'id' => 201, 'value' => 'test12'],
         ];
 
-        $chainProcessor = new ChainProcessor([$mock1, new SimpleGroupingOperation(['group'], ['id']), $mock2]);
+        $chainProcessor = new ChainProcessor([$mock1, new SimpleGroupingOperation(['group'], ['id']), $mock2], new ExecutionContextFactory());
         $chainProcessor->process(new \ArrayIterator($data), ['toto']);
 
         $this->assertEquals(4, $count1);
@@ -146,7 +147,8 @@ class ChainProcessorTest extends TestCase
                 $mock2,
                 new SimpleGroupingOperation(['value']),
                 $mock3,
-            ]
+            ],
+            new ExecutionContextFactory()
         );
         $chainProcessor->process(new \ArrayIterator($data), ['toto']);
 
@@ -162,13 +164,11 @@ class ChainProcessorTest extends TestCase
         });
 
         try {
-            $chainProcessor = new ChainProcessor(["op1" => $mock1]);
+            $chainProcessor = new ChainProcessor(["op1" => $mock1], new ExecutionContextFactory());
             $chainProcessor->process(new \ArrayIterator(['test']), ['toto']);
         } catch (ChainOperationException $exception) {
             $this->assertEquals('op1', $exception->getChainOperationName());
             $this->assertStringContainsString('1', $exception->getMessage());
         }
     }
-
-
 }

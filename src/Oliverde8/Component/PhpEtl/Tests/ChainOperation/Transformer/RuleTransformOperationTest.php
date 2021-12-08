@@ -11,7 +11,7 @@ namespace Oliverde8\Component\PhpEtl\Tests\ChainOperation\Transformer;
 use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\RuleTransformOperation;
 use Oliverde8\Component\PhpEtl\Item\DataItem;
 use Oliverde8\Component\PhpEtl\Model\ExecutionContext;
-use Oliverde8\Component\PhpEtl\Model\File\FileSystem;
+use Oliverde8\Component\PhpEtl\Model\File\LocalFileSystem;
 use Oliverde8\Component\RuleEngine\RuleApplier;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -31,7 +31,7 @@ class RuleTransformOperationTest extends TestCase
         $this->ruleApplierMock = $this->getMockBuilder(RuleApplier::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->context = new ExecutionContext([], new FileSystem());
+        $this->context = new ExecutionContext([], new LocalFileSystem());
     }
 
     public function testMultiColumnRulesAddingData()

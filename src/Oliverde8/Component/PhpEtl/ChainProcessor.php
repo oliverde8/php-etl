@@ -12,7 +12,6 @@ use Oliverde8\Component\PhpEtl\Item\GroupedItemInterface;
 use Oliverde8\Component\PhpEtl\Item\ItemInterface;
 use Oliverde8\Component\PhpEtl\Item\StopItem;
 use Oliverde8\Component\PhpEtl\Model\ExecutionContext;
-use Oliverde8\Component\PhpEtl\Model\File\FileSystem;
 use Oliverde8\Component\PhpEtl\Model\LoggerContext;
 
 /**
@@ -29,6 +28,8 @@ class ChainProcessor extends LoggerContext implements ChainProcessorInterface
     /** @var ChainOperationInterface[] */
     protected array $chainLinks = [];
 
+    protected ExecutionContextFactoryInterface $contextFactory;
+
     /** @var string[] */
     protected array $chainLinkNames = [];
 
@@ -37,16 +38,16 @@ class ChainProcessor extends LoggerContext implements ChainProcessorInterface
      *
      * @param ChainOperationInterface[] $chainLinks
      */
-    public function __construct(array $chainLinks)
+    public function __construct(array $chainLinks, ExecutionContextFactoryInterface $contextFactory)
     {
+        $this->contextFactory = $contextFactory;
         $this->chainLinkNames = array_keys($chainLinks);
         $this->chainLinks = array_values($chainLinks);
     }
 
     public function process(\Iterator $items, array $parameters)
     {
-        // TODO Replace this with a generic replacable factory.
-        $context = new ExecutionContext($parameters, new FileSystem());
+        $context = $this->contextFactory->get($parameters);
         $context->setLoggerContext(self::KEY_LOGGER_ETL_IDENTIFIER, '');
 
         $this->processItems($items, 0, $context);

@@ -20,8 +20,19 @@ class ChainBuilder
     /** @var AbstractFactory[] */
     protected array $operationFactories;
 
+    protected ExecutionContextFactoryInterface $contextFactory;
+
     /**
-     * Register a operation factory.
+     * @param ExecutionContextFactoryInterface $contextFactory
+     */
+    public function __construct(ExecutionContextFactoryInterface $contextFactory)
+    {
+        $this->contextFactory = $contextFactory;
+    }
+
+
+    /**
+     * Register an operation factory.
      *
      * @param AbstractFactory $factory
      */
@@ -43,7 +54,7 @@ class ChainBuilder
             $chainOperations[$id] = $this->getOperationFromConfig($operation);
         }
 
-        return new ChainProcessor($chainOperations);
+        return new ChainProcessor($chainOperations, $this->contextFactory);
     }
 
     /**
