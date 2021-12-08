@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Oliverde8\Component\RuleEngine\Rules;
 
 use Oliverde8\Component\RuleEngine\Exceptions\RuleOptionMissingException;
@@ -15,11 +17,9 @@ use Psr\Log\LoggerInterface;
  */
 abstract class AbstractRule implements RuleInterface
 {
-    /** @var RuleApplier */
-    protected $ruleApplier;
+    protected RuleApplier $ruleApplier;
 
-    /** @var LoggerInterface */
-    protected $logger;
+    protected LoggerInterface $logger;
 
     /**
      * AbstractRule constructor.
@@ -35,12 +35,12 @@ abstract class AbstractRule implements RuleInterface
      * Set the rule applier.
      *
      * @param RuleApplier $ruleApplier The rule applier that is using this rule.
-     *
      * @return $this
      */
-    public function setApplier(RuleApplier $ruleApplier)
+    public function setApplier(RuleApplier $ruleApplier): self
     {
         $this->ruleApplier = $ruleApplier;
+        return $this;
     }
 
     /**
@@ -53,7 +53,7 @@ abstract class AbstractRule implements RuleInterface
      * @return bool
      * @throws RuleOptionMissingException
      */
-    protected function requireOption($option, $options)
+    protected function requireOption($option, array $options): bool
     {
         if (is_array($option)) {
             foreach ($option as $key) {

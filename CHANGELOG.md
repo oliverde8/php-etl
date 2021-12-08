@@ -2,7 +2,7 @@
 - :confetti_ball: :tada: First stable release :tada: :confetti_ball:
 - :start2: Added support for symfony 6
 - :start2: Added better handling of 'execution' files to use as input files or as output files. (See Symfony Bundle)
-- :wrench: Improve the global quality of the code by having typed methods. 
+- :wrench: Improve the global quality of the code by having typed methods.
 
 -:exclamation: This will break any of your existing chain declarations: 
  - If you are using the symfony bundle only your custom operations will break (not factories). The context is now an object. 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Oliverde8\Component\RuleEngine\Rules;
 
 /**
@@ -14,7 +16,7 @@ class Implode extends AbstractRule
     /**
      * @inheritdoc
      */
-    public function apply($rowData, &$transformedData, $options = [])
+    public function apply(array $rowData, array &$transformedData, array $options = [])
     {
         $subOptions = $options;
         unset($subOptions['values']);
@@ -41,11 +43,11 @@ class Implode extends AbstractRule
     /**
      * Flatten a multidimensional array.
      *
-     * @param $array
+     * @param array $array
      *
      * @return \Generator
      */
-    protected function flatten($array)
+    protected function flatten(array $array): \Generator
     {
         foreach ($array as $v) {
             if (is_array($v)) {
@@ -61,7 +63,7 @@ class Implode extends AbstractRule
     /**
      * @inheritdoc
      */
-    public function validate($options)
+    public function validate(array $options): void
     {
         $this->requireOption('values', $options);
         $this->requireOption('with', $options);
@@ -70,7 +72,7 @@ class Implode extends AbstractRule
     /**
      * @inheritdoc
      */
-    public function getRuleCode()
+    public function getRuleCode(): string
     {
         return 'implode';
     }

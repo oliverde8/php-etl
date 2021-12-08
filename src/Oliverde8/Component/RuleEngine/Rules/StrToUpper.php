@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Oliverde8\Component\RuleEngine\Rules;
 
 use Oliverde8\Component\RuleEngine\Exceptions\RuleOptionMissingException;
@@ -16,7 +18,7 @@ class StrToUpper extends AbstractRule
     /**
      * @inheritdoc
      */
-    public function apply($rowData, &$transformedData, $options = [])
+    public function apply(array $rowData, array &$transformedData, array $options = []): string
     {
         $value = $options['value'];
         unset($options['value']);
@@ -27,7 +29,7 @@ class StrToUpper extends AbstractRule
     /**
      * @inheritdoc
      */
-    public function validate($options)
+    public function validate(array $options): void
     {
         $this->requireOption('value', $options);
     }
@@ -35,7 +37,7 @@ class StrToUpper extends AbstractRule
     /**
      * @inheritdoc
      */
-    public function getRuleCode()
+    public function getRuleCode(): string
     {
         return 'str_upper';
     }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Oliverde8\Component\RuleEngine\Rules;
 
 /**
@@ -14,7 +16,7 @@ class ExpressionLanguage extends AbstractRule
     /**
      * @inheritdoc
      */
-    public function apply($rowData, &$transformedData, $options = [])
+    public function apply(array $rowData, array &$transformedData, array $options = [])
     {
         $values = [
             'rowData' => $rowData,
@@ -27,7 +29,6 @@ class ExpressionLanguage extends AbstractRule
             foreach ($options['values'] as $valueKey => $value) {
                 $values[$valueKey] = $this->ruleApplier->apply($rowData, $transformedData, $value, $newOptions);
             }
-        } else {
         }
 
         $expressionLanguage = new \Symfony\Component\ExpressionLanguage\ExpressionLanguage();
@@ -39,7 +40,7 @@ class ExpressionLanguage extends AbstractRule
      *
      * @return string
      */
-    public function getRuleCode()
+    public function getRuleCode(): string
     {
         return 'expression_language';
     }
@@ -48,7 +49,7 @@ class ExpressionLanguage extends AbstractRule
     /**
      * @inheritdoc
      */
-    public function validate($options)
+    public function validate(array $options): void
     {
         $this->requireOption('expression', $options);
     }

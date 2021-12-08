@@ -2,6 +2,7 @@
 
 namespace Oliverde8\Component\RuleEngine\Rules;
 
+use Oliverde8\Component\RuleEngine\Exceptions\RuleException;
 use Oliverde8\Component\RuleEngine\RuleApplier;
 
 /**
@@ -20,23 +21,24 @@ interface RuleInterface
      * @param array $transformedData Transformed data at the current stage
      * @param array $options         Options to be used by the rule.
      *
-     * @return string|null
+     * @return mixed
      */
-    public function apply($rowData, &$transformedData, $options = []);
+    public function apply(array $rowData, array &$transformedData, array $options = []);
 
     /**
      * Validates if a rule can be used with these options
      *
      * @param array $options Options to be used by the rule.
+     * @throws RuleException
      */
-    public function validate($options);
+    public function validate(array $options): void;
 
     /**
      * Get unique code that needs to be used to apply this rule.
      *
      * @return string
      */
-    public function getRuleCode();
+    public function getRuleCode(): string;
 
     /**
      * Set the rule applier.
@@ -45,5 +47,5 @@ interface RuleInterface
      *
      * @return $this
      */
-    public function setApplier(RuleApplier $ruleApplier);
+    public function setApplier(RuleApplier $ruleApplier): self;
 }

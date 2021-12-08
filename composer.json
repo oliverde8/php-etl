@@ -13,7 +13,8 @@
         "symfony/yaml": "^4.3|^5.0|^6.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "9.*"
+        "phpunit/php-code-coverage": "^9.2",
+        "phpunit/phpunit": "9.4.*"
     },
     "suggest": {
         "league/flysystem": "For saving files"
