@@ -48,7 +48,7 @@ $ruleApplier = new \Oliverde8\Component\RuleEngine\RuleApplier(
 );
 
 
-$builder = new \Oliverde8\Component\PhpEtl\ChainBuilder();
+$builder = new \Oliverde8\Component\PhpEtl\ChainBuilder(new \Oliverde8\Component\PhpEtl\ExecutionContextFactory(new \Oliverde8\Component\PhpEtl\Model\File\LocalFileSystem()));
 $builder->registerFactory(new RuleTransformFactory('rule-engine-transformer', RuleTransformOperation::class, $ruleApplier));
 $builder->registerFactory(new SimpleGroupingFactory('simple-grouping', SimpleGroupingOperation::class));
 $builder->registerFactory(new CsvFileWriterFactory('csv-write', FileWriterOperation::class));
