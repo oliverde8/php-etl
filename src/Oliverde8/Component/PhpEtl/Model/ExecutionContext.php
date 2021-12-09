@@ -48,7 +48,4 @@ class ExecutionContext extends LoggerContext
     {
         return $this->fileSystem;
     }
-
-
-
 }

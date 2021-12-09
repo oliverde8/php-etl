@@ -56,7 +56,6 @@ class RuleTransformOperation extends AbstractChainOperation implements DataChain
         foreach ($this->rules as $column => $rule) {
             // Add context to the data.
             $data['@context'] = array_merge($context->getParameters(), $rule['context'] ?? []);
-//            var_dump($data);
 
             $columnsValues = $this->resolveColumnVariables((string) $column, $data, $newData);
             $possibleColumns = [];
