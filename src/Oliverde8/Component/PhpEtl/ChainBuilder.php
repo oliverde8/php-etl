@@ -66,6 +66,10 @@ class ChainBuilder
     protected function getOperationFromConfig(array $config): ChainOperationInterface
     {
         foreach ($this->operationFactories as $factory) {
+            if (is_null($config['options'])) {
+                $config['options'] = [];
+            }
+
             if ($factory->supports($config['operation'], $config['options'])) {
                 return $factory->getOperation($config['operation'], $config['options']);
             }

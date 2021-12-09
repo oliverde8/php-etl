@@ -8,7 +8,7 @@ use Symfony\Component\Filesystem\Filesystem;
 
 class LocalFileSystem implements FileSystemInterface
 {
-    protected $rootPath;
+    protected string $rootPath;
 
     protected Filesystem $filesystem;
 
@@ -21,10 +21,17 @@ class LocalFileSystem implements FileSystemInterface
             $rootPath = getcwd();
         }
 
-        $this->rootPath = trim($rootPath, "\\");
+        $this->rootPath = $rootPath;
         $this->filesystem = new Filesystem();
     }
 
+    /**
+     * @return string
+     */
+    public function getRootPath(): string
+    {
+        return $this->rootPath;
+    }
 
     public function fileExists(string $path): bool
     {
@@ -68,7 +75,8 @@ class LocalFileSystem implements FileSystemInterface
 
     public function listContents(string $path): array
     {
-        scandir($path);
+        $files = scandir($this->rootPath . "/" .$path);
+        return $files ?: [];
     }
 
     public function move(string $source, string $destination, array $config = [])

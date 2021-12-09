@@ -34,14 +34,14 @@ class ExecutionContext extends LoggerContext
         return $this->parameters;
     }
 
-    public function getParameter(string $key, $default = null)
+    public function getParameter(string $key, $default = null, string $separator = ".")
     {
-        return AssociativeArray::getFromKey($this->parameters, $key, $default, ".");
+        return AssociativeArray::getFromKey($this->parameters, $key, $default, $separator);
     }
 
-    public function setParameter(string $key, $value): void
+    public function setParameter(string $key, $value, string $separator = "."): void
     {
-        AssociativeArray::setFromKey($this->parameters, $key, $value, ".");
+        AssociativeArray::setFromKey($this->parameters, $key, $value, $separator);
     }
 
     public function getFileSystem(): FileSystemInterface
