@@ -25,5 +25,5 @@ interface DataChainOperationInterface
      *
      * @return ItemInterface
      */
-    public function processData(DataItemInterface $item, ExecutionContext $context);
+    public function processData(DataItemInterface $item, ExecutionContext $context): ItemInterface;
 }

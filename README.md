@@ -19,20 +19,67 @@ This is integrated inside the ETL with the `RuleTransformOperation`.
 
 The rule engine can be used in standalone, [see docs](docs/RuleEngine.md)
 
+## Understanding the ETL Chain 
+
+An ETL chain is described by **chain operations** and **Items**. The **chain operation** holds the logic, this
+means it can:
+- Extract data into the item, (possibly duplicate the item)
+- Transform the ite, 
+- Load the item somewhere. 
+
+Chain operations consumes **items** and order to create new **items**. 
+
+There are 3 main item types: 
+- **Data Item :** Is the most common item type. There is no special processes for these items. 
+
+- **GroupedItems :** Is a multitude of data items, these are automatically split by the ETL. So if an
+Chain operation returns a grouped item containing 2 data items, the next operation will be called twice, 
+once for each item. 
+
+- **ChainBreakItem :** Can be used by any Chain Operation to stop the flow in the chain. The next
+operation will not be used as the chain has been broken. 
+
+- **StopItem :** Is received by Chain Operation when all data items has been consumed. If the chain
+operation receiving StopItem returns another kind of item the chain will continue to run until 
+the chain operation sends a Stop Item. 
+
+### Execution Examples
+
+This is the simplest case. The chains receive an iterator containing 2 items in input, both items
+are processed by each chain operation. This could be for example a list of customer. Each operation
+changes the items.
+
+![](docs/flow-1.png)
+
+In the following example the iterator sends a single item. The first operation will then send **GroupedItems** 
+containing 2 items. The first item could be a customer, and then we fetch each order of the customer
+in the operation1.
+
+![](docs/flow-2.png)
+
+We can also group items, to make aggregations. The chain receives an iterator containg 2 items, 
+the first operation processes both items. It breaks the chain for the first item, and returns an aggregation
+of item1 & item 2. This can be used to count the number of customers.
+
+![](docs/flow-3.png)
+
+Chains can also be split, this would allow 2 different operations to be executed on the same item.
+
+![](docs/flow-4.png)
+
+
 ## Creating a chain. 
 
-A ETL chain is described by `links`, we call those operations. 
-
-There are a few operations pre-coded in the library. You can create you own. The entry of a ETL chain is 
+There are a few operations pre-coded in the library. You can create you own. The entry of an ETL chain is 
 a standard php `\Iterator`. 
 
-There are 2 ways of writing a chain, either you code it; or you write describe the chain in a yaml file. 
+There are 2 ways of writing a chain, either you code it; or you describe the chain in a yaml file. 
 
-The fallowing 2 exemples does takes the same input and returns the same output. The only thing that changes is the
+The fallowing 2 examples does take the same input and returns the same output. The only thing that changes is the
 way it's done.
 
-First of all you need to inizialize all the objects. Hopefully I will have a Symfony bundle around to have a 
-easier to use package.
+First you need to initialize all the objects. 
+If you are using symfony check the [symfony bundle](https://github.com/oliverde8/phpEtlBundle). 
 
 ```php
 <?php
@@ -54,78 +101,13 @@ $builder->registerFactory(new SimpleGroupingFactory('simple-grouping', SimpleGro
 $builder->registerFactory(new CsvFileWriterFactory('csv-write', FileWriterOperation::class));
 ```
 
-### Coding a ETL Chain
+### Coding an ETL Chain
 
 You can see find here more information [here](docs/ChainCoded.md).
 
-First let's prepare 2 transformations one to prepare for grouping.
-
-**transform1.yml**
-```yaml
-rules:
-    uid:
-        - implode:
-            values:
-              - 'PREFIX'
-              - [{get : {field: 'ID_PART1'}}]
-              - [{get : {field: "ID_PART2"}}]
-            with: "_"
-```
-
-> You can also use the symfony expression language to write a similar rule. (This wont behave the same way if one if the fields are empty)
-> ```php
-rules:
-    uid:
-        - expression_language:
-            expression: '"PREFIX_"~rowData["ID_PART1"]~"_"~rowData["ID_PART2"]'
-```
-
-And now the second one to finalize the data.
-
-**transform2.yml**
-```yaml
-rules:
-    uid: # Fetching the uid of the first element!
-        - get : {field: [0, 'uid']}
-        
-    label: # Fetching te label from the first if available and if not the second item.
-        - get : {field: [0, 'label']}
-        - get : {field: [1, 'label']}
-        # ...
-    # ...
-```
-
-```php
-<?php
-$inputIterator = new Csv(__DIR__  . '/exemples/input.csv');
-
-$operations = [];
-
-// Prepare a `key` so we can properly group the results.
-$operations[] = new RuleTransformOperation($ruleApplier, Yaml::parse('transform1.yml'), true);
-
-// Group multiple identical lines.
-$operations[] = new SimpleGroupingOperation(['uid']);
-
-// Removing all unessery columns. just keep what wee need and flatten the result after the grouping.
-$operations[] = new RuleTransformOperation($ruleApplier, Yaml::parse('transform2.yml'), false);
-
-// Now write the results
-$operations[] = new FileWriterOperation(new Writer(__DIR__ . '/exemples/output.csv'));
-
-// We can continue doing other transformations and writing results.
-// ....
-
-
-// Let's process our input file..
-$chainProcessor = new ChainProcessor($operations);
-$context = [];
-$chainProcessor->process($inputIterator, $context);
-```
-
 ### Configuring a ETL Chain
 
-Let's create a yml file describing the transformation.
+Let's create a yml file describing the chain instead of wiring all the code we wrote above.
 
 ```yaml
 transform1:
@@ -180,24 +162,36 @@ As you can see we have simply used the chain builder instead of creating each op
 
 ## Creating you own operations. 
 
-Before creating your own operations you need to understand how the system works. 
+To create your own operation you need to extend `Oliverde8\Component\PhpEtl\ChainOperation\AbstractChainOperation`
 
-A `ItemInterface` will travel througth the chain. There are multiple different type of items that will 
-have different effects. 
+In your class you will need to create a method taking in parameter an `ItemInterface` and a `ExecutionContext`
 
-* **GroupedItem** Will be returned by grouping operations, these will be splitted back into individual DataItems 
-automatically.
+**Example**
+```php
+class MyOperation extends Oliverde8\Component\PhpEtl\ChainOperation\AbstractChainOperation
+{
+    protected function processItem(\Oliverde8\Component\PhpEtl\Item\ItemInterface $item, \Oliverde8\Component\PhpEtl\Model\ExecutionContext $executionContext): \Oliverde8\Component\PhpEtl\Item\ItemInterface
+    {
+        // TODO
+        return $item;
+    }
 
-* **ChainBreakItem** can be returned by an operation when it wishes to stop the chain. For exemple an operation could filter unwanted data.
+}
+```
 
-* **DataItem** is the most common item, it will trigger the `processData` method of your operation.
+If you wish your operation to only process certain item types, for example data items, you can change the signature 
+of your `processItem` method.
+```php
+class MyOperation extends Oliverde8\Component\PhpEtl\ChainOperation\AbstractChainOperation
+{
+    protected function processItem(\Oliverde8\Component\PhpEtl\Item\DataItemInterface $item, \Oliverde8\Component\PhpEtl\Model\ExecutionContext $executionContext): \Oliverde8\Component\PhpEtl\Item\ItemInterface
+    {
+        // TODO
+        return $item;
+    }
 
-* **ChainStopItem** This item will travel thought the chain, to let now each operation that the chain has stopped. 
-It will trigger the `processStop` method.
-
-If an operation don't have the appropriate method to handle a particular Item, the item will simply skip the Operation.
-
-If you wish for you operation to be usable in with the configuration builder you will also need to create a Factory for it.
+}
+```
 
 # FAQ
 
@@ -206,8 +200,8 @@ PHP-Etl is a library, not meant to be used standalone, it is meant to be used in
 Each of these framework/cms's have their own way of handling the database. I do plan to make a Symfony bundle at one 
 point which could have doctrine extractor. 
 
-* **Is there a validaiton of the chain configuration ?**
-Yes sir there is. you will get an error like this : 
+* **Is there a validation of the chain configuration ?**
+Yes there is. you will get an error like this : 
 ```
 There was an error building the operation 'simple-grouping' : 
  - "grouping-key" : This field is missing.

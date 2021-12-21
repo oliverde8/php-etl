@@ -28,14 +28,6 @@ class DataItem implements DataItemInterface
         $this->data = $data;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getMethod(): string
-    {
-        return 'data';
-    }
-
     public function getData()
     {
        return $this->data;

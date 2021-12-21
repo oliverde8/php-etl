@@ -13,9 +13,4 @@ namespace Oliverde8\Component\PhpEtl\Item;
  */
 class ChainBreakItem implements ItemInterface
 {
-
-    public function getMethod(): string
-    {
-        return 'chainBreak';
-    }
 }

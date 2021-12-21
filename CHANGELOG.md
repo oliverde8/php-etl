@@ -2,6 +2,7 @@
 - :confetti_ball: :tada: First stable release :tada: :confetti_ball:
 - :start2: Added support for symfony 6
 - :start2: Added better handling of 'execution' files to use as input files or as output files. (See Symfony Bundle)
+- :start2: Improve method resolution for chain operations to use types instead of arbitrary names. processData can be names anything now as long as it typed properly
 - :wrench: Improve the global quality of the code by having typed methods.
 
 -:exclamation: This will break any of your existing chain declarations: 
