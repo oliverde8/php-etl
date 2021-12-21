@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Oliverde8\Component\RuleEngine\Rules;
 
 use oliverde8\AssociativeArraySimplified\AssociativeArray;
@@ -16,7 +18,7 @@ class Get extends AbstractRule
     /**
      * @inheritdoc
      */
-    public function apply($rowData, &$transformedData, $options = [])
+    public function apply(array $rowData, array &$transformedData, array $options = [])
     {
         if (!is_array($options['field'])) {
             $options['field'] = [$options['field']];
@@ -33,7 +35,7 @@ class Get extends AbstractRule
     /**
      * @inheritdoc
      */
-    public function validate($options)
+    public function validate(array $options): void
     {
         $this->requireOption('field', $options);
     }
@@ -41,7 +43,7 @@ class Get extends AbstractRule
     /**
      * @inheritdoc
      */
-    public function getRuleCode()
+    public function getRuleCode(): string
     {
         return 'get';
     }

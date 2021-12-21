@@ -1,8 +1,8 @@
 <?php
 
-namespace Oliverde8\Component\RuleEngine\Rules;
+declare(strict_types=1);
 
-use Oliverde8\Component\RuleEngine\Exceptions\RuleOptionMissingException;
+namespace Oliverde8\Component\RuleEngine\Rules;
 
 /**
  * Class StrToLower
@@ -16,7 +16,7 @@ class StrToLower extends AbstractRule
     /**
      * @inheritdoc
      */
-    public function apply($rowData, &$transformedData, $options = [])
+    public function apply(array $rowData, array &$transformedData, array $options = []): string
     {
         $value = $options['value'];
         unset($options['value']);
@@ -27,7 +27,7 @@ class StrToLower extends AbstractRule
     /**
      * @inheritdoc
      */
-    public function validate($options)
+    public function validate(array $options): void
     {
         $this->requireOption('value', $options);
     }
@@ -35,7 +35,7 @@ class StrToLower extends AbstractRule
     /**
      * @inheritdoc
      */
-    public function getRuleCode()
+    public function getRuleCode(): string
     {
         return 'str_lower';
     }

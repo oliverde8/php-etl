@@ -1,6 +1,73 @@
 
 ## Creating a chain using code.
 
+### Example
+
+First let's prepare 2 transformations one to prepare for grouping.
+
+**transform1.yml**
+```yaml
+rules:
+    uid:
+        - implode:
+            values:
+              - 'PREFIX'
+              - [{get : {field: 'ID_PART1'}}]
+              - [{get : {field: "ID_PART2"}}]
+            with: "_"
+```
+
+> You can also use the symfony expression language to write a similar rule. (This won't behave the same way if one of the fields are empty)
+```yaml
+rules:
+    uid:
+        - expression_language:
+            expression: '"PREFIX_"~rowData["ID_PART1"]~"_"~rowData["ID_PART2"]'
+```
+
+And now the second one to finalize the data.
+
+**transform2.yml**
+```yaml
+rules:
+    uid: # Fetching the uid of the first element!
+        - get : {field: [0, 'uid']}
+        
+    label: # Fetching te label from the first if available and if not the second item.
+        - get : {field: [0, 'label']}
+        - get : {field: [1, 'label']}
+        # ...
+    # ...
+```
+
+```php
+<?php
+$inputIterator = new Csv(__DIR__  . '/exemples/input.csv');
+
+$operations = [];
+
+// Prepare a `key` so we can properly group the results.
+$operations[] = new RuleTransformOperation($ruleApplier, Yaml::parse('transform1.yml'), true);
+
+// Group multiple identical lines.
+$operations[] = new SimpleGroupingOperation(['uid']);
+
+// Removing all unessery columns. just keep what wee need and flatten the result after the grouping.
+$operations[] = new RuleTransformOperation($ruleApplier, Yaml::parse('transform2.yml'), false);
+
+// Now write the results
+$operations[] = new FileWriterOperation(new Writer(__DIR__ . '/exemples/output.csv'));
+
+// We can continue doing other transformations and writing results.
+// ....
+
+
+// Let's process our input file..
+$chainProcessor = new ChainProcessor($operations);
+$context = [];
+$chainProcessor->process($inputIterator, $context);
+```
+
 ### Operations
 
 Each operation in the ETL Chain will take a `ItemInterface` in input and will need to return 

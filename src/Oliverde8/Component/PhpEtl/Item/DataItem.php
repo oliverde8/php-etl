@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Oliverde8\Component\PhpEtl\Item;
 
 /**
@@ -24,14 +26,6 @@ class DataItem implements DataItemInterface
     public function __construct($data)
     {
         $this->data = $data;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getMethod()
-    {
-        return 'data';
     }
 
     public function getData()

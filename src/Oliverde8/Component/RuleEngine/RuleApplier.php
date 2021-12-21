@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Oliverde8\Component\RuleEngine;
 
 use Oliverde8\Component\RuleEngine\Exceptions\RuleException;
@@ -16,17 +18,14 @@ use Psr\Log\LoggerInterface;
  */
 class RuleApplier
 {
-    /** @var LoggerInterface */
-    protected $logger;
+    protected LoggerInterface $logger;
 
     /** @var RuleInterface[] */
-    protected $rules;
+    protected array $rules;
 
-    /** @var boolean When vali */
-    protected $validate;
+    protected bool $validate;
 
-    /** @var array */
-    protected $currentIdentity;
+    protected array $currentIdentity;
 
     /**
      * RuleApplier constructor.
@@ -36,7 +35,7 @@ class RuleApplier
      * @param boolean         $validate When validation is active rules are validated and clear messages are displayed
      *                                  when a rule is not well coded. But performance is worsened.
      */
-    public function __construct(LoggerInterface $logger, array $rules, $validate = false)
+    public function __construct(LoggerInterface $logger, array $rules, bool $validate = false)
     {
         $this->logger = $logger;
         $this->validate = $validate;
@@ -60,8 +59,8 @@ class RuleApplier
     /**
      * Apply rules to data.
      *
-     * @param array|string $rowData         Data that is being trasformed.
-     * @param array        $transformedData Transformed data at the current stage
+     * @param array|string $rowData         Data that is being transformed.
+     * @param array|string $transformedData Transformed data at the current stage
      * @param array|string $rules           Rules to apply, if string is given the string is returned.
      * @param array        $options         Options to be used by the rules.
      * @param array        $identifier      Identity of the line rule is applied on to log & display.
@@ -70,7 +69,7 @@ class RuleApplier
      * @throws UnknownRuleException
      * @throws RuleException
      */
-    public function apply($rowData, $transformedData, $rules, $options = [], $identifier = [])
+    public function apply($rowData, $transformedData, $rules, array $options = [], array $identifier = [])
     {
         // There is no rule apply.
         if (!is_array($rules)) {
@@ -117,7 +116,7 @@ class RuleApplier
      * @return null|string
      * @throws UnknownRuleException
      */
-    protected function applyRule($rule, $ruleOptions, $rowData, $transformedData, $options)
+    protected function applyRule(string $rule, array $ruleOptions, array $rowData, array $transformedData, array $options)
     {
         if (!isset($this->rules[$rule])) {
             throw new UnknownRuleException("Rule '$rule' was not found!");
@@ -142,8 +141,6 @@ class RuleApplier
         }
 
         $ruleObject->setApplier($this);
-        $result = $ruleObject->apply($rowData, $transformedData, $options);
-
-        return $result;
+        return $ruleObject->apply($rowData, $transformedData, $options);
     }
 }

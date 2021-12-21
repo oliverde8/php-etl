@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Oliverde8\Component\PhpEtl;
 
 use Oliverde8\Component\PhpEtl\ChainOperation\ChainOperationInterface;
@@ -9,6 +11,8 @@ use Oliverde8\Component\PhpEtl\Item\DataItem;
 use Oliverde8\Component\PhpEtl\Item\GroupedItemInterface;
 use Oliverde8\Component\PhpEtl\Item\ItemInterface;
 use Oliverde8\Component\PhpEtl\Item\StopItem;
+use Oliverde8\Component\PhpEtl\Model\ExecutionContext;
+use Oliverde8\Component\PhpEtl\Model\LoggerContext;
 
 /**
  * Class ChainProcessor
@@ -17,87 +21,80 @@ use Oliverde8\Component\PhpEtl\Item\StopItem;
  * @copyright 2018 Oliverde8
  * @package Oliverde8\Component\PhpEtl
  */
-class ChainProcessor implements ChainProcessorInterface
+class ChainProcessor extends LoggerContext implements ChainProcessorInterface
 {
+    const KEY_LOGGER_ETL_IDENTIFIER = 'etl.identifier';
+
     /** @var ChainOperationInterface[] */
-    protected $chainLinks = [];
+    protected array $chainLinks = [];
+
+    protected ExecutionContextFactoryInterface $contextFactory;
 
     /** @var string[] */
-    protected $chainLinkNames = [];
+    protected array $chainLinkNames = [];
 
     /**
      * ChainProcessor constructor.
      *
      * @param ChainOperationInterface[] $chainLinks
      */
-    public function __construct(array $chainLinks)
+    public function __construct(array $chainLinks, ExecutionContextFactoryInterface $contextFactory)
     {
+        $this->contextFactory = $contextFactory;
         $this->chainLinkNames = array_keys($chainLinks);
         $this->chainLinks = array_values($chainLinks);
     }
 
-    /**
-     * Process items.
-     *
-     * @param \Iterator $items
-     * @param $context
-     * @throws ChainOperationException
-     */
-    public function process(\Iterator $items, $context)
+    public function process(\Iterator $items, array $parameters)
     {
-        if (!isset($context['etl']['identifier'])) {
-            $context['etl']['identifier'] = '';
-        }
+        $context = $this->contextFactory->get($parameters);
+        $context->replaceLoggerContext($parameters);
+        $context->setLoggerContext(self::KEY_LOGGER_ETL_IDENTIFIER, '');
 
-        $this->processItems($items, 0, $context);
+        try {
+            $context->getLogger()->info("Starting etl process!");
+            $this->processItems($items, 0, $context);
+            $context->getLogger()->info("Finished etl process!");
+        } catch (\Exception $e) {
+            $params['exception'] = $e;
+            $context->getLogger()->info("Failed during etl process!", $params);
+            throw $e;
+        } finally {
+            $context->finalise();
+        }
     }
 
     /**
      * Process list of items with chain starting at $startAt.
-     *
-     * @param \Iterator $items
-     * @param int $startAt
-     * @param array $context
-     *
-     * @return ItemInterface
-     * @throws ChainOperationException
      */
-    protected function processItems(\Iterator $items, $startAt, &$context)
+    protected function processItems(\Iterator $items, int $startAt, ExecutionContext $context)
     {
-        $identifierPrefix = $context['etl']['identifier'];
+        $identifierPrefix = $context->getParameter('etl.identifier');
 
         $count = 1;
         foreach ($items as $item) {
-            $context['etl']['identifier'] = $identifierPrefix . $count++;
+            $context->setLoggerContext(self::KEY_LOGGER_ETL_IDENTIFIER, $identifierPrefix . $count++);
 
             $dataItem = new DataItem($item);
             $this->processItem($dataItem, $startAt, $context);
         }
 
         $stopItem = new StopItem();
-        $context['etl']['identifier'] = $identifierPrefix . 'STOP';
-        while ($this->processItem($stopItem, $startAt, $context) !== $stopItem);
+        $context->setLoggerContext(self::KEY_LOGGER_ETL_IDENTIFIER, $identifierPrefix . 'STOP');
+        while ($this->processItem($stopItem, $startAt, $context) !== $stopItem) {
+            // Executing stop until the system stops.
+        }
 
         return $stopItem;
     }
 
-    /**
-     * Process an item, with chains starting at.
-     *
-     * @param ItemInterface $item
-     * @param $startAt
-     * @param $context
-     *
-     * @return mixed|ItemInterface|StopItem
-     * @throws ChainOperationException
-     */
-    public function processItem(ItemInterface $item, $startAt, &$context)
+    public function processItem(ItemInterface $item, int $startAt, ExecutionContext $context): ItemInterface
     {
         for ($chainNumber = $startAt; $chainNumber < count($this->chainLinks); $chainNumber++) {
             $item = $this->processItemWithOperation($item, $chainNumber, $context);
 
             if ($item instanceof GroupedItemInterface) {
-                $context['etl']['identifier'] .= "chain link:" . $this->chainLinkNames[$chainNumber] . "-";
+                $context->setLoggerContext(self::KEY_LOGGER_ETL_IDENTIFIER, "chain link:{$this->chainLinkNames[$chainNumber]}-");
                 $this->processItems($item->getIterator(), $chainNumber + 1, $context);
 
                 return new StopItem();
@@ -112,15 +109,9 @@ class ChainProcessor implements ChainProcessorInterface
     /**
      * Process an item and handle errors during the process.
      *
-     * @param $item
-     * @param $chainNumber
-     * @param $context
-     *
-     *
-     * @return ItemInterface
      * @throws ChainOperationException
      */
-    protected function processItemWithOperation($item, $chainNumber, &$context)
+    protected function processItemWithOperation(ItemInterface $item, int $chainNumber, ExecutionContext &$context): ItemInterface
     {
         try {
             return $this->chainLinks[$chainNumber]->process($item, $context);
@@ -128,7 +119,7 @@ class ChainProcessor implements ChainProcessorInterface
             throw new ChainOperationException(
                 "An exception was thrown during the handling of the chain link : "
                     . "{$this->chainLinkNames[$chainNumber]} "
-                    . "with the item {$context['etl']['identifier']}.",
+                    . "with the item {$context->getParameter(self::KEY_LOGGER_ETL_IDENTIFIER)}.",
                 0,
                 $exception,
                 $this->chainLinkNames[$chainNumber]

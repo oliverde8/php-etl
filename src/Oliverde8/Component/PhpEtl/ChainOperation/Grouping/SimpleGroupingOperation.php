@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Oliverde8\Component\PhpEtl\ChainOperation\Grouping;
 
 use oliverde8\AssociativeArraySimplified\AssociativeArray;
@@ -10,6 +12,7 @@ use Oliverde8\Component\PhpEtl\Item\DataItemInterface;
 use Oliverde8\Component\PhpEtl\Item\GroupedItem;
 use Oliverde8\Component\PhpEtl\Item\ItemInterface;
 use Oliverde8\Component\PhpEtl\Item\StopItem;
+use Oliverde8\Component\PhpEtl\Model\ExecutionContext;
 
 /**
  * Class SimpleGrouping
@@ -49,7 +52,7 @@ class SimpleGroupingOperation extends AbstractChainOperation implements DataChai
     /**
      * @inheritdoc
      */
-    public function processData(DataItemInterface $item, array &$context)
+    public function processData(DataItemInterface $item, ExecutionContext $context): ChainBreakItem
     {
         $groupingValue = AssociativeArray::getFromKey($item->getData(), $this->groupKey);
 
@@ -60,14 +63,13 @@ class SimpleGroupingOperation extends AbstractChainOperation implements DataChai
             $this->data[$groupingValue][] = $item->getData();
         }
 
-
         return new ChainBreakItem();
     }
 
     /**
      * @inheritdoc
      */
-    public function processStop(StopItem $stopItem, array &$context)
+    public function processStop(StopItem $stopItem, ExecutionContext $context): ItemInterface
     {
         if (empty($this->data)) {
             return $stopItem;

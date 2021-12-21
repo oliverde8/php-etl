@@ -1,6 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Oliverde8\Component\RuleEngine\Rules;
+
+use Oliverde8\Component\RuleEngine\Exceptions\RuleException;
 
 /**
  * Class Constant
@@ -21,7 +25,7 @@ class Constant extends AbstractRule
      *
      * @return string|null
      */
-    public function apply($rowData, &$transformedData, $options = [])
+    public function apply(array $rowData, array &$transformedData, array $options = [])
     {
         return $options['value'];
     }
@@ -29,7 +33,7 @@ class Constant extends AbstractRule
     /**
      * @inheritdoc
      */
-    public function validate($options)
+    public function validate($options): void
     {
         $this->requireOption('value', $options);
     }
@@ -39,7 +43,7 @@ class Constant extends AbstractRule
      *
      * @return string
      */
-    public function getRuleCode()
+    public function getRuleCode(): string
     {
         return 'constant';
     }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Oliverde8\Component\PhpEtl;
 
 use Oliverde8\Component\PhpEtl\Builder\Factories\AbstractFactory;
@@ -16,10 +18,21 @@ use Oliverde8\Component\PhpEtl\Exception\UnknownOperationException;
 class ChainBuilder
 {
     /** @var AbstractFactory[] */
-    protected $operationFactories;
+    protected array $operationFactories;
+
+    protected ExecutionContextFactoryInterface $contextFactory;
 
     /**
-     * Register a operation factory.
+     * @param ExecutionContextFactoryInterface $contextFactory
+     */
+    public function __construct(ExecutionContextFactoryInterface $contextFactory)
+    {
+        $this->contextFactory = $contextFactory;
+    }
+
+
+    /**
+     * Register an operation factory.
      *
      * @param AbstractFactory $factory
      */
@@ -31,35 +44,32 @@ class ChainBuilder
     /**
      * Get chain processor from configs.
      *
-     * @param $configs
-     *
-     * @return ChainProcessor
      * @throws Exception\ChainBuilderValidationException
      * @throws UnknownOperationException
      */
-    public function buildChainProcessor($configs)
+    public function buildChainProcessor(array $configs): ChainProcessorInterface
     {
         $chainOperations = [];
         foreach ($configs as $id => $operation) {
             $chainOperations[$id] = $this->getOperationFromConfig($operation);
         }
 
-        return new ChainProcessor($chainOperations);
+        return new ChainProcessor($chainOperations, $this->contextFactory);
     }
 
     /**
      * Get chain operation instance from config.
      *
-     * @param $config
-     *
-     * @return ChainOperationInterface
-     *
      * @throws Exception\ChainBuilderValidationException
      * @throws UnknownOperationException
      */
-    protected function getOperationFromConfig($config)
+    protected function getOperationFromConfig(array $config): ChainOperationInterface
     {
         foreach ($this->operationFactories as $factory) {
+            if (is_null($config['options'])) {
+                $config['options'] = [];
+            }
+
             if ($factory->supports($config['operation'], $config['options'])) {
                 return $factory->getOperation($config['operation'], $config['options']);
             }
