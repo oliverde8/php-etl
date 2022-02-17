@@ -56,8 +56,8 @@ class ChainProcessor extends LoggerContext implements ChainProcessorInterface
             $this->processItems($items, 0, $context);
             $context->getLogger()->info("Finished etl process!");
         } catch (\Exception $e) {
-            $params['exception'] = $e;
-            $context->getLogger()->info("Failed during etl process!", $params);
+            $parameters['exception'] = $e;
+            $context->getLogger()->info("Failed during etl process!", $parameters);
             throw $e;
         } finally {
             $context->finalise();
