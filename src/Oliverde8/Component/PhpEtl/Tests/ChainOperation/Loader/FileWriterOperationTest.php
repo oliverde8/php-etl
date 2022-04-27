@@ -30,7 +30,7 @@ class FileWriterOperationTest extends TestCase
         $this->writerMock = $this->getMockBuilder(FileWriterInterface::class)
             ->getMock();
 
-        $this->writerOperation = new FileWriterOperation($this->writerMock);
+        $this->writerOperation = new FileWriterOperation($this->writerMock, 'fileName');
     }
 
     public function testWrite()

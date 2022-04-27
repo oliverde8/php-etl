@@ -34,6 +34,7 @@ class CsvFileWriterFactory extends AbstractFactory
      */
     protected function build($operation, $options): ChainOperationInterface
     {
-        return $this->create(new Csv($options['file']));
+        $tmp = tempnam(sys_get_temp_dir(), 'etl');
+        return $this->create(new Csv($tmp), $options['file']);
     }
 }

@@ -41,4 +41,9 @@ class AbstractCsvFile
         $this->enclosure = $enclosure;
         $this->escape = $escape;
     }
+
+    public function getResource()
+    {
+        return $this->file;
+    }
 }

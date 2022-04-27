@@ -45,7 +45,7 @@ class LocalFileSystem implements FileSystemInterface
 
     public function writeStream(string $path, $contents, array $config = []): void
     {
-        $this->filesystem->dumpFile($this->rootPath . "/" . $path, $contents);
+        stream_copy_to_stream($contents, fopen($this->rootPath . "/" . $path, 'w+'));
     }
 
     public function read(string $path): string

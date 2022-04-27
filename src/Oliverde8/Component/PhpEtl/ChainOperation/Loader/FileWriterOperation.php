@@ -7,6 +7,7 @@ namespace Oliverde8\Component\PhpEtl\ChainOperation\Loader;
 use Oliverde8\Component\PhpEtl\ChainOperation\AbstractChainOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\DataChainOperationInterface;
 use Oliverde8\Component\PhpEtl\Item\DataItemInterface;
+use Oliverde8\Component\PhpEtl\Item\StopItem;
 use Oliverde8\Component\PhpEtl\Load\File\FileWriterInterface;
 use Oliverde8\Component\PhpEtl\Model\ExecutionContext;
 
@@ -14,7 +15,7 @@ use Oliverde8\Component\PhpEtl\Model\ExecutionContext;
  * Class FileWriter
  *
  * @author    de Cramer Oliver<oliverde8@gmail.com>
- * @copyright 2018 Oliverde8
+ * @copyright 2022 Oliverde8
  * @package Oliverde8\Component\PhpEtl\ChainOperation\Loader
  */
 class FileWriterOperation extends AbstractChainOperation implements DataChainOperationInterface
@@ -22,16 +23,13 @@ class FileWriterOperation extends AbstractChainOperation implements DataChainOpe
     /** @var FileWriterInterface */
     protected $writer;
 
-    /**
-     * FileWriter constructor.
-     *
-     * @param FileWriterInterface $writer
-     */
-    public function __construct(FileWriterInterface $writer)
+    protected string $fileName;
+
+    public function __construct(FileWriterInterface $writer, string $fileName)
     {
         $this->writer = $writer;
+        $this->fileName = $fileName;
     }
-
 
     /**
      * @inheritdoc
@@ -41,5 +39,17 @@ class FileWriterOperation extends AbstractChainOperation implements DataChainOpe
         $this->writer->write($item->getData());
 
         return $item;
+    }
+
+    public function processStop(StopItem $stopItem, ExecutionContext $context): StopItem
+    {
+        $resource = $this->writer->getResource();
+
+        $meta_data = stream_get_meta_data($resource);
+        $filename = $meta_data["uri"];
+
+        $context->getFileSystem()->writeStream($this->fileName, fopen($filename, 'r'));
+
+        return $stopItem;
     }
 }

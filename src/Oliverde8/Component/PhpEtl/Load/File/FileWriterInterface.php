@@ -12,4 +12,6 @@ namespace Oliverde8\Component\PhpEtl\Load\File;
 interface FileWriterInterface
 {
     public function write($rowData);
+
+    public function getResource();
 }

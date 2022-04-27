@@ -1,3 +1,6 @@
+# 1.0.1 
+- :wrench: Fix - File writers not using the file abstraction.
+
 # 1.0.0
 - :confetti_ball: :tada: First stable release :tada: :confetti_ball:
 - :star2: Added support for symfony 6
