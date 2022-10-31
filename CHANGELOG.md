@@ -1,3 +1,6 @@
+# 1.0.2
+- :wrench: Fix - Context not being finalised when there is an exception.
+
 # 1.0.1 
 - :wrench: Fix - File writers not using the file abstraction.
 
