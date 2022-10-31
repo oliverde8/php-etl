@@ -6,7 +6,7 @@
     "require": {
         "php": ">=7.4",
         "oliverde8/associative-array-simplified": "^1.0",
-        "psr/log": "^1.0",
+        "psr/log": "^2.0.0",
         "symfony/expression-language": "^4.3|^5.0|^6.0",
         "symfony/filesystem": "^5.4",
         "symfony/validator": "^4.3|^5.0|^6.0",
