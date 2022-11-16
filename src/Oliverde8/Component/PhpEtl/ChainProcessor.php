@@ -67,7 +67,7 @@ class ChainProcessor extends LoggerContext implements ChainProcessorInterface
     /**
      * Process list of items with chain starting at $startAt.
      */
-    protected function processItems(\Iterator $items, int $startAt, ExecutionContext $context)
+    protected function processItems(\Iterator $items, int $startAt, ExecutionContext $context, bool $withStop = true)
     {
         $identifierPrefix = $context->getParameter('etl.identifier');
 
@@ -80,9 +80,11 @@ class ChainProcessor extends LoggerContext implements ChainProcessorInterface
         }
 
         $stopItem = new StopItem();
-        $context->setLoggerContext(self::KEY_LOGGER_ETL_IDENTIFIER, $identifierPrefix . 'STOP');
-        while ($this->processItem($stopItem, $startAt, $context) !== $stopItem) {
-            // Executing stop until the system stops.
+        if ($withStop) {
+            $context->setLoggerContext(self::KEY_LOGGER_ETL_IDENTIFIER, $identifierPrefix . 'STOP');
+            while ($this->processItem($stopItem, $startAt, $context) !== $stopItem) {
+                // Executing stop until the system stops.
+            }
         }
 
         return $stopItem;
@@ -95,7 +97,7 @@ class ChainProcessor extends LoggerContext implements ChainProcessorInterface
 
             if ($item instanceof GroupedItemInterface) {
                 $context->setLoggerContext(self::KEY_LOGGER_ETL_IDENTIFIER, "chain link:{$this->chainLinkNames[$chainNumber]}-");
-                $this->processItems($item->getIterator(), $chainNumber + 1, $context);
+                $this->processItems($item->getIterator(), $chainNumber + 1, $context, false);
 
                 return new StopItem();
             } else if ($item instanceof ChainBreakItem) {
