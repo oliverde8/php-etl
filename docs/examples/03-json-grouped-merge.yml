@@ -1,0 +1,15 @@
+chain:
+  read-file:
+    operation: csv-read
+    options: [] # The default delimeter
+
+  group-per-subscription:
+    operation: simple-grouping
+    options:
+      grouping-key: ['IsSubscribed']
+      group-identifier: []
+
+  write-new-file:
+    operation: json-write
+    options:
+      file: "output.json"
