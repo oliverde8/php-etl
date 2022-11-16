@@ -75,90 +75,10 @@ a standard php `\Iterator`.
 
 There are 2 ways of writing a chain, either you code it; or you describe the chain in a yaml file. 
 
-The fallowing 2 examples does take the same input and returns the same output. The only thing that changes is the
-way it's done.
+- Using php code to initiate each operation yourself, this is not recommended! 
+- Using yaml files to descrive the chain. 
 
-First you need to initialize all the objects. 
-If you are using symfony check the [symfony bundle](https://github.com/oliverde8/phpEtlBundle). 
-
-```php
-<?php
-$ruleApplier = new \Oliverde8\Component\RuleEngine\RuleApplier(
-    new \Psr\Log\NullLogger(),
-    [
-        new \Oliverde8\Component\RuleEngine\Rules\Get(new \Psr\Log\NullLogger()),
-        new \Oliverde8\Component\RuleEngine\Rules\Implode(new \Psr\Log\NullLogger()),
-        new \Oliverde8\Component\RuleEngine\Rules\StrToLower(new \Psr\Log\NullLogger()),
-        new \Oliverde8\Component\RuleEngine\Rules\StrToUpper(new \Psr\Log\NullLogger()),
-        new \Oliverde8\Component\RuleEngine\Rules\ExpressionLanguage(new \Psr\Log\NullLogger()),
-    ]
-);
-
-
-$builder = new \Oliverde8\Component\PhpEtl\ChainBuilder(new \Oliverde8\Component\PhpEtl\ExecutionContextFactory(new \Oliverde8\Component\PhpEtl\Model\File\LocalFileSystem()));
-$builder->registerFactory(new RuleTransformFactory('rule-engine-transformer', RuleTransformOperation::class, $ruleApplier));
-$builder->registerFactory(new SimpleGroupingFactory('simple-grouping', SimpleGroupingOperation::class));
-$builder->registerFactory(new CsvFileWriterFactory('csv-write', FileWriterOperation::class));
-```
-
-### Coding an ETL Chain
-
-You can see find here more information [here](docs/ChainCoded.md).
-
-### Configuring a ETL Chain
-
-Let's create a yml file describing the chain instead of wiring all the code we wrote above.
-
-```yaml
-transform1:
-  operation: rule-engine-transformer
-  options:
-    add: true
-    columns:
-      uid:
-        - implode:
-            values:
-              - 'PREFIX'
-              - [{get : {field: 'ID_PART1'}}]
-              - [{get : {field: "ID_PART2"}}]
-            with: "_"
-
-group:
-  operation: simple-grouping
-  options:
-    grouping-key: [sku]
-    group-identifier: [locale]
-
-transform2:
-  operation: rule-engine-transformer
-  options:
-    add: false
-    columns:
-        uid: # Fetching the uid of the first element!
-            - get : {field: [0, 'uid']}
-            
-        label: # Fetching te label from the first if available and if not the second item.
-            - get : {field: [0, 'label']}
-            - get : {field: [1, 'label']}
-
-write:
-  operation: csv-write
-  options:
-    file: exemples/output.csv
-```
-
-Now we can run this : 
-
-```php
-<?php
-$builder = new ChainBuilder();
-$chainProcessor = $builder->buildChainProcessor(Yaml::parse(file_get_contents(__DIR__ . '/exemples/etl_chain.yml')));
-$context = [];
-
-$chainProcessor->process($inputIterator, $context);
-```
-
-As you can see we have simply used the chain builder instead of creating each operation manually.
+Please see the [describe chains using yaml configurations](docs/DescribeChain.md)
 
 ## Creating you own operations. 
 
@@ -181,6 +101,7 @@ class MyOperation extends Oliverde8\Component\PhpEtl\ChainOperation\AbstractChai
 
 If you wish your operation to only process certain item types, for example data items, you can change the signature 
 of your `processItem` method.
+
 ```php
 class MyOperation extends Oliverde8\Component\PhpEtl\ChainOperation\AbstractChainOperation
 {

@@ -1,3 +1,9 @@
+# 1.1.0
+- :star2: Docs & Docs & Docs, lots of new & better documentation
+- :star2: Added Support to the ChainBuilder for the `Split` operation
+- :star2: Added ne Filter operation to filter data.
+
+
 # 1.0.3
 - :wrench: Fix - Stop Item is sent multiple times when using a step returns multiple GroupedItem's
 
