@@ -68,9 +68,10 @@ abstract class AbstractChainOperation implements ChainOperationInterface
             return true;
         }
 
-        $parentClass = get_parent_class($class);
-        if ($parentClass) {
-            return $this->getExtensionDistance($parentClass, $targetClass);
+        while($class = get_parent_class($class)) {
+            if ($class == $targetClass) {
+                return true;
+            }
         }
 
         return false;
@@ -90,4 +91,5 @@ abstract class AbstractChainOperation implements ChainOperationInterface
 
         return true;
     }
+
 }
