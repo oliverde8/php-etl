@@ -10,6 +10,7 @@ use Oliverde8\Component\PhpEtl\Item\ChainBreakItem;
 use Oliverde8\Component\PhpEtl\Item\DataItem;
 use Oliverde8\Component\PhpEtl\Item\GroupedItemInterface;
 use Oliverde8\Component\PhpEtl\Item\ItemInterface;
+use Oliverde8\Component\PhpEtl\Item\MixItem;
 use Oliverde8\Component\PhpEtl\Item\StopItem;
 use Oliverde8\Component\PhpEtl\Model\ExecutionContext;
 use Oliverde8\Component\PhpEtl\Model\LoggerContext;
@@ -95,7 +96,18 @@ class ChainProcessor extends LoggerContext implements ChainProcessorInterface
         for ($chainNumber = $startAt; $chainNumber < count($this->chainLinks); $chainNumber++) {
             $item = $this->processItemWithOperation($item, $chainNumber, $context);
 
-            if ($item instanceof GroupedItemInterface) {
+            if ($item instanceof MixItem) {
+                $context->setLoggerContext(self::KEY_LOGGER_ETL_IDENTIFIER, "chain link:{$this->chainLinkNames[$chainNumber]}-");
+
+                foreach ($item->getItems() as $mixItem) {
+                    if ($mixItem instanceof GroupedItemInterface) {
+                        $item = $this->processItems($mixItem->getIterator(), $chainNumber + 1, $context, false);
+                    } else {
+                        $item = $this->processItem($mixItem, $chainNumber+1, $context);
+                    }
+                }
+                return $item;
+            } elseif ($item instanceof GroupedItemInterface) {
                 $context->setLoggerContext(self::KEY_LOGGER_ETL_IDENTIFIER, "chain link:{$this->chainLinkNames[$chainNumber]}-");
                 $this->processItems($item->getIterator(), $chainNumber + 1, $context, false);
 

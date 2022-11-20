@@ -15,7 +15,9 @@ use Oliverde8\Component\PhpEtl\Exception\ChainOperationException;
 use Oliverde8\Component\PhpEtl\ExecutionContextFactory;
 use Oliverde8\Component\PhpEtl\Item\ChainBreakItem;
 use Oliverde8\Component\PhpEtl\Item\DataItem;
+use Oliverde8\Component\PhpEtl\Item\GroupedItem;
 use Oliverde8\Component\PhpEtl\Item\ItemInterface;
+use Oliverde8\Component\PhpEtl\Item\MixItem;
 use PHPUnit\Framework\TestCase;
 
 class ChainProcessorTest extends TestCase
@@ -155,6 +157,27 @@ class ChainProcessorTest extends TestCase
         $this->assertEquals(4, $count1);
         $this->assertEquals(2, $count2);
         $this->assertEquals(1, $count3);
+    }
+
+    public function testMixItems()
+    {
+        $values1 = [];
+        $values2 = [];
+
+        $mock1 = new CallbackTransformerOperation(function (ItemInterface $item) use (&$values1) {
+            $values1[] = $item->getData();
+            return new MixItem([$item, new GroupedItem(new \ArrayIterator([3, 4])), new DataItem(5)]);
+        });
+        $mock2 = new CallbackTransformerOperation(function (ItemInterface $item) use (&$values2) {
+            $values2[] = $item->getData();
+            return $item;
+        });
+
+        $chainProcessor = new ChainProcessor([$mock1, $mock2], new ExecutionContextFactory());
+        $chainProcessor->process(new \ArrayIterator([1,2]), ['toto']);
+
+        $this->assertEquals([1, 2], $values1);
+        $this->assertEquals([1, 3, 4, 5, 2, 3, 4, 5], $values2);
     }
 
     public function testException()
