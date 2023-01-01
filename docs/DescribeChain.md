@@ -11,7 +11,7 @@ $builder->registerFactory(new CsvExtractFactory('csv-read', CsvExtractOperation:
 // ...
 ```
 
-Then you can create load the yaml and use it to create the ChainProcessor. 
+Then you can load the yaml and use it to create the ChainProcessor. 
 
 ```php
 $chainProcessor $builder->buildChainProcessor(
@@ -194,7 +194,7 @@ It's the responsibility of the Extraction Operation to return this item; the ETL
 Let us continue with a few additional examples to see how powerfull phpEtl can be. We will get into more details on 
 all available operations and options later.
 
-### Example - Grouping
+### Example 03 - Grouping
 
 A second example we can work on is to write a json file where customers are grouped based on their subscription state.
 We will write this in json as its more suited to understand what we are doing. 
@@ -230,7 +230,7 @@ This works like the csv file, but is more suited for complex multi level datas a
 You can test this rule yourself, check the [transform yml](examples/03-json-grouped-merge.yml)
 and by executing `php docs/examples/03-json-grouped-merge.php`
 
-### Example - Keep subscribed customers only
+### Example 04 - Keep subscribed customers only
 
 We can also filter data preventing some of it from being propagated through all the chain, in our example
 it will prevent unsubscribed customers from being written in our final csv file. 
@@ -252,7 +252,7 @@ This might seem limiting but the rule engine does support SymfonyExpressions whi
 You can test this rule yourself, check the [transform yml](examples/04-csv-filter.yml)
 and by executing `php docs/examples/04-csv-filter.php`
 
-### Example - Write 3 customer files
+### Example 05 - Write 3 customer files
 
 In our next example which will be also the last of this section we wish to write 3 files. 
 - One file containing all the customers
@@ -322,10 +322,102 @@ S2 --->|Susbscribed| S3(Write Both)
 S2 --->|UnSubscribed| S3
 ```
 
-## Available Operations
+### Example 06 - Making your chains configurable
+
+You are able to configure through the input the names of the files that are being read. 
+
+```php
+$chainProcessor->process(
+    new ArrayIterator([__DIR__ . "/customers.csv"]),
+    []
+);
+```
+
+But we might need to configure some operations independently from the input. For example the name of the csv output file. 
+
+```yaml
+write-new-file:
+  operation: csv-write
+  options:
+    file: "output.csv"
+```
+
+The name "output.csv" is hardcoded here. But we can make this dynamic with symfony expression language. We will need
+to start our line with the `!` character. 
+
+```yaml
+write-new-file:
+  operation: csv-write
+  options:
+    file: "!filewriter['outputfile']['name']"
+```
+
+We will also need to give this informaton when the chain is being created: 
+
+```php
+$inputOptions = ['filewriter' =>
+    ['outputfile' =>
+        ['name' => 'configured-output.csv']
+    ]
+];
+
+$chainProcessor = $builder->buildChainProcessor(
+    Yaml::parse(file_get_contents($fileName))['chain'],
+    $inputOptions
+);
+```
+
+You can test this rule yourself, check the [transform yml](examples/06-csv-transform.yml)
+and by executing `php docs/examples/06-csv-transform.php`
+
+### Example 07 - Flatten yml files to csv
+
+Complex `json` files can be flattened and have multiple columns using the rule engine. In our example [json](./examples/products.json) 
+we have a list of products with their name, their skus etc. The name of the product is different for each locale. 
+
+We could manually create a list of columns for each locale using the rule engine, but this will not be very generic, 
+and if we have a lot of locales & a lot of translatable fields on our products this will be complicated to maintain.
+
+We can use dynamic columns for this purpose. To use this we will need to list locales when starting the process: 
+
+```php
+$chainProcessor->process(
+    new ArrayIterator([__DIR__ . "/products.json"]),
+    [
+        'locales' => ['fr_FR', 'en_US']
+    ]
+);
+```
+
+Then we will use the following rule to read the name for each of the given locales: 
+```yaml
+        'name-{@context/locales}':
+          rules:
+            - get : {field: ['name', '@context/locales']}
+```
+
+As you can see the `{@context/locales}` part of the columns name is dynamic. We can use then the get rule to read the 
+data from that product. We could also have used symfony expression language but both behaves differently if the 
+given locale is missing. `get` will simply return an empty column, symfont expression language rule will fail. 
+
+You can test this rule yourself, check the [transform yml](examples/07-json-transform.yml)
+and by executing `php docs/examples/07-json-transform.php`
+
+## Additional information
+
+### File Abstraction Layer
+
+The etl has a file abstraction layer when reading & writing files. By default, that's the local file system and
+gives the etl access to all files on the server. 
+
+Different integrations of the ETL will behave differently. The symfony integration for example will create a directory 
+per execution and each execution will only be able to interact with files in that directory by default. This allows 
+user interfaces to display loaded & extracted files.
+
+### Conclusion
 
 You can now read the [Operations](Operations.md) documentation that list all available operations
 
-You can also read all [available rules](RuleEngine.md) for the rule operation. 
+You can also read all [Available Rules](RuleEngine.md) for the rule operation. 
 
 Finally check for additional examples here(TBD). 

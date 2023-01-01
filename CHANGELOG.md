@@ -6,6 +6,7 @@
 - :star2: Feature #17 - Add new complex item MixItem. This allows operations to return more than one type of item.
 - :star2: Feature #18 - Add new Item FileExtractedItem. Operations extracting data from files should send this item once all the data has been extracted.
 - :star2: Feature #19 - Add new Item FileLoadedItem. Operations loading data into files should send this item once all the data has been written.
+- :star2: Feature #4 - Add new split item operation
 
 # 1.0.3
 - :wrench: Fix - Stop Item is sent multiple times when using a step returns multiple GroupedItem's

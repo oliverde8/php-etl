@@ -28,15 +28,24 @@ class Csv extends AbstractCsvFile implements \Iterator
     protected function init()
     {
         if (is_null($this->file)) {
-            $this->file = fopen($this->filePath, 'r');
-            $headers = fgetcsv($this->file, 0, $this->delimiter, $this->enclosure, $this->escape);
-
-            if (is_null($this->headers)) {
-                $this->headers = $headers;
-            }
-
-            $this->next();
+            $this->setStream(fopen($this->filePath, 'r'));
         }
+    }
+
+    public function setStream($file)
+    {
+        if (!is_null($file)) {
+            throw new \LogicException("Can't set a stream, stream already open!");
+        }
+
+        $this->file = $file;
+        $headers = fgetcsv($this->file, 0, $this->delimiter, $this->enclosure, $this->escape);
+
+        if (is_null($this->headers)) {
+            $this->headers = $headers;
+        }
+
+        $this->next();
     }
 
     /**

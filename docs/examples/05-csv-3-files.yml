@@ -8,7 +8,7 @@ chain:
     options:
       branches:
         -
-          filter-unsubscribed:
+          filter-subscribed:
             operation: filter
             options:
               rule: [{get : {field: 'IsSubscribed'}}]
@@ -19,7 +19,7 @@ chain:
             options:
               file: "subscribed.csv"
         -
-          filter-subscribed:
+          filter-unsubscribed:
             operation: filter
             options:
               rule: [{get : {field: 'IsSubscribed'}}]

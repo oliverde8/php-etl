@@ -16,6 +16,7 @@ class CsvExtractFactory extends AbstractFactory
             $options['enclosure'] ?? '"',
             $options['escape'] ?? '\\',
             $options['fileKey'] ?? 'file',
+            $options['scoped'] ?? false,
         );
     }
 }
