@@ -1,4 +1,5 @@
-productId;sku;name-fr_FR;name-en_US
-1;sku1;"Mon Produit 1";"My Product 1"
-2;sku2;"Mon Produit 2";"My Product 2"
-3;sku3;"Mon Produit 3";"My Product 3"
+createdAt;name;avatar;id
+2023-01-04T19:54:01.129Z;"Tracey Howe I";https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/562.jpg;1
+2023-01-04T18:43:35.731Z;"Mrs. Robyn Daniel";https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/101.jpg;4
+2023-01-05T03:16:52.156Z;"Peggy Block";https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/1016.jpg;7
+2023-01-05T02:02:58.602Z;"Justin Hodkiewicz";https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/400.jpg;10

@@ -403,6 +403,74 @@ given locale is missing. `get` will simply return an empty column, symfont expre
 You can test this rule yourself, check the [transform yml](examples/07-json-transform.yml)
 and by executing `php docs/examples/07-json-transform.php`
 
+### Example 08 - Write the result of an API to a CSV File. 
+
+The php etl also provides a basic http client operation, this operation will allow us to get or push data throught
+rest api's. 
+
+Let's call a mock api returning a list of users.
+
+```yaml
+  get-from-api:
+    operation: http
+    options:
+      url: https://63b687951907f863aaf90ab1.mockapi.io/test
+      method: GET
+      response_is_json: true
+      option_key: ~
+      response_key: ~
+      options:
+        headers: {'Accept': 'application/json'}
+```
+
+Using `response_is_json` allow us to decode the json returned by the api automaticall. `option_key` will allow us to 
+pass additional options to the query. This can be used to add dynamic headers, or data that needs to be posted. 
+If `response_key` is set that the response data will be added to the original data object. If not the response will 
+replace the object.
+
+This will return a single DataItem with all the users of the api. We will need to split this item in order to process
+each users individually. 
+
+```yaml
+  split-item:
+    operation: split-item
+    options:
+      keys: ['content']
+      singleElement: true
+```
+
+Now we can write the users into the csv file, as we have done so in our previous examples.
+You can test this rule yourself, check the [transform yml](examples/08-api-to-csv.yml)
+and by executing `php docs/examples/08-api-to-csv.yml`
+
+### Example 09 - Write the result of an API to a CSV File.
+
+Previously we fetched from a mock api all the users, what if we need to call individual api's for each user id. 
+In order to achieve this we need the url of our api to be "dynamic" as at each execution we need to use another
+user id. 
+
+We can achieve this by using symfony expressions in the url key. To tell the operation that a symfony expression
+is being used just prefix it with a `@`. 
+
+```yaml
+  get-from-api:
+    operation: http
+    options:
+      url: '@"https://63b687951907f863aaf90ab1.mockapi.io/test/"~data["id"]'
+      method: GET
+      response_is_json: true
+      option_key: "-placeholder-"
+      response_key: ~
+      options:
+        headers: {'Accept': 'application/json'}
+```
+We will also change the `option_key`, if not our data (id = 1), will be sent into the options of the HttpClient, which 
+will cause an error. Having an invalid key here will allow us not to have any options. 
+
+Now we can write the users into the csv file, as we have done so in our previous examples.
+You can test this rule yourself, check the [transform yml](examples/09-api-to-csv2.yml)
+and by executing `php docs/examples/09-api-to-csv2.yml`
+
 ## Additional information
 
 ### File Abstraction Layer

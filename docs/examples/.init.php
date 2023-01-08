@@ -8,6 +8,7 @@ use Oliverde8\Component\PhpEtl\Builder\Factories\Loader\CsvFileWriterFactory;
 use Oliverde8\Component\PhpEtl\Builder\Factories\Loader\JsonFileWriterFactory;
 use Oliverde8\Component\PhpEtl\Builder\Factories\Transformer\FilterDataFactory;
 use Oliverde8\Component\PhpEtl\Builder\Factories\Transformer\RuleTransformFactory;
+use Oliverde8\Component\PhpEtl\Builder\Factories\Transformer\SimpleHttpOperationFactory;
 use Oliverde8\Component\PhpEtl\Builder\Factories\Transformer\SplitItemFactory;
 use Oliverde8\Component\PhpEtl\ChainBuilder;
 use Oliverde8\Component\PhpEtl\ChainOperation\ChainSplitOperation;
@@ -17,6 +18,7 @@ use Oliverde8\Component\PhpEtl\ChainOperation\Grouping\SimpleGroupingOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Loader\FileWriterOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\FilterDataOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\RuleTransformOperation;
+use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\SimpleHttpOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\SplitItemOperation;
 use Oliverde8\Component\PhpEtl\ChainProcessor;
 use Oliverde8\Component\PhpEtl\ExecutionContextFactory;
@@ -49,6 +51,7 @@ function getChainProcessor($fileName, $options = []): ChainProcessor
     $builder->registerFactory(new CsvExtractFactory('csv-read', CsvExtractOperation::class));
     $builder->registerFactory(new JsonExtractFactory('json-read', JsonExtractOperation::class));
     $builder->registerFactory(new SplitItemFactory('split-item', SplitItemOperation::class));
+    $builder->registerFactory(new SimpleHttpOperationFactory('http', SimpleHttpOperation::class));
 
     return $builder->buildChainProcessor(
         Yaml::parse(file_get_contents($fileName))['chain'],
