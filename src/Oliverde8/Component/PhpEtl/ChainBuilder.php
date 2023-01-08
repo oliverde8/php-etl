@@ -52,14 +52,14 @@ class ChainBuilder
      * @throws Exception\ChainBuilderValidationException
      * @throws UnknownOperationException
      */
-    public function buildChainProcessor(array $configs, array $inputOptions = []): ChainProcessorInterface
+    public function buildChainProcessor(array $configs, array $inputOptions = [], int $maxAsynchronousItems = 10): ChainProcessorInterface
     {
         $chainOperations = [];
         foreach ($configs as $id => $operation) {
             $chainOperations[$id] = $this->getOperationFromConfig($operation, $inputOptions);
         }
 
-        return new ChainProcessor($chainOperations, $this->contextFactory);
+        return new ChainProcessor($chainOperations, $this->contextFactory, $maxAsynchronousItems);
     }
 
     /**

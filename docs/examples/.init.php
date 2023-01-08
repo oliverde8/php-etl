@@ -26,10 +26,7 @@ use Symfony\Component\Yaml\Yaml;
 
 require_once __DIR__ . "/../../vendor/autoload.php";
 
-function getChainProcessor($fileName, $options = []): ChainProcessor
-{
-    $fileName = str_replace(".php", ".yml", $fileName);
-
+function getBuilder(){
     $ruleApplier = new \Oliverde8\Component\RuleEngine\RuleApplier(
         new \Psr\Log\NullLogger(),
         [
@@ -53,8 +50,16 @@ function getChainProcessor($fileName, $options = []): ChainProcessor
     $builder->registerFactory(new SplitItemFactory('split-item', SplitItemOperation::class));
     $builder->registerFactory(new SimpleHttpOperationFactory('http', SimpleHttpOperation::class));
 
-    return $builder->buildChainProcessor(
+    return $builder;
+}
+
+function getChainProcessor($fileName, $options = []): ChainProcessor
+{
+    $fileName = str_replace(".php", ".yml", $fileName);
+
+    return getBuilder()->buildChainProcessor(
         Yaml::parse(file_get_contents($fileName))['chain'],
-        $options
+        $options,
+        1
     );
 }

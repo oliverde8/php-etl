@@ -120,7 +120,7 @@ class ChainProcessor extends LoggerContext implements ChainProcessorInterface
 
         if ($item instanceof AsyncItemInterface) {
             while (count($this->asyncItems) >= $this->maxAsynchronousItems) {
-                sleep(1);
+                usleep(1000);
                 $this->processAsyncOperations();
             }
             $this->asyncItems[] = [
@@ -135,12 +135,16 @@ class ChainProcessor extends LoggerContext implements ChainProcessorInterface
 
             foreach ($item->getItems() as $mixItem) {
                 if ($mixItem instanceof AsyncItemInterface) {
-                    $this->processItemWithChain($mixItem, $chainNumber, $context);
+                    $item = $this->processItemWithChain($mixItem, $chainNumber, $context);
                 } elseif ($mixItem instanceof GroupedItemInterface) {
-                    $this->processItems($mixItem->getIterator(), $chainNumber + 1, $context, false);
+                    $item = $this->processItems($mixItem->getIterator(), $chainNumber + 1, $context, false);
                 } else {
-                    $this->processItemWithChain($mixItem, $chainNumber + 1, $context);
+                    $item = $this->processItemWithChain($mixItem, $chainNumber + 1, $context);
                 }
+            }
+
+            if ($item instanceof StopItem) {
+                return $item;
             }
             return new ChainBreakItem();
         } elseif ($item instanceof GroupedItemInterface) {
@@ -173,7 +177,7 @@ class ChainProcessor extends LoggerContext implements ChainProcessorInterface
             $this->processAsyncOperations();
 
             if (!empty($this->asyncItems)) {
-                sleep(1);
+                usleep(1000);
             }
         }
     }

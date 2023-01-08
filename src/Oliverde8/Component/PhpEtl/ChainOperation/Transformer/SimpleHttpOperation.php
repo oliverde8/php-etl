@@ -7,6 +7,7 @@ namespace Oliverde8\Component\PhpEtl\ChainOperation\Transformer;
 use oliverde8\AssociativeArraySimplified\AssociativeArray;
 use Oliverde8\Component\PhpEtl\ChainOperation\AbstractChainOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\DataChainOperationInterface;
+use Oliverde8\Component\PhpEtl\Item\AsyncHttpClientResponseItem;
 use Oliverde8\Component\PhpEtl\Item\DataItem;
 use Oliverde8\Component\PhpEtl\Item\DataItemInterface;
 use Oliverde8\Component\PhpEtl\Item\ItemInterface;
@@ -60,28 +61,12 @@ class SimpleHttpOperation extends AbstractChainOperation implements DataChainOpe
         $url = $this->url;
         if (strpos($url, "@") === 0) {
             $url = ltrim($url, '@');
-            var_dump($data);
             $url = $this->expressionLanguage->evaluate($url, ['data' => $data]);
         }
-        var_dump($url);
 
         $response = $this->client->request($this->method, $url, $options);
+        $response->getInfo();
 
-        $responseData = [
-            'content' => $response->getContent(),
-            'headers' => $response->getHeaders(),
-            'status_code' => $response->getStatusCode(),
-        ];
-        if ($this->responseIsJson) {
-            $responseData['content'] = $response->toArray();
-        }
-
-        if ($this->responseKey) {
-            AssociativeArray::setFromKey($data, $this->responseKey, $responseData);
-        } else {
-            $data = $responseData;
-        }
-
-        return new DataItem($data);
+        return new AsyncHttpClientResponseItem($this->client, $response, $this->responseIsJson, $this->responseKey, $data);
     }
 }

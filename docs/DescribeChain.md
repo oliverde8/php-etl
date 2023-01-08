@@ -16,6 +16,8 @@ Then you can load the yaml and use it to create the ChainProcessor.
 ```php
 $chainProcessor $builder->buildChainProcessor(
     Yaml::parse(file_get_contents($fileName))['chain']
+    [],
+    10 // Max number of conncurent/asynchonous items to handle.
 );
 ```
 
@@ -139,55 +141,6 @@ PhpEtl works by propagating Items from one end of the chain to the other. On it'
 - **Modified:** when we modify the item. In the previous example if we replaced the **rule** operation with `add: true`
 - **Untouched:** The operation might use the item todo a process but then return it back untouched. The write csv operation does this, it reads the item data and writes it in a file, then returns it back. Allowing additional processing to be done after.
 - **Dropped:** A step might decide that the item is invalid, in which case we wish to prevent the item to continue to be propageted in the chain. We can also use this to group data.
-
-For this purpose the ETL comes with 4 basic Item types. This can be extended to make more complex behaviours 
-if needed when developing custom operations.
-
-### DataItem 
-
-This is our main object we will be receiving containing an associative array of data. You can instiate new ones as needed. 
-You receive it in argument, and you can return it in your process function. 
-
-### ChainBreakItem
-
-Your operation can return a chainBreakItem if you want to stop the current objects propagation in the next steps 
-of the chain. 
-
-### GroupedItem 
-
-Can only be returned by an operation, as grouped items are not propagated as they are. GroupedItems are split into 
-individual DataItems automatically by the intrnal workings of the Etl. 
-
-A CSV reader will for example return a GroupedItem of a Csv Reader iterator. 
-
-### StopItem
-
-Can be received and returned, but you should never entirely replace a StopItem nor should you initiate a 
-new StopItem yourself.  
-
-The StopItem is automatically created by the ETL, the etl will continue to push a StopItem as long as it has not been 
-propagated through all the operation. So if an operation ignores the StopItem and returns a DataItem, that operation
-will continue to receive a StopItem until it returns back a StopItem. 
-
-A File writing operation will for example close the file when it receives a StopItem, 
-
-An operation that groups data will for example return a DataItem when it reveice a StopItem for the first time. That's
-the data in had in memory that it needs to propagate. The second time it receives a StopItem it has nothing more
-to propagate, it will therefore return the StopItem and allow the chain to end. 
-
-### FileExtractedItem
-
-This item is propagated after all lines/data from a file has been extracted. It's mostly ignored but could be used by 
-custom steps to archive read files for example or for other purposes. 
-
-It's the responsibility of the Extraction Operation to return this item; the ETL does not make it mandatory.
-
-### FileLoadedItem
-
-This item is propagated after we finished writing in a file. This can be used to archive a file, send a file to an sftp
-our per email...
-
-It's the responsibility of the Extraction Operation to return this item; the ETL does not make it mandatory.
 
 ## Fundamentals - Understanding more "complex" chains
 
@@ -467,9 +420,13 @@ is being used just prefix it with a `@`.
 We will also change the `option_key`, if not our data (id = 1), will be sent into the options of the HttpClient, which 
 will cause an error. Having an invalid key here will allow us not to have any options. 
 
+Let us note that this operation runs multiple queries with concurrency. A single Symfony HttpClient is created for this
+operation. And using the AsyncItems functionality of the ETL, we can run all the http requests in parallel. 
+
 Now we can write the users into the csv file, as we have done so in our previous examples.
 You can test this rule yourself, check the [transform yml](examples/09-api-to-csv2.yml)
 and by executing `php docs/examples/09-api-to-csv2.yml`
+
 
 ## Additional information
 
