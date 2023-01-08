@@ -8,6 +8,7 @@
 - :star2: Feature #19 - Add new Item FileLoadedItem. Operations loading data into files should send this item once all the data has been written.
 - :star2: Feature #4 - Add new split item operation
 - :star2: Feature #11 - Add a Http client operation using symfony http client.
+- :star2: Feature #24 - Added support for Asynchronous Items. The Processor will then wait for the item to finish before transferring it to the next operation.
 
 # 1.0.3
 - :wrench: Fix - Stop Item is sent multiple times when using a step returns multiple GroupedItem's

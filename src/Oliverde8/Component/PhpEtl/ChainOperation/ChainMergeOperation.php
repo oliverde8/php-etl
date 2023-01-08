@@ -37,7 +37,7 @@ class ChainMergeOperation extends AbstractChainOperation implements DataChainOpe
     {
         $returnItems = [];
         foreach ($this->chainProcessors as $chainProcessor) {
-            $returnItems[] = $chainProcessor->processItem($item, 0,  $context);
+            $returnItems[] = $chainProcessor->processItemWithChain($item, 0,  $context);
         }
 
         // Nothing to process.
@@ -47,7 +47,7 @@ class ChainMergeOperation extends AbstractChainOperation implements DataChainOpe
     public function processStop(StopItem $item, ExecutionContext $context): ItemInterface
     {
         foreach ($this->chainProcessors as $chainProcessor) {
-            $result = $chainProcessor->processItem($item, 0,  $context);
+            $result = $chainProcessor->processItemWithChain($item, 0,  $context);
 
             if ($result !== $item) {
                 // Return a new stop item in order to continue flushing out data with stop items.
