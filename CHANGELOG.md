@@ -12,6 +12,7 @@
 
 # 1.0.3
 - :wrench: Fix - Stop Item is sent multiple times when using a step returns multiple GroupedItem's
+- :star2: Added support for psr/log 2 & 3. (no code needed)
 
 # 1.0.2
 - :wrench: Fix - Context not being finalised when there is an exception.
