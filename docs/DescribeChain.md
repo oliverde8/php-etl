@@ -46,9 +46,9 @@ Let us consider a csv file with 4 columns:
 
 We would like to output a new CSV file with only 2 columns
 - Name, that contains the concatenation of FirstName & LastName
-- SubscriptionStatus which for now is the same value as the previous IsSubscribed column remapped. 
+- SubscriptionStatus which is the same value as the previous IsSubscribed column remapped. 
 
-So our first operation needs to read a csv file. You can find an example file [here](examples/customers.csv)
+So our first operation needs to read a csv file. You can find an example csv file [here](examples/customers.csv)
 
 ```yaml
 read-file:
@@ -103,7 +103,7 @@ write-new-file:
   operation: csv-write
   options:
     file: "output.csv"
-  ```
+```
 
 This step is quite simple and the only option needed here is the name of the output file. 
 
@@ -122,7 +122,7 @@ You can test this rule yourself, check the [transform yml](examples/01-csv-trans
 The way phpEtl works is by sending individual data to each step.
 So our file path will be sent to the first step that will not return the file path, but will read the file and split 
 that data in as many lines as the csv file contains. So running the Etl with multiple input file will allow us to use
-this same chain to merge multiple customers csv files. 
+this same chain to merge multiple customer csv files. 
 
 ```php
 $chainProcessor->process(
@@ -140,11 +140,11 @@ PhpEtl works by propagating Items from one end of the chain to the other. On it'
 - **Replaced**, when we create a new item based of the data of the pervious item. We used for example the **rule** operation with `add: false`
 - **Modified:** when we modify the item. In the previous example if we replaced the **rule** operation with `add: true`
 - **Untouched:** The operation might use the item todo a process but then return it back untouched. The write csv operation does this, it reads the item data and writes it in a file, then returns it back. Allowing additional processing to be done after.
-- **Dropped:** A step might decide that the item is invalid, in which case we wish to prevent the item to continue to be propageted in the chain. We can also use this to group data.
+- **Dropped:** A step might decide that the item is invalid, in which case we wish to prevent the item to continue to be propagated in the chain. We can also use this to group data.
 
 ## Fundamentals - Understanding more "complex" chains
 
-Let us continue with a few additional examples to see how powerfull phpEtl can be. We will get into more details on 
+Let us continue with a few additional examples to see how powerful phpEtl can be. We will get into more details on 
 all available operations and options later.
 
 ### Example 03 - Grouping
@@ -213,7 +213,7 @@ In our next example which will be also the last of this section we wish to write
 - A third file with subscribed customers. 
 
 To achieve this we will use the split operation. This operation creates multiple new chains linked to the first chain. 
-The result of thise new chains are not attached to the main chain. So if we do any filtering in one of these 
+The result of these new chains are not attached to the main chain. So if we do any filtering in one of these 
 **branches** as they are called, the filtering will not be visible on the main branch. 
 
 For our example, the main branch will be used to write all customers, this is very similar to what we did in the
@@ -351,7 +351,7 @@ Then we will use the following rule to read the name for each of the given local
 
 As you can see the `{@context/locales}` part of the columns name is dynamic. We can use then the get rule to read the 
 data from that product. We could also have used symfony expression language but both behaves differently if the 
-given locale is missing. `get` will simply return an empty column, symfont expression language rule will fail. 
+given locale is missing. `get` will simply return an empty column, symfony expression language rule will fail. 
 
 You can test this rule yourself, check the [transform yml](examples/07-json-transform.yml)
 and by executing `php docs/examples/07-json-transform.php`
@@ -379,7 +379,7 @@ Let's call a mock api returning a list of users.
 Using `response_is_json` allow us to decode the json returned by the api automaticall. `option_key` will allow us to 
 pass additional options to the query. This can be used to add dynamic headers, or data that needs to be posted. 
 If `response_key` is set that the response data will be added to the original data object. If not the response will 
-replace the object.
+replace the input data.
 
 This will return a single DataItem with all the users of the api. We will need to split this item in order to process
 each users individually. 
@@ -403,7 +403,9 @@ In order to achieve this we need the url of our api to be "dynamic" as at each e
 user id. 
 
 We can achieve this by using symfony expressions in the url key. To tell the operation that a symfony expression
-is being used just prefix it with a `@`. 
+is being used just prefix it with a `@`. (`!` is for using values from the input, @ is for using data from the current data.
+All fields do not support `@` as it's handled by each operation. but all fields support `!` as it's generated before the etl starts 
+processing).
 
 ```yaml
   get-from-api:

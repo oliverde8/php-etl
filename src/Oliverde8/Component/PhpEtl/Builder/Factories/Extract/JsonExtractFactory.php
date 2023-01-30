@@ -9,6 +9,6 @@ class JsonExtractFactory extends AbstractFactory
 {
     protected function build(string $operation, array $options): ChainOperationInterface
     {
-        return $this->create($options['fileKey'] ?? 'file', $options['scoped'] ?? false);
+        return $this->create($options['fileKey'] ?? 'file', $options['scoped'] ?? true);
     }
 }

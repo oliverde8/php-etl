@@ -10,7 +10,7 @@
 
 Php etl is a ETL that will allow transformation of data in a simple and efficient way.
 
-It comes in 2 components : 
+It comes in 2 php components : 
 
 ## Rule engine
 
@@ -27,15 +27,15 @@ means it can:
 - Transform data 
 - Load the data somewhere. 
 
-Data will propagate throught the ETL operations using Items, there can be different type of items. We will detail this later. 
+Data will propagate throught the ETL operations using Items, there can be different type of items (We will detail this later.)
 
 Chain operations consumes one **item** in order to create a new **item** or an **iterator**. The purpose is to always 
-process data individually. For example if importing customers we try to never have the data of more then one
+process data individually. For example if we are importing customers we try to never have the data of more than one
 customer in memory. 
 
 ### Examples of how it works
 
-We will have more detailled examples when we check how to use the etl. 
+We will have more detailed real use cases with sample data a bit further in the document.
 
 In the simplest case the chains receive an iterator containing 2 items in input, both items
 are processed by each chain operation. This could be for example a list of customer. Each operation
