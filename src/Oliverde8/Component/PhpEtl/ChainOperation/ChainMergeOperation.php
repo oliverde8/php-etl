@@ -7,6 +7,7 @@ namespace Oliverde8\Component\PhpEtl\ChainOperation;
 use Oliverde8\Component\PhpEtl\ChainProcessor;
 use Oliverde8\Component\PhpEtl\Item\DataItemInterface;
 use Oliverde8\Component\PhpEtl\Item\ItemInterface;
+use Oliverde8\Component\PhpEtl\Item\MixItem;
 use Oliverde8\Component\PhpEtl\Item\StopItem;
 use Oliverde8\Component\PhpEtl\Model\ExecutionContext;
 
@@ -17,7 +18,7 @@ use Oliverde8\Component\PhpEtl\Model\ExecutionContext;
  * @copyright 2018 Oliverde8
  * @package Oliverde8\Component\PhpEtl\ChainOperation
  */
-class ChainSplitOperation extends AbstractChainOperation implements DataChainOperationInterface
+class ChainMergeOperation extends AbstractChainOperation implements DataChainOperationInterface
 {
     /** @var ChainProcessor[] */
     protected array $chainProcessors;
@@ -34,12 +35,13 @@ class ChainSplitOperation extends AbstractChainOperation implements DataChainOpe
 
     public function processData(DataItemInterface $item, ExecutionContext $context): ItemInterface
     {
+        $returnItems = [];
         foreach ($this->chainProcessors as $chainProcessor) {
-            $chainProcessor->processItemWithChain($item, 0,  $context);
+            $returnItems[] = $chainProcessor->processItemWithChain($item, 0,  $context);
         }
 
         // Nothing to process.
-        return $item;
+        return new MixItem($returnItems);
     }
 
     public function processStop(StopItem $item, ExecutionContext $context): ItemInterface

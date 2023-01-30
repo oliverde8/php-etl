@@ -6,10 +6,12 @@ namespace Oliverde8\Component\PhpEtl;
 
 use Oliverde8\Component\PhpEtl\ChainOperation\ChainOperationInterface;
 use Oliverde8\Component\PhpEtl\Exception\ChainOperationException;
+use Oliverde8\Component\PhpEtl\Item\AsyncItemInterface;
 use Oliverde8\Component\PhpEtl\Item\ChainBreakItem;
 use Oliverde8\Component\PhpEtl\Item\DataItem;
 use Oliverde8\Component\PhpEtl\Item\GroupedItemInterface;
 use Oliverde8\Component\PhpEtl\Item\ItemInterface;
+use Oliverde8\Component\PhpEtl\Item\MixItem;
 use Oliverde8\Component\PhpEtl\Item\StopItem;
 use Oliverde8\Component\PhpEtl\Model\ExecutionContext;
 use Oliverde8\Component\PhpEtl\Model\LoggerContext;
@@ -33,14 +35,23 @@ class ChainProcessor extends LoggerContext implements ChainProcessorInterface
     /** @var string[] */
     protected array $chainLinkNames = [];
 
+    protected array $asyncItems = [];
+
+    protected int $maxAsynchronousItems = 10;
+
     /**
      * ChainProcessor constructor.
      *
      * @param ChainOperationInterface[] $chainLinks
      */
-    public function __construct(array $chainLinks, ExecutionContextFactoryInterface $contextFactory)
+    public function __construct(
+        array $chainLinks,
+        ExecutionContextFactoryInterface $contextFactory,
+        int $maxAsynchronousItems = 10
+    )
     {
         $this->contextFactory = $contextFactory;
+        $this->maxAsynchronousItems = $maxAsynchronousItems;
         $this->chainLinkNames = array_keys($chainLinks);
         $this->chainLinks = array_values($chainLinks);
     }
@@ -76,13 +87,15 @@ class ChainProcessor extends LoggerContext implements ChainProcessorInterface
             $context->setLoggerContext(self::KEY_LOGGER_ETL_IDENTIFIER, $identifierPrefix . $count++);
 
             $dataItem = new DataItem($item);
-            $this->processItem($dataItem, $startAt, $context);
+            $this->processItemWithChain($dataItem, $startAt, $context);
         }
+
+        $this->endAllAsyncOperations();
 
         $stopItem = new StopItem();
         if ($withStop) {
             $context->setLoggerContext(self::KEY_LOGGER_ETL_IDENTIFIER, $identifierPrefix . 'STOP');
-            while ($this->processItem($stopItem, $startAt, $context) !== $stopItem) {
+            while ($this->processItemWithChain($stopItem, $startAt, $context) !== $stopItem) {
                 // Executing stop until the system stops.
             }
         }
@@ -90,22 +103,83 @@ class ChainProcessor extends LoggerContext implements ChainProcessorInterface
         return $stopItem;
     }
 
-    public function processItem(ItemInterface $item, int $startAt, ExecutionContext $context): ItemInterface
+    public function processItemWithChain(ItemInterface $item, int $startAt, ExecutionContext $context): ItemInterface
     {
         for ($chainNumber = $startAt; $chainNumber < count($this->chainLinks); $chainNumber++) {
             $item = $this->processItemWithOperation($item, $chainNumber, $context);
 
-            if ($item instanceof GroupedItemInterface) {
-                $context->setLoggerContext(self::KEY_LOGGER_ETL_IDENTIFIER, "chain link:{$this->chainLinkNames[$chainNumber]}-");
-                $this->processItems($item->getIterator(), $chainNumber + 1, $context, false);
-
-                return new StopItem();
-            } else if ($item instanceof ChainBreakItem) {
-                return $item;
-            }
+            $item = $this->processItem($item, $chainNumber, $context);
         }
 
         return $item;
+    }
+
+    public function processItem(ItemInterface $item, int $chainNumber, ExecutionContext $context): ItemInterface
+    {
+        $this->processAsyncOperations();
+
+        if ($item instanceof AsyncItemInterface) {
+            while (count($this->asyncItems) >= $this->maxAsynchronousItems) {
+                usleep(1000);
+                $this->processAsyncOperations();
+            }
+            $this->asyncItems[] = [
+                'item' => $item,
+                'context' => $context,
+                'chain_number' => $chainNumber,
+            ];
+
+            return new ChainBreakItem();
+        } elseif ($item instanceof MixItem) {
+            $context->setLoggerContext(self::KEY_LOGGER_ETL_IDENTIFIER, "chain link:{$this->chainLinkNames[$chainNumber]}-");
+
+            foreach ($item->getItems() as $mixItem) {
+                if ($mixItem instanceof AsyncItemInterface) {
+                    $item = $this->processItemWithChain($mixItem, $chainNumber, $context);
+                } elseif ($mixItem instanceof GroupedItemInterface) {
+                    $item = $this->processItems($mixItem->getIterator(), $chainNumber + 1, $context, false);
+                } else {
+                    $item = $this->processItemWithChain($mixItem, $chainNumber + 1, $context);
+                }
+            }
+
+            if ($item instanceof StopItem) {
+                return $item;
+            }
+            return new ChainBreakItem();
+        } elseif ($item instanceof GroupedItemInterface) {
+            $context->setLoggerContext(self::KEY_LOGGER_ETL_IDENTIFIER, "chain link:{$this->chainLinkNames[$chainNumber]}-");
+            $this->processItems($item->getIterator(), $chainNumber + 1, $context, false);
+
+            return new StopItem();
+        } else if ($item instanceof ChainBreakItem) {
+            return $item;
+        }
+
+        return $item;
+    }
+
+    protected function processAsyncOperations()
+    {
+        foreach ($this->asyncItems as $id => $item) {
+            if (!$item['item']->isRunning()) {
+                // Item has finished.
+                unset($this->asyncItems[$id]);
+                $this->processItemWithChain($item['item']->getItem(), $item['chain_number'] + 1, $item['context']);
+            }
+        }
+
+    }
+
+    protected function endAllAsyncOperations()
+    {
+        while (!empty($this->asyncItems)) {
+            $this->processAsyncOperations();
+
+            if (!empty($this->asyncItems)) {
+                usleep(1000);
+            }
+        }
     }
 
     /**

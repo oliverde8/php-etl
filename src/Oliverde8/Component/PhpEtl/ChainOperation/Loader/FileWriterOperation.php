@@ -7,6 +7,9 @@ namespace Oliverde8\Component\PhpEtl\ChainOperation\Loader;
 use Oliverde8\Component\PhpEtl\ChainOperation\AbstractChainOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\DataChainOperationInterface;
 use Oliverde8\Component\PhpEtl\Item\DataItemInterface;
+use Oliverde8\Component\PhpEtl\Item\FileLoadedItem;
+use Oliverde8\Component\PhpEtl\Item\ItemInterface;
+use Oliverde8\Component\PhpEtl\Item\MixItem;
 use Oliverde8\Component\PhpEtl\Item\StopItem;
 use Oliverde8\Component\PhpEtl\Load\File\FileWriterInterface;
 use Oliverde8\Component\PhpEtl\Model\ExecutionContext;
@@ -41,7 +44,7 @@ class FileWriterOperation extends AbstractChainOperation implements DataChainOpe
         return $item;
     }
 
-    public function processStop(StopItem $stopItem, ExecutionContext $context): StopItem
+    public function processStop(StopItem $stopItem, ExecutionContext $context): ItemInterface
     {
         $resource = $this->writer->getResource();
 
@@ -50,6 +53,6 @@ class FileWriterOperation extends AbstractChainOperation implements DataChainOpe
 
         $context->getFileSystem()->writeStream($this->fileName, fopen($filename, 'r'));
 
-        return $stopItem;
+        return new MixItem([new FileLoadedItem($this->fileName), $stopItem]);
     }
 }

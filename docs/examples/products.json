@@ -1,0 +1,26 @@
+[
+  {
+    "productId": 1,
+    "sku": "sku1",
+    "name": {
+      "fr_FR": "Mon Produit 1",
+      "en_US": "My Product 1"
+    }
+  },
+  {
+    "productId": 2,
+    "sku": "sku2",
+    "name": {
+      "fr_FR": "Mon Produit 2",
+      "en_US": "My Product 2"
+    }
+  },
+  {
+    "productId": 3,
+    "sku": "sku3",
+    "name": {
+      "fr_FR": "Mon Produit 3",
+      "en_US": "My Product 3"
+    }
+  }
+]

@@ -29,5 +29,5 @@ interface ChainProcessorInterface
     /**
      * Process an item, with chains starting at.
      */
-    public function processItem(ItemInterface $item, int $startAt, ExecutionContext $context);
+    public function processItemWithChain(ItemInterface $item, int $startAt, ExecutionContext $context);
 }

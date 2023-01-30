@@ -1,3 +1,15 @@
+# 1.1.0
+- :star2: Docs & Docs & Docs, lots of new & better documentation
+- :star2: Feature #4 - Added Support to the ChainBuilder for the `Split` operation
+- :star2: Feature #4 - new `Merge` operation that works like split but merges back the result of each branch for nex operations.
+- :star2: Feature #9 - Added ne Filter operation to filter data.
+- :star2: Feature #17 - Add new complex item MixItem. This allows operations to return more than one type of item.
+- :star2: Feature #18 - Add new Item FileExtractedItem. Operations extracting data from files should send this item once all the data has been extracted.
+- :star2: Feature #19 - Add new Item FileLoadedItem. Operations loading data into files should send this item once all the data has been written.
+- :star2: Feature #4 - Add new split item operation
+- :star2: Feature #11 - Add a Http client operation using symfony http client.
+- :star2: Feature #24 - Added support for Asynchronous Items. The Processor will then wait for the item to finish before transferring it to the next operation.
+
 # 1.0.3
 - :wrench: Fix - Stop Item is sent multiple times when using a step returns multiple GroupedItem's
 - :star2: Added support for psr/log 2 & 3. (no code needed)

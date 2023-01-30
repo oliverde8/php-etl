@@ -1,0 +1,24 @@
+chain:
+  read-file:
+    operation: json-read
+    options: []
+
+  flatten:
+    operation: rule-engine-transformer
+    options:
+      add: false # We want to replace all existing columns with our new columns.
+      columns:
+        productId:
+          rules:
+            - get: {field: 'productId'}
+        sku:
+          rules:
+            - get: {field: 'sku'}
+        'name-{@context/locales}':
+          rules:
+            - get : {field: ['name', '@context/locales']}
+
+  write-new-file:
+    operation: csv-write
+    options:
+      file: "output.csv"

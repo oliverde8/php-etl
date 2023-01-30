@@ -28,7 +28,7 @@ class ChainBuilderValidationException extends \Exception
     {
         $msg = "There was an error building the operation '$operation' : ";
         foreach ($violations as $violation) {
-            $msg .= "\n - " . implode(', ', $violation->getParameters()) . " : " . $violation->getMessage();
+            $msg .= "\n - " . $violation->getPropertyPath() . " - " . implode(', ', $violation->getParameters()) . " : " . $violation->getMessage();
         }
         $msg .= "\n";
 

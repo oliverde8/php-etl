@@ -1,0 +1,34 @@
+chain:
+  get-from-api:
+    operation: http
+    options:
+      url: '@"https://63b687951907f863aaf90ab1.mockapi.io/test/"~data["id"]'
+      method: GET
+      response_is_json: true
+      option_key: "-placeholder-"
+      response_key: ~
+      options:
+        headers: {'Accept': 'application/json'}
+
+  content-only:
+    operation: rule-engine-transformer
+    options:
+      add: false # We want to replace all existing columns with our new columns.
+      columns:
+        createdAt:
+          rules:
+            - get: {field: ['content','createdAt']}
+        name:
+          rules:
+            - get: {field: ['content','name']}
+        avatar:
+          rules:
+            - get: {field: ['content','avatar']}
+        id:
+          rules:
+            - get: {field: ['content','id']}
+
+  write-new-file:
+    operation: csv-write
+    options:
+      file: "output.csv"

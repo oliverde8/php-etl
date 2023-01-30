@@ -1,0 +1,25 @@
+chain:
+  read-file:
+    operation: csv-read
+    options: [] # The default delimeter,&
+
+  keep-only-name-and-subscription:
+    operation: rule-engine-transformer
+    options:
+      add: false # We want to replace all existing columns with our new columns.
+      columns:
+        Name:
+          rules:
+            - implode: # Concat both firstname & lastname
+                values:
+                  - [{get : {field: 'FirstName'}}]
+                  - [{get : {field: "LastName"}}]
+                with: " "
+        SubscriptionStatus:
+          rules:
+            - get: {field: 'IsSubscribed'}
+
+  write-new-file:
+    operation: csv-write
+    options:
+      file: "!filewriter['outputfile']['name']"
