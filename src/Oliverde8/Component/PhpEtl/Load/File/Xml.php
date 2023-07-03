@@ -15,8 +15,17 @@ class Xml implements FileWriterInterface
         $this->filePath = $filePath;
     }
 
+    protected function init()
+    {
+        if (is_null($this->file)) {
+            $this->file = fopen($this->filePath, 'w');
+        }
+    }
+
     public function write($rowData)
     {
+        $this->init();
+
         if ($rowData instanceof SimpleXMLElement) {
             $rowData->asXML($this->filePath);
         }
