@@ -445,6 +445,5 @@ user interfaces to display loaded & extracted files.
 
 You can now read the [Operations](Operations.md) documentation that list all available operations
 
-You can also read all [Available Rules](RuleEngine.md) for the rule operation. 
-
-Finally check for additional examples here(TBD). 
+You can also read all [Available Rules](RuleEngine.md) for the rule operation as well additional examples for the rule
+engine [Rule Engine Examples](RuleEngineExamples1.md). 
