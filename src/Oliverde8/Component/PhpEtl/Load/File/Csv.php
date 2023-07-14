@@ -46,6 +46,13 @@ class Csv extends AbstractCsvFile implements FileWriterInterface
         }
     }
 
+    public function getResource()
+    {
+        $this->init([]);
+        return parent::getResource();
+    }
+
+
     /**
      * Write row data in the csv file.
      *
