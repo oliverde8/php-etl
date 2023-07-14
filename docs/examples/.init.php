@@ -2,10 +2,12 @@
 
 use Oliverde8\Component\PhpEtl\Builder\Factories\ChainSplitFactory;
 use Oliverde8\Component\PhpEtl\Builder\Factories\Extract\CsvExtractFactory;
+use Oliverde8\Component\PhpEtl\Builder\Factories\Extract\ExternalFileFinderFactory;
 use Oliverde8\Component\PhpEtl\Builder\Factories\Extract\JsonExtractFactory;
 use Oliverde8\Component\PhpEtl\Builder\Factories\Grouping\SimpleGroupingFactory;
 use Oliverde8\Component\PhpEtl\Builder\Factories\Loader\CsvFileWriterFactory;
 use Oliverde8\Component\PhpEtl\Builder\Factories\Loader\JsonFileWriterFactory;
+use Oliverde8\Component\PhpEtl\Builder\Factories\Transformer\ExternalFileProcessorFactory;
 use Oliverde8\Component\PhpEtl\Builder\Factories\Transformer\FilterDataFactory;
 use Oliverde8\Component\PhpEtl\Builder\Factories\Transformer\RuleTransformFactory;
 use Oliverde8\Component\PhpEtl\Builder\Factories\Transformer\SimpleHttpOperationFactory;
@@ -13,15 +15,18 @@ use Oliverde8\Component\PhpEtl\Builder\Factories\Transformer\SplitItemFactory;
 use Oliverde8\Component\PhpEtl\ChainBuilder;
 use Oliverde8\Component\PhpEtl\ChainOperation\ChainSplitOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Extract\CsvExtractOperation;
+use Oliverde8\Component\PhpEtl\ChainOperation\Extract\ExternalFileFinderOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Extract\JsonExtractOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Grouping\SimpleGroupingOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Loader\FileWriterOperation;
+use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\ExternalFileProcessorOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\FilterDataOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\RuleTransformOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\SimpleHttpOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\SplitItemOperation;
 use Oliverde8\Component\PhpEtl\ChainProcessor;
 use Oliverde8\Component\PhpEtl\ExecutionContextFactory;
+use Oliverde8\Component\PhpEtl\Model\File\LocalFileSystem;
 use Symfony\Component\Yaml\Yaml;
 
 require_once __DIR__ . "/../../vendor/autoload.php";
@@ -38,7 +43,7 @@ function getBuilder(){
         ]
     );
 
-    $builder = new ChainBuilder(new ExecutionContextFactory());
+    $builder = new ChainBuilder(getExecutionContextFactory());
     $builder->registerFactory(new RuleTransformFactory('rule-engine-transformer', RuleTransformOperation::class, $ruleApplier));
     $builder->registerFactory(new FilterDataFactory('filter', FilterDataOperation::class, $ruleApplier));
     $builder->registerFactory(new SimpleGroupingFactory('simple-grouping', SimpleGroupingOperation::class));
@@ -49,6 +54,8 @@ function getBuilder(){
     $builder->registerFactory(new JsonExtractFactory('json-read', JsonExtractOperation::class));
     $builder->registerFactory(new SplitItemFactory('split-item', SplitItemOperation::class));
     $builder->registerFactory(new SimpleHttpOperationFactory('http', SimpleHttpOperation::class));
+    $builder->registerFactory(new ExternalFileFinderFactory('external-file-finder-local', ExternalFileFinderOperation::class, new LocalFileSystem("/")));
+    $builder->registerFactory(new ExternalFileProcessorFactory("external-file-processor", ExternalFileProcessorOperation::class));
 
     return $builder;
 }

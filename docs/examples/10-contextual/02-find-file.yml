@@ -1,0 +1,22 @@
+chain:
+  find-file1:
+    operation: external-file-finder-local
+    options:
+      directory: "@context['dir']"
+
+  process-new-file1:
+    operation: external-file-processor
+    options: []
+
+  read-file:
+    operation: csv-read
+    options: [] # The default delimeter,&
+
+  write-new-file:
+    operation: csv-write
+    options:
+      file: "output.csv"
+
+  process-finalized-file1:
+    operation: external-file-processor
+    options: []
