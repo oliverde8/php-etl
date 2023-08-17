@@ -17,7 +17,7 @@
         "phpunit/phpunit": "9.4.*"
     },
     "suggest": {
-        "league/flysystem": "For saving files",
+        "league/flysystem": "For transfaring files from external file systems",
         "symfony/http-client": "For a simple http request operation"
     },
     "config": {

@@ -117,7 +117,7 @@ $chainProcessor->process(
 );
 ```
 
-You can test this rule yourself, check the [transform yml](examples/01-csv-transform.yml), and execute `php docs/examples/01-csv-transform.php`
+You can test this rule yourself, check the [transform yml](examples/00-describe/01-csv-transform.yml), and execute `php docs/examples/00-describe/01-csv-transform.php`
 
 The way phpEtl works is by sending individual data to each step.
 So our file path will be sent to the first step that will not return the file path, but will read the file and split 
@@ -131,7 +131,7 @@ $chainProcessor->process(
 );
 ```
 
-You can test this rule yourself by executing `php docs/examples/02-csv-transform-merge.php`
+You can test this rule yourself by executing `php docs/examples/00-describe/02-csv-transform-merge.php`
 
 ## Fundamentals - Understanding the propagation
 
@@ -180,8 +180,8 @@ write-new-file:
 
 This works like the csv file, but is more suited for complex multi level datas as we have after the grouping. 
 
-You can test this rule yourself, check the [transform yml](examples/03-json-grouped-merge.yml)
-and by executing `php docs/examples/03-json-grouped-merge.php`
+You can test this rule yourself, check the [transform yml](examples/00-describe/03-json-grouped-merge.yml)
+and by executing `php docs/examples/00-describe/03-json-grouped-merge.php`
 
 ### Example 04 - Keep subscribed customers only
 
@@ -202,8 +202,8 @@ false for the item **to be propagated**.
 
 This might seem limiting but the rule engine does support SymfonyExpressions which opens a whole lot of flexibility. 
 
-You can test this rule yourself, check the [transform yml](examples/04-csv-filter.yml)
-and by executing `php docs/examples/04-csv-filter.php`
+You can test this rule yourself, check the [transform yml](examples/00-describe/04-csv-filter.yml)
+and by executing `php docs/examples/00-describe/04-csv-filter.php`
 
 ### Example 05 - Write 3 customer files
 
@@ -250,8 +250,8 @@ write them.
               file: "unsubscribed.csv"
 ```
 
-You can test this rule yourself, check the [transform yml](examples/05-csv-3-files.yml)
-and by executing `php docs/examples/05-csv-3-files.php`
+You can test this rule yourself, check the [transform yml](examples/00-describe/05-csv-3-files.yml)
+and by executing `php docs/examples/00-describe/05-csv-3-files.php`
 
 ```mermaid
 flowchart TB
@@ -320,8 +320,8 @@ $chainProcessor = $builder->buildChainProcessor(
 );
 ```
 
-You can test this rule yourself, check the [transform yml](examples/06-csv-transform.yml)
-and by executing `php docs/examples/06-csv-transform.php`
+You can test this rule yourself, check the [transform yml](examples/00-describe/06-csv-transform.yml)
+and by executing `php docs/examples/00-describe/06-csv-transform.php`
 
 ### Example 07 - Flatten yml files to csv
 
@@ -353,8 +353,8 @@ As you can see the `{@context/locales}` part of the columns name is dynamic. We 
 data from that product. We could also have used symfony expression language but both behaves differently if the 
 given locale is missing. `get` will simply return an empty column, symfony expression language rule will fail. 
 
-You can test this rule yourself, check the [transform yml](examples/07-json-transform.yml)
-and by executing `php docs/examples/07-json-transform.php`
+You can test this rule yourself, check the [transform yml](examples/00-describe/07-json-transform.yml)
+and by executing `php docs/examples/00-describe/07-json-transform.php`
 
 ### Example 08 - Write the result of an API to a CSV File. 
 
@@ -393,8 +393,8 @@ each users individually.
 ```
 
 Now we can write the users into the csv file, as we have done so in our previous examples.
-You can test this rule yourself, check the [transform yml](examples/08-api-to-csv.yml)
-and by executing `php docs/examples/08-api-to-csv.yml`
+You can test this rule yourself, check the [transform yml](examples/00-describe/08-api-to-csv.yml)
+and by executing `php docs/examples/00-describe/08-api-to-csv.yml`
 
 ### Example 09 - Write the result of an API to a CSV File.
 
@@ -426,8 +426,8 @@ Let us note that this operation runs multiple queries with concurrency. A single
 operation. And using the AsyncItems functionality of the ETL, we can run all the http requests in parallel. 
 
 Now we can write the users into the csv file, as we have done so in our previous examples.
-You can test this rule yourself, check the [transform yml](examples/09-api-to-csv2.yml)
-and by executing `php docs/examples/09-api-to-csv2.yml`
+You can test this rule yourself, check the [transform yml](examples/00-describe/09-api-to-csv2.yml)
+and by executing `php docs/examples/00-describe/09-api-to-csv2.yml`
 
 
 ## Additional information
@@ -445,6 +445,5 @@ user interfaces to display loaded & extracted files.
 
 You can now read the [Operations](Operations.md) documentation that list all available operations
 
-You can also read all [Available Rules](RuleEngine.md) for the rule operation. 
-
-Finally check for additional examples here(TBD). 
+You can also read all [Available Rules](RuleEngine.md) for the rule operation as well additional examples for the rule
+engine [Rule Engine Examples](RuleEngineExamples1.md). 

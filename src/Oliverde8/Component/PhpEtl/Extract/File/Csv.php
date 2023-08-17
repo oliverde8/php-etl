@@ -28,13 +28,17 @@ class Csv extends AbstractCsvFile implements \Iterator
     protected function init()
     {
         if (is_null($this->file)) {
-            $this->setStream(fopen($this->filePath, 'r'));
+            if (is_string($this->filePath)) {
+                $this->setStream(fopen($this->filePath, 'r'));
+            } else {
+                $this->setStream($this->filePath);
+            }
         }
     }
 
     public function setStream($file)
     {
-        if (!is_null($file)) {
+        if (!is_null($this->file)) {
             throw new \LogicException("Can't set a stream, stream already open!");
         }
 
