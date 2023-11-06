@@ -36,6 +36,7 @@ class ExternalFileFinderOperation extends AbstractChainOperation implements Data
         $pattern = $item->getData();
         $files = [];
 
+        $directory = $this->directory;
         if (strpos($this->directory, "@") === 0) {
             $directory = ltrim($this->directory, '@');
             $directory = $this->expressionLanguage->evaluate($directory, ['context' => $context->getParameters()]);
