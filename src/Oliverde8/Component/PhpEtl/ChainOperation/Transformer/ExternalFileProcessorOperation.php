@@ -21,7 +21,6 @@ class ExternalFileProcessorOperation extends AbstractChainOperation
         $localFileSystem = $context->getFileSystem();
 
         if ($item->getState() == ExternalFileItem::STATE_NEW) {
-            var_dump("EXECUTE");
             // Move file to prevent it to be processed by another process.
             $externalFileSystem->createDirectory($externalDir . "/processing");
             $externalFileSystem->move($externalFilePath, $externalDir . "/processing/" . $fileName);
