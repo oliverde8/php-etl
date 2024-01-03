@@ -34,7 +34,7 @@ class ChainSplitOperationTest extends TestCase
 
         foreach ($processors as $i => $processor) {
             $processor->expects($this->exactly(2))
-                ->method('processItem')
+                ->method('processItemWithChain')
                 ->withConsecutive([$datas[0], 0, $context], [$datas[1], 0, $context]);
         }
 
@@ -61,13 +61,13 @@ class ChainSplitOperationTest extends TestCase
 
         $processors[0]
             ->expects($this->exactly(3))
-            ->method('processItem')
+            ->method('processItemWithChain')
             ->withConsecutive([$datas[0], 0, $context], [$stopItem, 0, $context], [$stopItem, 0, $context])
             ->willReturnOnConsecutiveCalls($datas[0], $datas[1], $stopItem);
 
         $processors[1]
             ->expects($this->exactly(3))
-            ->method('processItem')
+            ->method('processItemWithChain')
             ->withConsecutive([$datas[0], 0, $context], [$stopItem, 0, $context], [$stopItem, 0, $context])
             ->willReturnOnConsecutiveCalls($datas[0], $stopItem, $stopItem);
 
