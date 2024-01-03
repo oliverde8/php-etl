@@ -1,0 +1,38 @@
+name: PHP Tests
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        php-versions: ['8.1', '8.2', '8.3']
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-versions }}
+          extensions: xdebug2
+
+      - name: Check PHP Version
+        run: php -v
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --dev
+
+      - name: Run unit tests
+        run: ./vendor/bin/phpunit  -c phpunit.xml.dist
