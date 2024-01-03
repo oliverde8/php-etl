@@ -1,3 +1,9 @@
+# 1.1.1
+- -:exclamation: **Deprecation - Dropped support for php 7.4 and 8.0.** Both are in end of life.
+- :wrench: Fix - Deprecation issues with the Csv extractor.
+- :wrench: Fix - Add missing tests to Csv extractor. 
+- :wrench: Fix - Unit test not running for ChainSplitOperation.
+
 # 1.1.0
 - :star2: Docs & Docs & Docs, lots of new & better documentation
 - :star2: Feature #4 - Added Support to the ChainBuilder for the `Split` operation
