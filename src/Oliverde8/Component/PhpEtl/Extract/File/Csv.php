@@ -25,7 +25,7 @@ class Csv extends AbstractCsvFile implements \Iterator
     /**
      * Initialize the read of the file.
      */
-    protected function init()
+    protected function init(): void
     {
         if (is_null($this->file)) {
             if (is_string($this->filePath)) {
@@ -36,7 +36,7 @@ class Csv extends AbstractCsvFile implements \Iterator
         }
     }
 
-    public function setStream($file)
+    public function setStream($file): void
     {
         if (!is_null($this->file)) {
             throw new \LogicException("Can't set a stream, stream already open!");
@@ -57,7 +57,7 @@ class Csv extends AbstractCsvFile implements \Iterator
      *
      * @return \string[]
      */
-    public function getHeaders()
+    public function getHeaders(): array
     {
         $this->init();
 
@@ -69,7 +69,7 @@ class Csv extends AbstractCsvFile implements \Iterator
      *
      * @param array $headers File headers to set
      */
-    public function setHeaders($headers)
+    public function setHeaders(array $headers): void
     {
         $this->init();
 
@@ -83,7 +83,7 @@ class Csv extends AbstractCsvFile implements \Iterator
      * @return mixed Can return any type.
      * @since 5.0.0
      */
-    public function current()
+    public function current(): mixed
     {
         $this->init();
 
@@ -97,7 +97,7 @@ class Csv extends AbstractCsvFile implements \Iterator
      * @return void Any returned value is ignored.
      * @since 5.0.0
      */
-    public function next()
+    public function next(): void
     {
         $this->init();
         $this->count++;
@@ -119,7 +119,7 @@ class Csv extends AbstractCsvFile implements \Iterator
      * @return mixed scalar on success, or null on failure.
      * @since 5.0.0
      */
-    public function key()
+    public function key(): mixed
     {
         $this->init();
 
@@ -134,7 +134,7 @@ class Csv extends AbstractCsvFile implements \Iterator
      * Returns true on success or false on failure.
      * @since 5.0.0
      */
-    public function valid()
+    public function valid(): bool
     {
         $this->init();
 
@@ -148,7 +148,7 @@ class Csv extends AbstractCsvFile implements \Iterator
      * @return void Any returned value is ignored.
      * @since 5.0.0
      */
-    public function rewind()
+    public function rewind(): void
     {
         if (!is_null($this->file)) {
             fclose($this->file);
