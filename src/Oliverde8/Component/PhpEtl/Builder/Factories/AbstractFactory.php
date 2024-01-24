@@ -69,7 +69,7 @@ abstract class AbstractFactory
      */
     protected function configureValidator(): Constraint
     {
-        return new Assert\Collection([]);
+        return new Assert\Collection(['fields' => []]);
     }
 
     /**

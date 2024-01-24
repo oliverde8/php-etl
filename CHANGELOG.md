@@ -1,3 +1,6 @@
+# 1.1.2
+- :wrench: Fix - Usage of the AbstractFactory for operation without overriding configureValidator causing errors.
+
 # 1.1.1
 - -:exclamation: **Deprecation - Dropped support for php 7.4 and 8.0.** Both are in end of life.
 - :wrench: Fix - Deprecation issues with the Csv extractor.
