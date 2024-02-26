@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Oliverde8\Component\PhpEtl;
 
 use Oliverde8\Component\PhpEtl\Builder\Factories\AbstractFactory;
+use Oliverde8\Component\PhpEtl\ChainOperation\ChainMergeOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\ChainOperationInterface;
 use Oliverde8\Component\PhpEtl\Exception\UnknownOperationException;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
@@ -20,6 +21,9 @@ class ChainBuilder
 {
     /** @var AbstractFactory[] */
     protected array $operationFactories;
+
+    /** @var ChainProcessor[] */
+    protected array $subChainProcessors = [];
 
     protected ExecutionContextFactoryInterface $contextFactory;
 
@@ -52,10 +56,32 @@ class ChainBuilder
      * @throws Exception\ChainBuilderValidationException
      * @throws UnknownOperationException
      */
-    public function buildChainProcessor(array $configs, array $inputOptions = [], int $maxAsynchronousItems = 10): ChainProcessorInterface
+    public function buildChainProcessor(array $configs, array $inputOptions = [], int $maxAsynchronousItems = 10, ?array $subChainProcessors = null): ChainProcessorInterface
     {
+        if ($subChainProcessors) {
+            $this->subChainProcessors = $subChainProcessors;
+        }
+
+        $mainChainConfig = $configs;
+        if (isset($configs['chain'])) {
+            $mainChainConfig = $configs['chain'];
+        }
+
+        foreach ($configs['subChains'] ?? [] as $subChainName => $subChainConfigs) {
+            $chainOperations = [];
+            foreach ($subChainConfigs['chain'] as $id => $operation) {
+                $chainOperations[$id] = $this->getOperationFromConfig($operation, $inputOptions, $subChainProcessors);
+            }
+            $this->subChainProcessors[$subChainName] = new ChainProcessor(
+                $chainOperations,
+                $this->contextFactory,
+                $maxAsynchronousItems,
+                $subChainConfigs['shared'] ?? false
+            );
+        }
+
         $chainOperations = [];
-        foreach ($configs as $id => $operation) {
+        foreach ($mainChainConfig as $id => $operation) {
             $chainOperations[$id] = $this->getOperationFromConfig($operation, $inputOptions);
         }
 
@@ -77,9 +103,25 @@ class ChainBuilder
             }
         }
 
-        foreach ($this->operationFactories as $factory) {
-            if ($factory->supports($config['operation'], $config['options'])) {
-                return $factory->getOperation($config['operation'], $config['options']);
+        if (strtolower($config['operation']) == 'subchain') {
+            $subChain = $config['options']['name'];
+            if (!isset($this->subChainProcessors[$subChain])) {
+                throw new UnknownOperationException("No subchain '$subChain' was found to create operation");
+            }
+
+            $chainOperation = $this->subChainProcessors[$subChain];
+            // In case the operation is shared create a clone. If not use the same operation.
+            if ($chainOperation instanceof ChainProcessor && !$chainOperation->isShared()) {
+                $chainOperation = clone $chainOperation;
+            }
+            // Use the merge operation to execute a sub chain and not split. Merge with a single operation will return
+            // the result of the sub chain to the next steps of the chain.
+            return new ChainMergeOperation([$chainOperation]);
+        } else {
+            foreach ($this->operationFactories as $factory) {
+                if ($factory->supports($config['operation'], $config['options'])) {
+                    return $factory->getOperation($config['operation'], $config['options']);
+                }
             }
         }
 

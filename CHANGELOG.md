@@ -1,3 +1,6 @@
+# 1.2.0
+- :star2: Feature #14 - Added possibility to create subchains.
+
 # 1.1.2
 - :wrench: Fix - Usage of the AbstractFactory for operation without overriding configureValidator causing errors.
 
