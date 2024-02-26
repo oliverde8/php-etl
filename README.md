@@ -68,7 +68,8 @@ There are 2 ways of writing a chain, either you code it; or you describe the cha
 - Using php code to initiate each operation yourself, this is not recommended! 
 - Using yaml files to descrive the chain. 
 
-Please see the [describe chains using yaml configurations](docs/DescribeChain.md)
+Please see the [describe chains using yaml configurations](docs/DescribeChain.md), you can check the doc on [sub chains and more complex
+cases as well](docs/DescribeChain-01.md)
 
 ## Creating you own operations.
 

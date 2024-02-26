@@ -443,7 +443,10 @@ user interfaces to display loaded & extracted files.
 
 ### Conclusion
 
-You can now read the [Operations](Operations.md) documentation that list all available operations
+You can now read the [Operations](Operations.md) documentation that list all available operations.
 
 You can also read all [Available Rules](RuleEngine.md) for the rule operation as well additional examples for the rule
 engine [Rule Engine Examples](RuleEngineExamples1.md). 
+
+If you want to create more complex chains, you might also wish to read the [second chapter](DescribeChain-01.md) 
+which will explain the usages of the subchains. 

@@ -65,8 +65,14 @@ function getChainProcessor($fileName, $options = []): ChainProcessor
     $fileName = str_replace(".php", ".yml", $fileName);
 
     return getBuilder()->buildChainProcessor(
-        Yaml::parse(file_get_contents($fileName))['chain'],
+        Yaml::parse(file_get_contents($fileName)),
         $options,
         1
     );
+}
+
+function getProcessFilePath($dir, $filName): string
+{
+    $cwd = getcwd();
+    return str_replace($cwd, "", $dir) . "$filName";
 }

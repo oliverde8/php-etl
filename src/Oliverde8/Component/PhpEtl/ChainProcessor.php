@@ -28,16 +28,12 @@ class ChainProcessor extends LoggerContext implements ChainProcessorInterface
     const KEY_LOGGER_ETL_IDENTIFIER = 'etl.identifier';
 
     /** @var ChainOperationInterface[] */
-    protected array $chainLinks = [];
-
-    protected ExecutionContextFactoryInterface $contextFactory;
+    protected readonly array $chainLinks;
 
     /** @var string[] */
-    protected array $chainLinkNames = [];
+    protected readonly array $chainLinkNames;
 
     protected array $asyncItems = [];
-
-    protected int $maxAsynchronousItems = 10;
 
     /**
      * ChainProcessor constructor.
@@ -46,12 +42,11 @@ class ChainProcessor extends LoggerContext implements ChainProcessorInterface
      */
     public function __construct(
         array $chainLinks,
-        ExecutionContextFactoryInterface $contextFactory,
-        int $maxAsynchronousItems = 10
+        protected ExecutionContextFactoryInterface $contextFactory,
+        protected int $maxAsynchronousItems = 10,
+        protected bool $isShared = false,
     )
     {
-        $this->contextFactory = $contextFactory;
-        $this->maxAsynchronousItems = $maxAsynchronousItems;
         $this->chainLinkNames = array_keys($chainLinks);
         $this->chainLinks = array_values($chainLinks);
     }
@@ -73,6 +68,11 @@ class ChainProcessor extends LoggerContext implements ChainProcessorInterface
             $context->finalise();
             throw $e;
         }
+    }
+
+    public function isShared(): bool
+    {
+        return $this->isShared;
     }
 
     /**

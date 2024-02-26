@@ -1,0 +1,51 @@
+subChains:
+  customTransform:
+    chain:
+      -
+        operation: rule-engine-transformer
+        options:
+          add: false # We want to replace all existing columns with our new columns.
+          columns:
+            FirstName:
+              rules:
+                - get : {field: 'FirstName'}
+            LastName:
+              rules:
+                - get : {field: "LastName"}
+
+chain:
+  read-file:
+    operation: csv-read
+    options: [] # The default delimeter,&
+  branch-out:
+    operation: split
+    options:
+      branches:
+        -
+          filter-unsubscribed:
+            operation: filter
+            options:
+              rule: [{get : {field: 'IsSubscribed'}}]
+              negate: false
+          transform:
+            operation: subchain
+            options:
+              name: customTransform
+          write-new-file:
+            operation: csv-write
+            options:
+              file: "subscribed.csv"
+        -
+          filter-subscribed:
+            operation: filter
+            options:
+              rule: [{get : {field: 'IsSubscribed'}}]
+              negate: true
+          transform:
+            operation: subchain
+            options:
+              name: customTransform
+          write-new-file:
+            operation: csv-write
+            options:
+              file: "unsubscribed.csv"
