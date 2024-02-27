@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Oliverde8\Component\PhpEtl;
 
+use Oliverde8\Component\PhpEtl\ChainObserver\ChainObserver;
+use Oliverde8\Component\PhpEtl\ChainObserver\ChainObserverInterface;
 use Oliverde8\Component\PhpEtl\ChainOperation\ChainOperationInterface;
 use Oliverde8\Component\PhpEtl\Exception\ChainOperationException;
 use Oliverde8\Component\PhpEtl\Item\AsyncItemInterface;
@@ -33,6 +35,8 @@ class ChainProcessor extends LoggerContext implements ChainProcessorInterface
     /** @var string[] */
     protected readonly array $chainLinkNames;
 
+    protected ?ChainObserverInterface $chainObserver = null;
+
     protected array $asyncItems = [];
 
     /**
@@ -51,11 +55,13 @@ class ChainProcessor extends LoggerContext implements ChainProcessorInterface
         $this->chainLinks = array_values($chainLinks);
     }
 
-    public function process(\Iterator $items, array $parameters)
+    public function process(\Iterator $items, array $parameters, ?callable $observerCallback = null)
     {
         $context = $this->contextFactory->get($parameters);
         $context->replaceLoggerContext($parameters);
         $context->setLoggerContext(self::KEY_LOGGER_ETL_IDENTIFIER, '');
+
+        $this->initObserver($observerCallback);
 
         try {
             $context->getLogger()->info("Starting etl process!");
@@ -105,9 +111,10 @@ class ChainProcessor extends LoggerContext implements ChainProcessorInterface
 
     public function processItemWithChain(ItemInterface $item, int $startAt, ExecutionContext $context): ItemInterface
     {
+        $this->initObserver();
+
         for ($chainNumber = $startAt; $chainNumber < count($this->chainLinks); $chainNumber++) {
             $item = $this->processItemWithOperation($item, $chainNumber, $context);
-
             $item = $this->processItem($item, $chainNumber, $context);
         }
 
@@ -164,8 +171,13 @@ class ChainProcessor extends LoggerContext implements ChainProcessorInterface
         foreach ($this->asyncItems as $id => $item) {
             if (!$item['item']->isRunning()) {
                 // Item has finished.
+                $chainNumber = $item['chain_number'];
+                $newItem = $item['item']->getItem();
+
+                // We consider that the process finished only once the async operation is done.
+                $this->chainObserver->onAfterProcess($chainNumber, $this->chainLinks[$chainNumber], $newItem);
                 unset($this->asyncItems[$id]);
-                $this->processItemWithChain($item['item']->getItem(), $item['chain_number'] + 1, $item['context']);
+                $this->processItemWithChain($newItem, $chainNumber + 1, $item['context']);
             }
         }
 
@@ -190,7 +202,12 @@ class ChainProcessor extends LoggerContext implements ChainProcessorInterface
     protected function processItemWithOperation(ItemInterface $item, int $chainNumber, ExecutionContext &$context): ItemInterface
     {
         try {
-            return $this->chainLinks[$chainNumber]->process($item, $context);
+            $this->chainObserver->onBeforeProcess($chainNumber, $this->chainLinks[$chainNumber], $item);
+//            sleep(1);
+            $result = $this->chainLinks[$chainNumber]->process($item, $context);
+            $this->chainObserver->onAfterProcess($chainNumber, $this->chainLinks[$chainNumber], $result);
+
+            return $result;
         } catch (\Exception $exception) {
             throw new ChainOperationException(
                 "An exception was thrown during the handling of the chain link : "
@@ -201,5 +218,19 @@ class ChainProcessor extends LoggerContext implements ChainProcessorInterface
                 $this->chainLinkNames[$chainNumber]
             );
         }
+    }
+
+    protected function initObserver(?callable $observerCallback = null)
+    {
+        if ($this->chainObserver) {
+            return;
+        }
+
+        // TODO init chain observer here with ideally factory.
+        if (!$observerCallback) {
+            $observerCallback = function (){};
+        }
+        $this->chainObserver = new ChainObserver($observerCallback);
+        $this->chainObserver->init($this->chainLinks, $this->chainLinkNames);
     }
 }
