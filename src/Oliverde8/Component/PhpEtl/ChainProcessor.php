@@ -109,9 +109,13 @@ class ChainProcessor extends LoggerContext implements ChainProcessorInterface
         return $stopItem;
     }
 
-    public function processItemWithChain(ItemInterface $item, int $startAt, ExecutionContext $context): ItemInterface
-    {
-        $this->initObserver();
+    public function processItemWithChain(
+        ItemInterface $item,
+        int $startAt,
+        ExecutionContext $context,
+        ?callable $observerCallback = null
+    ): ItemInterface {
+        $this->initObserver($observerCallback);
 
         for ($chainNumber = $startAt; $chainNumber < count($this->chainLinks); $chainNumber++) {
             $item = $this->processItemWithOperation($item, $chainNumber, $context);
@@ -203,7 +207,6 @@ class ChainProcessor extends LoggerContext implements ChainProcessorInterface
     {
         try {
             $this->chainObserver->onBeforeProcess($chainNumber, $this->chainLinks[$chainNumber], $item);
-//            sleep(1);
             $result = $this->chainLinks[$chainNumber]->process($item, $context);
             $this->chainObserver->onAfterProcess($chainNumber, $this->chainLinks[$chainNumber], $result);
 
@@ -220,17 +223,18 @@ class ChainProcessor extends LoggerContext implements ChainProcessorInterface
         }
     }
 
-    protected function initObserver(?callable $observerCallback = null)
+    public function initObserver(?callable $observerCallback = null): ChainObserver
     {
         if ($this->chainObserver) {
-            return;
+            return $this->chainObserver;
         }
 
-        // TODO init chain observer here with ideally factory.
         if (!$observerCallback) {
             $observerCallback = function (){};
         }
         $this->chainObserver = new ChainObserver($observerCallback);
         $this->chainObserver->init($this->chainLinks, $this->chainLinkNames);
+
+        return $this->chainObserver;
     }
 }

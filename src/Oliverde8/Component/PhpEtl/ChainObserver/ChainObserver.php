@@ -24,8 +24,8 @@ class ChainObserver extends OperationState implements ChainObserverInterface
 
     public function init(array $chainLinks, array $chainNames): void
     {
-        foreach ($chainLinks as $id => $opeartion) {
-            $this->operationStates[$id] = new OperationState($chainNames[$id]);
+        foreach ($chainLinks as $id => $operation) {
+            $this->operationStates[$id] = new OperationState($chainNames[$id], $operation);
         }
 
         $this->callback();
@@ -33,16 +33,16 @@ class ChainObserver extends OperationState implements ChainObserverInterface
 
     public function onBeforeProcess($operationId, ChainOperationInterface $operation, ItemInterface $item): void
     {
-        $this->processItem($item);
-        $this->operationStates[$operationId]->processItem($item);
+        $this->processItem($operation, $item);
+        $this->operationStates[$operationId]->processItem($operation, $item);
 
         $this->callback();
     }
 
     public function onAfterProcess($operationId, ChainOperationInterface $operation, ItemInterface $item): void
     {
-        $this->returnItem($item);
-        $this->operationStates[$operationId]->returnItem($item);
+        $this->returnItem($operation, $item);
+        $this->operationStates[$operationId]->returnItem($operation, $item);
 
         $this->callback();
     }
@@ -51,5 +51,10 @@ class ChainObserver extends OperationState implements ChainObserverInterface
     {
         $callback = $this->callable;
         $callback($this->operationStates, $this->getItemsProcessed(), $this->getItemsReturned());
+    }
+
+    public function getOperationStates(): array
+    {
+        return $this->operationStates;
     }
 }

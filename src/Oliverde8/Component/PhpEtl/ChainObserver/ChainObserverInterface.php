@@ -11,5 +11,5 @@ interface ChainObserverInterface
 
     public function onBeforeProcess($operationId, ChainOperationInterface $operation, ItemInterface $item): void;
 
-    public function onAfterProcess($chainId, ChainOperationInterface $operation, ItemInterface $item): void;
+    public function onAfterProcess($operationId, ChainOperationInterface $operation, ItemInterface $item): void;
 }

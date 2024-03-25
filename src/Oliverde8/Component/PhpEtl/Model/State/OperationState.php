@@ -2,6 +2,8 @@
 
 namespace Oliverde8\Component\PhpEtl\Model\State;
 
+use Oliverde8\Component\PhpEtl\ChainOperation\ChainOperationInterface;
+use Oliverde8\Component\PhpEtl\ChainOperation\DetailedObservableOperation;
 use Oliverde8\Component\PhpEtl\Item\AsyncItemInterface;
 use Oliverde8\Component\PhpEtl\Item\ChainBreakItem;
 use Oliverde8\Component\PhpEtl\Item\ItemInterface;
@@ -20,12 +22,15 @@ class OperationState
     /** @var AsyncItemInterface[] */
     private array $asynInProgress = [];
 
-    /**
-     * @param string $operationName
-     */
-    public function __construct(string $operationName)
+    private array $subStates = [];
+
+    public function __construct(string $operationName, ChainOperationInterface $operation)
     {
         $this->operationName = $operationName;
+
+        if ($operation instanceof DetailedObservableOperation) {
+            $this->subStates = $operation->getLastObservedState();
+        }
     }
 
     public function getOperationName(): string
@@ -53,7 +58,12 @@ class OperationState
         return count($this->asynInProgress);
     }
 
-    protected function processItem(ItemInterface $item)
+    public function getSubStates(): array
+    {
+        return $this->subStates;
+    }
+
+    protected function processItem(ChainOperationInterface $operation, ItemInterface $item): void
     {
         if ($item instanceof StopItem) {
             $this->state = OperationStateEnum::Stopping;
@@ -61,9 +71,13 @@ class OperationState
             $this->state = OperationStateEnum::Running;
             $this->itemsProcessed++;
         }
+
+        if ($operation instanceof DetailedObservableOperation) {
+            $this->subStates = $operation->getLastObservedState();
+        }
     }
 
-    protected function returnItem(ItemInterface $item)
+    protected function returnItem(ChainOperationInterface $operation, ItemInterface $item): void
     {
         foreach ($this->asynInProgress as $key => $asynInProgress) {
             if (!$asynInProgress->isRunning()) {
@@ -82,6 +96,10 @@ class OperationState
             if (count($this->asynInProgress) == 0) {
                 $this->state = OperationStateEnum::Waiting;
             }
+        }
+
+        if ($operation instanceof DetailedObservableOperation) {
+            $this->subStates = $operation->getLastObservedState();
         }
     }
 }
