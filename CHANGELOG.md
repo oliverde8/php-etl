@@ -1,3 +1,6 @@
+# 1.1.3
+- :wrench: Fix - Added support for symfony 7
+
 # 1.1.2
 - :wrench: Fix - Usage of the AbstractFactory for operation without overriding configureValidator causing errors.
 
