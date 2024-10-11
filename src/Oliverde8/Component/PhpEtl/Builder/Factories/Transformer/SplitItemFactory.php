@@ -28,7 +28,13 @@ class SplitItemFactory extends AbstractFactory
      */
     public function build(string $operation, array $options): ChainOperationInterface
     {
-        return $this->create($options['singleElement'] ?? true, $options['keys']);
+        return $this->create(
+            $options['singleElement'] ?? true,
+            $options['keys'],
+            $options['keepKeys'] ?? false,
+            $options['keyName'] ?? null,
+            $options['duplicateKeys'] ?? []
+        );
     }
 
     /**
@@ -36,12 +42,20 @@ class SplitItemFactory extends AbstractFactory
      */
     protected function configureValidator(): Constraint
     {
-        return new Assert\Collection([
-            'keys' => [
-                new Assert\Type(["type" => "array"]),
-                new Assert\NotBlank(),
+        return new Assert\Collection(
+            [
+                'keys' => [
+                    new Assert\Type(["type" => "array"]),
+                    new Assert\NotBlank(),
+                ],
+                'keyName' => new Assert\Type(["type" => "string"]),
+                'singleElement' => new Assert\Type(["type" => "boolean"]),
+                'keepKeys' => new Assert\Type(["type" => "boolean"]),
+                'duplicateKeys' => [
+                    new Assert\Type(["type" => "array"])
+                ],
             ],
-            'singleElement' => new Assert\Type(["type" => "boolean"])
-        ]);
+            allowMissingFields: true
+        );
     }
 }

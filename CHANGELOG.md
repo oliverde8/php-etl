@@ -1,6 +1,11 @@
 # 1.2.0
 - :star2: Feature #14 - Added possibility to create subchains.
 
+# 1.1.4
+- :star2: Split item operation can now return more complex data sets using the `keyName` option
+- :star2: Split item operation can now keep/duplicate data before splitting it using the `duplicateKeys` option.
+- :star2: Split item operation can now keep the original keys while splitting it using the `keepKeys` option.
+
 # 1.1.3
 - :wrench: Fix - Added support for symfony 7
 
