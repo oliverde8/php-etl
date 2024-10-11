@@ -4,6 +4,9 @@ require_once __DIR__ . "/.init.php";
 
 $chainProcessor = getChainProcessor(__FILE__);
 
+$output = new \Symfony\Component\Console\Output\ConsoleOutput();
+$symfonyOutput = new \Oliverde8\Component\PhpEtl\Output\SymfonyConsoleOutput($output);
+
 $chainProcessor->process(
     new ArrayIterator(
         [
@@ -27,5 +30,8 @@ $chainProcessor->process(
             ["id"=> 18],
             ["id"=> 19],
         ]),
-    []
+    [],
+    function (array $operationStates) use ($symfonyOutput) {
+        $symfonyOutput->output($operationStates);
+    }
 );

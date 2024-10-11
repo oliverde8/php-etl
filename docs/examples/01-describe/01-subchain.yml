@@ -1,7 +1,7 @@
 subChains:
   customTransform:
     chain:
-      -
+      generic-subchain-transformation:
         operation: rule-engine-transformer
         options:
           add: false # We want to replace all existing columns with our new columns.

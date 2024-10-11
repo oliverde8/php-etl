@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Oliverde8\Component\PhpEtl\Builder\Factories;
 
+use Composer\InstalledVersions;
 use Oliverde8\Component\PhpEtl\ChainOperation\ChainOperationInterface;
 use Oliverde8\Component\PhpEtl\Exception\ChainBuilderValidationException;
 use Symfony\Component\Validator\Constraint;
@@ -69,7 +70,15 @@ abstract class AbstractFactory
      */
     protected function configureValidator(): Constraint
     {
-        return new Assert\Collection(['fields' => []]);
+        $symfonyValidatorVersion = InstalledVersions::getVersion('symfony/validator');
+        if (version_compare('5.4', $symfonyValidatorVersion)) {
+            return new Assert\Collection(fields: []);
+        } else {
+            // This code is here to continue to support all version of symfony because of Magento2 still using
+            // 5.0 and even 4.0 version of some symfony packages. This lib being used by multiple Magento2 projects
+            // I need to keep supporting it.
+            return new Assert\Collection(['fields' => []]);
+        }
     }
 
     /**

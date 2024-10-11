@@ -376,7 +376,7 @@ Let's call a mock api returning a list of users.
         headers: {'Accept': 'application/json'}
 ```
 
-Using `response_is_json` allow us to decode the json returned by the api automaticall. `option_key` will allow us to 
+Using `response_is_json` allow us to decode the json returned by the api automatically. `option_key` will allow us to 
 pass additional options to the query. This can be used to add dynamic headers, or data that needs to be posted. 
 If `response_key` is set that the response data will be added to the original data object. If not the response will 
 replace the input data.
