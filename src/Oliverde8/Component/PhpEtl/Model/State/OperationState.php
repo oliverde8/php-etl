@@ -19,6 +19,10 @@ class OperationState
 
     private int $itemsReturned = 0;
 
+    private int $timeSpent = 0;
+
+    private int $lastStartTime = 0;
+
     /** @var AsyncItemInterface[] */
     private array $asynInProgress = [];
 
@@ -53,6 +57,11 @@ class OperationState
         return $this->itemsReturned;
     }
 
+    public function getTimeSpent(): int
+    {
+        return $this->timeSpent;
+    }
+
     public function getAsyncWaiting(): int
     {
         return count($this->asynInProgress);
@@ -65,6 +74,8 @@ class OperationState
 
     protected function processItem(ChainOperationInterface $operation, ItemInterface $item): void
     {
+        $this->lastStartTime = floor(microtime(true) * 1000);
+
         if ($item instanceof StopItem) {
             $this->state = OperationStateEnum::Stopping;
         } elseif (!$item instanceof ChainBreakItem) {
@@ -79,6 +90,8 @@ class OperationState
 
     protected function returnItem(ChainOperationInterface $operation, ItemInterface $item): void
     {
+        $this->timeSpent += floor(microtime(true) * 1000) - $this->lastStartTime;
+
         foreach ($this->asynInProgress as $key => $asynInProgress) {
             if (!$asynInProgress->isRunning()) {
                 unset($this->asynInProgress[$key]);

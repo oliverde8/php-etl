@@ -35,6 +35,7 @@ class ChainObserver extends OperationState implements ChainObserverInterface
 
     public function onBeforeProcess($operationId, ChainOperationInterface $operation, ItemInterface $item): void
     {
+        $this->ended = false;
         $this->processItem($operation, $item);
         $this->operationStates[$operationId]->processItem($operation, $item);
 
