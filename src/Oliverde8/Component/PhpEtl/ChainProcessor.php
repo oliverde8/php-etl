@@ -238,4 +238,20 @@ class ChainProcessor extends LoggerContext implements ChainProcessorInterface
 
         return $this->chainObserver;
     }
+
+    /**
+     * @return ChainOperationInterface[]
+     */
+    public function getChainLinks(): array
+    {
+        return $this->chainLinks;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getChainLinkNames(): array
+    {
+        return $this->chainLinkNames;
+    }
 }

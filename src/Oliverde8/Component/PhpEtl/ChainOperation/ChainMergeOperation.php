@@ -60,4 +60,12 @@ class ChainMergeOperation extends AbstractChainOperation implements DataChainOpe
 
         return $item;
     }
+
+    /**
+     * @return ChainProcessor[]
+     */
+    public function getChainProcessors(): array
+    {
+        return $this->chainProcessors;
+    }
 }
