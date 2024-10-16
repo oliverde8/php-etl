@@ -17,12 +17,13 @@ class SymfonyConsoleOutput
         protected readonly OutputInterface $output,
         protected readonly int $updateFrequency = 1
     ) {
+        $updateFrequency = $updateFrequency > 0 ? $updateFrequency : 1;
         $this->progressIndicators = new AssociativeArray();
     }
 
-    public function output(array $operationStates)
+    public function output(array $operationStates, $ended)
     {
-        if ($this->lastUpdatedAt + $this->updateFrequency > time()) {
+        if ((($this->lastUpdatedAt + $this->updateFrequency) > time()) && !$ended) {
             // Don't update output.
             return;
         }

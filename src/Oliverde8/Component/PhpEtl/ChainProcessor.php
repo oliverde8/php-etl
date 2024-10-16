@@ -74,6 +74,7 @@ class ChainProcessor extends LoggerContext implements ChainProcessorInterface
             $context->finalise();
             throw $e;
         }
+        $this->chainObserver->onFinish();
     }
 
     public function isShared(): bool
