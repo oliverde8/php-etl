@@ -2,6 +2,7 @@
 - :star2: Feature #14 - Added possibility to create subchains.
 - :star2: Feature #34 - Allow chain's to be observed to see progress.
 - :star2: Feature #35 - Added a symfony console output to display nice output based on the chain's progress.
+- :wrench: Fix - Boolean false values being converted to string by the rule engine.
 
 # 1.1.4
 - :star2: Split item operation can now return more complex data sets using the `keyName` option
