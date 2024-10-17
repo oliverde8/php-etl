@@ -2,6 +2,7 @@
 - :star2: Feature #14 - Added possibility to create subchains.
 - :star2: Feature #34 - Allow chain's to be observed to see progress.
 - :star2: Feature #35 - Added a symfony console output to display nice output based on the chain's progress.
+- :star2: Feature #42 - Added output for generating mermaid graph for a etl chain definition.
 - :wrench: Fix - Boolean false values being converted to string by the rule engine.
 
 # 1.1.4
