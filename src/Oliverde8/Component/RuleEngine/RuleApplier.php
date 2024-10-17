@@ -89,7 +89,7 @@ class RuleApplier
             foreach ($ruleData as $rule => $ruleOptions) {
                 $value = $this->applyRule($rule, $ruleOptions, $rowData, $transformedData, $options);
 
-                if (!empty($value) || $value === 0 || $value === "0") {
+                if (!empty($value) || $value === 0 || $value === "0" || $value === false) {
                     return $value;
                 }
             }

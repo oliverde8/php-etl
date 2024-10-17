@@ -17,12 +17,13 @@ class SymfonyConsoleOutput
         protected readonly OutputInterface $output,
         protected readonly int $updateFrequency = 1
     ) {
+        $updateFrequency = $updateFrequency > 0 ? $updateFrequency : 1;
         $this->progressIndicators = new AssociativeArray();
     }
 
-    public function output(array $operationStates)
+    public function output(array $operationStates, $ended)
     {
-        if ($this->lastUpdatedAt + $this->updateFrequency > time()) {
+        if ((($this->lastUpdatedAt + $this->updateFrequency) >= time()) && !$ended) {
             // Don't update output.
             return;
         }
@@ -98,6 +99,26 @@ class SymfonyConsoleOutput
         $processed = $operationState->getItemsProcessed();
         $returned = $operationState->getItemsReturned();
         $asyncWaiting = $operationState->getAsyncWaiting();
-        return "$pad$state - $name ($processed IN / $asyncWaiting ASYNC / $returned OUT)";
+        $timeSpent = $this->formatTimeSpent($operationState->getTimeSpent());
+        return "$pad$state - $name ($processed IN / $asyncWaiting ASYNC / $returned OUT) $timeSpent";
+    }
+
+    private function formatTimeSpent(int $time): string
+    {
+        $time = abs($time);
+        $cent = str_pad(($time % 1000), 3, '0', STR_PAD_LEFT);
+        $time = floor($time / 1000);
+        $sec = str_pad($time % 60, 2, '0', STR_PAD_LEFT);
+        $min = str_pad(floor($time / 60), 2, '0', STR_PAD_LEFT);
+        $hour = str_pad(floor($time / 60 / 60), 1, '0');
+
+        $textTime = $min.':'.$sec;
+        if (floor($time / 60 / 60) > 0) {
+            $textTime = $hour."'".$textTime;
+        }
+
+        $textTime = $textTime.'.'.$cent;
+
+        return $textTime;
     }
 }

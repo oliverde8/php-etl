@@ -74,6 +74,7 @@ class ChainProcessor extends LoggerContext implements ChainProcessorInterface
             $context->finalise();
             throw $e;
         }
+        $this->chainObserver->onFinish();
     }
 
     public function isShared(): bool
@@ -236,5 +237,21 @@ class ChainProcessor extends LoggerContext implements ChainProcessorInterface
         $this->chainObserver->init($this->chainLinks, $this->chainLinkNames);
 
         return $this->chainObserver;
+    }
+
+    /**
+     * @return ChainOperationInterface[]
+     */
+    public function getChainLinks(): array
+    {
+        return $this->chainLinks;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getChainLinkNames(): array
+    {
+        return $this->chainLinkNames;
     }
 }

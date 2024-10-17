@@ -11,6 +11,8 @@ class ChainObserver extends OperationState implements ChainObserverInterface
     /** @var OperationState[] */
     protected array $operationStates = [];
 
+    protected bool $ended = false;
+
     protected $callable;
 
     /**
@@ -33,6 +35,7 @@ class ChainObserver extends OperationState implements ChainObserverInterface
 
     public function onBeforeProcess($operationId, ChainOperationInterface $operation, ItemInterface $item): void
     {
+        $this->ended = false;
         $this->processItem($operation, $item);
         $this->operationStates[$operationId]->processItem($operation, $item);
 
@@ -47,10 +50,21 @@ class ChainObserver extends OperationState implements ChainObserverInterface
         $this->callback();
     }
 
+    public function onFinish()
+    {
+        $this->ended = true;
+        $this->callback();
+    }
+
+    public function isFinished(): bool
+    {
+        return $this->ended;
+    }
+
     private function callback()
     {
         $callback = $this->callable;
-        $callback($this->operationStates, $this->getItemsProcessed(), $this->getItemsReturned());
+        $callback($this->operationStates, $this->getItemsProcessed(), $this->getItemsReturned(), $this->ended);
     }
 
     public function getOperationStates(): array
