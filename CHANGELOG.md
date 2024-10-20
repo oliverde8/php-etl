@@ -4,6 +4,7 @@
 - :star2: Feature #35 - Added a symfony console output to display nice output based on the chain's progress.
 - :star2: Feature #42 - Added output for generating mermaid graph for a etl chain definition & for running chain.
 - :wrench: Fix - Boolean false values being converted to string by the rule engine.
+- :wrench: Fix - Http client operation not handling empty response properly when response is json.
 
 # 1.1.4
 - :star2: Split item operation can now return more complex data sets using the `keyName` option
