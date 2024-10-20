@@ -106,11 +106,11 @@ class SymfonyConsoleOutput
     private function formatTimeSpent(int $time): string
     {
         $time = abs($time);
-        $cent = str_pad(($time % 1000), 3, '0', STR_PAD_LEFT);
+        $cent = str_pad((string) ($time % 1000), 3, '0', STR_PAD_LEFT);
         $time = floor($time / 1000);
-        $sec = str_pad($time % 60, 2, '0', STR_PAD_LEFT);
-        $min = str_pad(floor($time / 60), 2, '0', STR_PAD_LEFT);
-        $hour = str_pad(floor($time / 60 / 60), 1, '0');
+        $sec = str_pad((string) ($time % 60), 2, '0', STR_PAD_LEFT);
+        $min = str_pad((string) floor($time / 60), 2, '0', STR_PAD_LEFT);
+        $hour = str_pad((string) floor($time / 60 / 60), 1, '0');
 
         $textTime = $min.':'.$sec;
         if (floor($time / 60 / 60) > 0) {

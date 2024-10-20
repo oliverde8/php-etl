@@ -9,7 +9,7 @@ use Oliverde8\Component\PhpEtl\Item\ChainBreakItem;
 use Oliverde8\Component\PhpEtl\Item\ItemInterface;
 use Oliverde8\Component\PhpEtl\Item\StopItem;
 
-class OperationState
+class OperationState implements \JsonSerializable
 {
     private readonly string $operationName;
 
@@ -114,5 +114,14 @@ class OperationState
         if ($operation instanceof DetailedObservableOperation) {
             $this->subStates = $operation->getLastObservedState();
         }
+    }
+
+    public function jsonSerialize()
+    {
+        $vars = get_object_vars($this);
+        $vars['state'] = $this->state->name;
+        $vars['asynInProgres'] = count($this->asynInProgress);
+
+        return $vars;
     }
 }
