@@ -146,3 +146,21 @@ product and the single product.
 #### 🔧 Options
 
 **branches:** A list of etl chains (see examples)
+
+### Log operation 
+
+Allows to log a message with a context. 
+
+#### 🔧 Options
+
+- **message:** Symfony expression containing the message to be logged. 
+- **level:** Log level, must be one of the following values: 
+    - debug
+    - info
+    - notice
+    - warning
+    - error
+    - critical
+    - alert
+    - emergency
+- **context:** Data to add to the context, data is pulled from the DataItem received.
