@@ -17,7 +17,7 @@ It comes in 2 php components :
 The rule engine allows to have configuration based transformations to transform a particular data. 
 This is integrated inside the ETL with the `RuleTransformOperation`. 
 
-The rule engine can be used in standalone, [see docs](docs/RuleEngine.md)
+The rule engine can be used in standalone, [see docs](old-docs/RuleEngine.md)
 
 ## The ETL Chain 
 
@@ -41,24 +41,24 @@ In the simplest case the chains receive an iterator containing 2 items in input,
 are processed by each chain operation. This could be for example a list of customer. Each operation
 changes the items.
 
-![](docs/flow-1.png)
+![](old-docs/flow-1.png)
 
 In the following example the iterator sends a single item. The first operation will then send **GroupedItems** 
 containing 2 items. The first item could be a customer, and then we fetch each order of the customer
 in the operation1.
 
-![](docs/flow-2.png)
+![](old-docs/flow-2.png)
 
 We can also group items, to make aggregations. The chain receives an iterator containg 2 items, 
 the first operation processes both items. It breaks the chain for the first item, and returns an aggregation
 of item1 & item 2. This can be used to count the number of customers. This kind of grouping can use more memory
 and should therefore be used with care.
 
-![](docs/flow-3.png)
+![](old-docs/flow-3.png)
 
 Chains can also be split, this would allow 2 different operations to be executed on the same item.
 
-![](docs/flow-4.png)
+![](old-docs/flow-4.png)
 
 
 ## Creating a chain. 
@@ -68,14 +68,14 @@ There are 2 ways of writing a chain, either you code it; or you describe the cha
 - Using php code to initiate each operation yourself, this is not recommended! 
 - Using yaml files to descrive the chain. 
 
-Please see the [describe chains using yaml configurations](docs/DescribeChain.md), you can check the doc on [sub chains and more complex
-cases as well](docs/DescribeChain-01.md)
+Please see the [describe chains using yaml configurations](old-docs/DescribeChain.md), you can check the doc on [sub chains and more complex
+cases as well](old-docs/DescribeChain-01.md)
 
 ## Creating you own operations.
 
-Please refer to the [Custom Opertions doc](docs/CustomOperations.md)
+Please refer to the [Custom Opertions doc](old-docs/CustomOperations.md)
 
 # FAQ
 
-Please refer to the [FAQ](docs/faq.md)
+Please refer to the [FAQ](old-docs/faq.md)
 

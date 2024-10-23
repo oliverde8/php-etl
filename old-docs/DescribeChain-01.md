@@ -2,12 +2,12 @@
 
 This is the second chapter on describing chains using yaml. Here we will go abit further and see more complex use cases. 
 
-If you haven't already you should read the [first chapter first](./DescribeChain.md). 
+If you haven't already you should read the [first chapter first](DescribeChain.md). 
 
 ## Sub chains. 
 
 There will be cases where the chain description can become quite repetitive, let's take the following example
-from Chapter 1 - [Example 05 - Write 3 customer files](./DescribeChain.md).
+from Chapter 1 - [Example 05 - Write 3 customer files](DescribeChain.md).
 
 In that example we have split our customer.csv files into 2 files, one with the customers subscribed to the newsletter
 and one with those not subscribed. We do not do any additional process to change the structure of the data. 

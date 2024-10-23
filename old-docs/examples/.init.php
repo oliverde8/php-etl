@@ -74,5 +74,5 @@ function getChainProcessor($fileName, $options = []): ChainProcessor
 function getProcessFilePath($dir, $filName): string
 {
     $cwd = getcwd();
-    return str_replace($cwd, "", $dir) . "$filName";
+    return str_replace($cwd, "", $dir) . ".init.php";
 }

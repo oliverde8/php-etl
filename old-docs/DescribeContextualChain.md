@@ -1,6 +1,6 @@
 # Contextual chain using Yaml!
 
-In our [previous examples](./DescribeChain.md) our chain had access to the whole file system. This means having
+In our [previous examples](DescribeChain.md) our chain had access to the whole file system. This means having
 multiple chains running together, or having a list of files each execution is generated is impossible. 
 
 Both the **Symfony Bundle** and the **Magento2 Module** will use contextual chains. This means the "main" operations
