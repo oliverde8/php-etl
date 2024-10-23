@@ -21,7 +21,6 @@ class ChainObserver extends OperationState implements ChainObserverInterface
     public function __construct(callable $closure)
     {
         $this->callable = $closure;
-        parent::__construct("GLOBAL");
     }
 
 
