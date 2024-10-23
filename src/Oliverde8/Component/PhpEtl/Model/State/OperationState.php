@@ -76,7 +76,7 @@ class OperationState implements \JsonSerializable
     {
         $this->lastStartTime = floor(microtime(true) * 1000);
 
-        if ($item instanceof StopItem) {
+        if ($item instanceof StopItem && $item->isFinal) {
             $this->state = OperationStateEnum::Stopping;
         } elseif (!$item instanceof ChainBreakItem) {
             $this->state = OperationStateEnum::Running;
@@ -98,7 +98,7 @@ class OperationState implements \JsonSerializable
             }
         }
 
-        if ($item instanceof StopItem) {
+        if ($item instanceof StopItem && $item->isFinal) {
             $this->state = OperationStateEnum::Stopped;
         } elseif ($item instanceof AsyncItemInterface) {
             $this->state = OperationStateEnum::Async;
@@ -108,6 +108,8 @@ class OperationState implements \JsonSerializable
 
             if (count($this->asynInProgress) == 0) {
                 $this->state = OperationStateEnum::Waiting;
+            } else {
+                $this->state = OperationStateEnum::Async;
             }
         }
 

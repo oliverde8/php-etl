@@ -100,6 +100,7 @@ class ChainProcessor extends LoggerContext implements ChainProcessorInterface
 
         $stopItem = new StopItem();
         if ($withStop) {
+            $stopItem = new StopItem(true);
             $context->setLoggerContext(self::KEY_LOGGER_ETL_IDENTIFIER, $identifierPrefix . 'STOP');
             while ($this->processItemWithChain($stopItem, $startAt, $context) !== $stopItem) {
                 // Executing stop until the system stops.
@@ -164,9 +165,7 @@ class ChainProcessor extends LoggerContext implements ChainProcessorInterface
             return new ChainBreakItem();
         } elseif ($item instanceof GroupedItemInterface) {
             $context->setLoggerContext(self::KEY_LOGGER_ETL_IDENTIFIER, "chain link:{$this->chainLinkNames[$chainNumber]}-");
-            $this->processItems($item->getIterator(), $chainNumber + 1, $context, false);
-
-            return new StopItem();
+            return $this->processItems($item->getIterator(), $chainNumber + 1, $context, false);
         } else if ($item instanceof ChainBreakItem) {
             return $item;
         }
