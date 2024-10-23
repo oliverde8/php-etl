@@ -93,7 +93,11 @@ class ChainProcessor extends LoggerContext implements ChainProcessorInterface
         foreach ($items as $item) {
             $context->setLoggerContext(self::KEY_LOGGER_ETL_IDENTIFIER, $identifierPrefix . $count++);
 
-            $dataItem = new DataItem($item);
+            if ($item instanceof ItemInterface) {
+                $dataItem = $item;
+            } else {
+                $dataItem = new DataItem($item);
+            }
             $this->processItemWithChain($dataItem, $startAt, $context);
         }
 
@@ -134,6 +138,12 @@ class ChainProcessor extends LoggerContext implements ChainProcessorInterface
     {
         $this->processAsyncOperations();
 
+        if ($item instanceof AsyncItemInterface && $this->maxAsynchronousItems === 0) {
+            while ($item->isRunning()) {
+                usleep(1000);
+            }
+            $item = $item->getItem();
+        }
         if ($item instanceof AsyncItemInterface) {
             while (count($this->asyncItems) >= $this->maxAsynchronousItems) {
                 usleep(1000);
