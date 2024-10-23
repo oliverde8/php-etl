@@ -1,0 +1,21 @@
+
+#main-div {
+    width: 100%
+}
+
+#main-menu {
+    width: 16%;
+    height: 100vh;
+    float: left;
+
+    &>.menu {
+        width: 100%;
+        height: 100%
+    }
+}
+
+#main-content {
+    width: 83%;
+    height: 100vh;
+    float: right
+}
