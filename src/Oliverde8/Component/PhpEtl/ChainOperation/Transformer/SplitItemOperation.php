@@ -17,16 +17,21 @@ class SplitItemOperation extends AbstractChainOperation implements DataChainOper
 {
     protected bool $singleElement;
 
+    protected bool $keepKeys;
+
     protected array $keys;
 
-    /**
-     * @param bool $singleElement
-     * @param array $keys
-     */
-    public function __construct(bool $singleElement, array $keys)
+    protected ?string $keyName;
+
+    protected array $duplicateKeys;
+
+    public function __construct(bool $singleElement, array $keys, bool $keepKeys, string $keyName = null, array $duplicatekeys = [])
     {
         $this->singleElement = $singleElement;
+        $this->keepKeys = $keepKeys;
         $this->keys = $keys;
+        $this->keyName = $keyName;
+        $this->duplicateKeys = $duplicatekeys;
     }
 
     /**
@@ -36,12 +41,11 @@ class SplitItemOperation extends AbstractChainOperation implements DataChainOper
     {
         if ($this->singleElement) {
             $data = AssociativeArray::getFromKey($item->getData(), $this->keys[0], new ChainBreakItem());
-
             if ($data instanceof ItemInterface) {
                 return $data;
             }
 
-            return $this->createItem($data);
+            return $this->createItem($data, $item->getData());
         }
 
         $newItemData = [];
@@ -52,18 +56,32 @@ class SplitItemOperation extends AbstractChainOperation implements DataChainOper
         return $this->createItem($newItemData);
     }
 
-    protected function createItem($data): ItemInterface
+    protected function createItem($itemData, $fullData): ItemInterface
     {
-        if (!is_array($data)) {
-            throw new ChainOperationException(sprintf('Split operation expects an array to split; "%s', gettype($data)));
+        if (!is_array($itemData)) {
+            throw new ChainOperationException(sprintf('Split operation expects an array to split; "%s', gettype($itemData)));
         }
 
         $items = [];
-        foreach ($data as $datum) {
+        foreach ($itemData as $datumKey => $datum) {
             if ($datum instanceof ItemInterface) {
                 $items[] = $datum;
             } else {
-                $items[] = new DataItem($datum);
+                $dataItem = [];
+                if ($this->keyName) {
+                    AssociativeArray::setFromKey($dataItem, $this->keyName, $datum);
+                } else {
+                    $dataItem = $datum;
+                }
+
+                foreach ($this->duplicateKeys as $keyStore => $keyFetch) {
+                    AssociativeArray::setFromKey($dataItem, $keyStore, AssociativeArray::getFromKey($fullData, $keyFetch));
+                }
+
+                if ($this->keepKeys) {
+                    $dataItem = ['key' => $datumKey, 'value' => $dataItem];
+                }
+                $items[] = new DataItem($dataItem);
             }
         }
 

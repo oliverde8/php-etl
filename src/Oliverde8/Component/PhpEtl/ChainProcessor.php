@@ -74,6 +74,7 @@ class ChainProcessor extends LoggerContext implements ChainProcessorInterface
             $context->finalise();
             throw $e;
         }
+        $this->chainObserver->onFinish();
     }
 
     public function isShared(): bool
@@ -96,10 +97,10 @@ class ChainProcessor extends LoggerContext implements ChainProcessorInterface
             $this->processItemWithChain($dataItem, $startAt, $context);
         }
 
-        $this->endAllAsyncOperations();
 
         $stopItem = new StopItem();
         if ($withStop) {
+            $stopItem = new StopItem(true);
             $context->setLoggerContext(self::KEY_LOGGER_ETL_IDENTIFIER, $identifierPrefix . 'STOP');
             while ($this->processItemWithChain($stopItem, $startAt, $context) !== $stopItem) {
                 // Executing stop until the system stops.
@@ -109,9 +110,17 @@ class ChainProcessor extends LoggerContext implements ChainProcessorInterface
         return $stopItem;
     }
 
-    public function processItemWithChain(ItemInterface $item, int $startAt, ExecutionContext $context): ItemInterface
-    {
-        $this->initObserver();
+    public function processItemWithChain(
+        ItemInterface $item,
+        int $startAt,
+        ExecutionContext $context,
+        ?callable $observerCallback = null
+    ): ItemInterface {
+        $this->initObserver($observerCallback);
+
+        if ($item instanceof StopItem) {
+            $this->endAllAsyncOperations();
+        }
 
         for ($chainNumber = $startAt; $chainNumber < count($this->chainLinks); $chainNumber++) {
             $item = $this->processItemWithOperation($item, $chainNumber, $context);
@@ -156,9 +165,7 @@ class ChainProcessor extends LoggerContext implements ChainProcessorInterface
             return new ChainBreakItem();
         } elseif ($item instanceof GroupedItemInterface) {
             $context->setLoggerContext(self::KEY_LOGGER_ETL_IDENTIFIER, "chain link:{$this->chainLinkNames[$chainNumber]}-");
-            $this->processItems($item->getIterator(), $chainNumber + 1, $context, false);
-
-            return new StopItem();
+            return $this->processItems($item->getIterator(), $chainNumber + 1, $context, false);
         } else if ($item instanceof ChainBreakItem) {
             return $item;
         }
@@ -224,17 +231,34 @@ class ChainProcessor extends LoggerContext implements ChainProcessorInterface
         }
     }
 
-    protected function initObserver(?callable $observerCallback = null)
+    public function initObserver(?callable $observerCallback = null): ChainObserver
     {
         if ($this->chainObserver) {
-            return;
+            return $this->chainObserver;
         }
 
-        // TODO init chain observer here with ideally factory.
         if (!$observerCallback) {
             $observerCallback = function (){};
         }
         $this->chainObserver = new ChainObserver($observerCallback);
         $this->chainObserver->init($this->chainLinks, $this->chainLinkNames);
+
+        return $this->chainObserver;
+    }
+
+    /**
+     * @return ChainOperationInterface[]
+     */
+    public function getChainLinks(): array
+    {
+        return $this->chainLinks;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getChainLinkNames(): array
+    {
+        return $this->chainLinkNames;
     }
 }

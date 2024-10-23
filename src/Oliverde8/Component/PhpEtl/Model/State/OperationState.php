@@ -2,12 +2,14 @@
 
 namespace Oliverde8\Component\PhpEtl\Model\State;
 
+use Oliverde8\Component\PhpEtl\ChainOperation\ChainOperationInterface;
+use Oliverde8\Component\PhpEtl\ChainOperation\DetailedObservableOperation;
 use Oliverde8\Component\PhpEtl\Item\AsyncItemInterface;
 use Oliverde8\Component\PhpEtl\Item\ChainBreakItem;
 use Oliverde8\Component\PhpEtl\Item\ItemInterface;
 use Oliverde8\Component\PhpEtl\Item\StopItem;
 
-class OperationState
+class OperationState implements \JsonSerializable
 {
     private readonly string $operationName;
 
@@ -17,15 +19,22 @@ class OperationState
 
     private int $itemsReturned = 0;
 
+    private int $timeSpent = 0;
+
+    private int $lastStartTime = 0;
+
     /** @var AsyncItemInterface[] */
     private array $asynInProgress = [];
 
-    /**
-     * @param string $operationName
-     */
-    public function __construct(string $operationName)
+    private array $subStates = [];
+
+    public function __construct(string $operationName, ChainOperationInterface $operation)
     {
         $this->operationName = $operationName;
+
+        if ($operation instanceof DetailedObservableOperation) {
+            $this->subStates = $operation->getLastObservedState();
+        }
     }
 
     public function getOperationName(): string
@@ -48,30 +57,48 @@ class OperationState
         return $this->itemsReturned;
     }
 
+    public function getTimeSpent(): int
+    {
+        return $this->timeSpent;
+    }
+
     public function getAsyncWaiting(): int
     {
         return count($this->asynInProgress);
     }
 
-    protected function processItem(ItemInterface $item)
+    public function getSubStates(): array
     {
-        if ($item instanceof StopItem) {
+        return $this->subStates;
+    }
+
+    protected function processItem(ChainOperationInterface $operation, ItemInterface $item): void
+    {
+        $this->lastStartTime = floor(microtime(true) * 1000);
+
+        if ($item instanceof StopItem && $item->isFinal) {
             $this->state = OperationStateEnum::Stopping;
         } elseif (!$item instanceof ChainBreakItem) {
             $this->state = OperationStateEnum::Running;
             $this->itemsProcessed++;
         }
+
+        if ($operation instanceof DetailedObservableOperation) {
+            $this->subStates = $operation->getLastObservedState();
+        }
     }
 
-    protected function returnItem(ItemInterface $item)
+    protected function returnItem(ChainOperationInterface $operation, ItemInterface $item): void
     {
+        $this->timeSpent += floor(microtime(true) * 1000) - $this->lastStartTime;
+
         foreach ($this->asynInProgress as $key => $asynInProgress) {
             if (!$asynInProgress->isRunning()) {
                 unset($this->asynInProgress[$key]);
             }
         }
 
-        if ($item instanceof StopItem) {
+        if ($item instanceof StopItem && $item->isFinal) {
             $this->state = OperationStateEnum::Stopped;
         } elseif ($item instanceof AsyncItemInterface) {
             $this->state = OperationStateEnum::Async;
@@ -81,7 +108,22 @@ class OperationState
 
             if (count($this->asynInProgress) == 0) {
                 $this->state = OperationStateEnum::Waiting;
+            } else {
+                $this->state = OperationStateEnum::Async;
             }
         }
+
+        if ($operation instanceof DetailedObservableOperation) {
+            $this->subStates = $operation->getLastObservedState();
+        }
+    }
+
+    public function jsonSerialize(): mixed
+    {
+        $vars = get_object_vars($this);
+        $vars['state'] = $this->state->name;
+        $vars['asynInProgres'] = count($this->asynInProgress);
+
+        return $vars;
     }
 }

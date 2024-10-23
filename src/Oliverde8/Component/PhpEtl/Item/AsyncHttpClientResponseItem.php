@@ -66,7 +66,10 @@ class AsyncHttpClientResponseItem implements AsyncItemInterface
             'status_code' => $this->response->getStatusCode(),
         ];
         if ($this->responseIsJson) {
-            $responseData['content'] = $this->response->toArray();
+            $responseData['content'] = [];
+            if ($this->response->getStatusCode() !== 204) {
+                $responseData['content'] = $this->response->toArray();
+            }
         }
 
         $data = $this->baseData;

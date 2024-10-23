@@ -11,7 +11,8 @@ custom-rule:
     add: false # We want to replace all existing columns with our new columns.
     columns:
       uid:
-        - get: {field: 'UniqueId'}
+        rules:
+          - get: {field: 'UniqueId'}
 ```
 
 It is also possible to give multiple choices, maybe our data is not well normalized and the `UniqueId` key does not 
@@ -24,8 +25,9 @@ custom-rule:
     add: false # We want to replace all existing columns with our new columns.
     columns:
       uid:
-        - get: {field: 'UniqueId'}
-        - get: {field: 'sku'}
+        rules:
+          - get: {field: 'UniqueId'}
+          - get: {field: 'sku'}
 ```
 
 It's also possible to mix operations, so if the get operation can't find a value then another operation can. We can use 
@@ -38,9 +40,10 @@ custom-rule:
     add: false # We want to replace all existing columns with our new columns.
     columns:
       uid:
-        - get: {field: 'UniqueId'}
-        - get: {field: 'sku'}
-        - "DefaultUID"
+        rules:
+          - get: {field: 'UniqueId'}
+          - get: {field: 'sku'}
+          - "DefaultUID"
 ```
 
 The rule engine can also create nested arrays. This is done using the `/` character.
@@ -52,7 +55,8 @@ custom-rule:
     add: false # We want to replace all existing columns with our new columns.
     columns:
       data/uid:
-        - get: {field: 'UniqueId'}
+        rules:
+          - get: {field: 'UniqueId'}
 ```
 
 The get operation can of course read nested arrays. This is done using an array.
@@ -64,7 +68,8 @@ custom-rule:
     add: false # We want to replace all existing columns with our new columns.
     columns:
       data/uid:
-        - get: {field: ["data", "UniqueId"]}
+        rules:
+          - get: {field: ["data", "UniqueId"]}
 ```
 
 
@@ -77,7 +82,8 @@ custom-rule:
     add: false # We want to replace all existing columns with our new columns.
     columns:
       label-{@context/locales}:
-        - [{get : {field: ['@context/locales', 'label']}]
+        rules:
+          - [{get : {field: ['@context/locales', 'label']}]
 ```
 
 In this case a `label-` column for each locales provided in the execution context will be created. 

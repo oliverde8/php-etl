@@ -18,8 +18,10 @@ use Oliverde8\Component\PhpEtl\Model\ExecutionContext;
  * @copyright 2018 Oliverde8
  * @package Oliverde8\Component\PhpEtl\ChainOperation
  */
-class ChainMergeOperation extends AbstractChainOperation implements DataChainOperationInterface
+class ChainMergeOperation extends AbstractChainOperation implements DataChainOperationInterface, DetailedObservableOperation
 {
+    use SplittedChainOperationTrait;
+
     /** @var ChainProcessor[] */
     protected array $chainProcessors;
 
@@ -31,6 +33,7 @@ class ChainMergeOperation extends AbstractChainOperation implements DataChainOpe
     public function __construct(array $chainProcessors)
     {
         $this->chainProcessors = $chainProcessors;
+        $this->onSplittedChainOperationConstruct($chainProcessors);
     }
 
     public function processData(DataItemInterface $item, ExecutionContext $context): ItemInterface
@@ -56,5 +59,13 @@ class ChainMergeOperation extends AbstractChainOperation implements DataChainOpe
         }
 
         return $item;
+    }
+
+    /**
+     * @return ChainProcessor[]
+     */
+    public function getChainProcessors(): array
+    {
+        return $this->chainProcessors;
     }
 }
