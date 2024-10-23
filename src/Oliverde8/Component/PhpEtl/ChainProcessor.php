@@ -97,7 +97,6 @@ class ChainProcessor extends LoggerContext implements ChainProcessorInterface
             $this->processItemWithChain($dataItem, $startAt, $context);
         }
 
-        $this->endAllAsyncOperations();
 
         $stopItem = new StopItem();
         if ($withStop) {
@@ -117,6 +116,10 @@ class ChainProcessor extends LoggerContext implements ChainProcessorInterface
         ?callable $observerCallback = null
     ): ItemInterface {
         $this->initObserver($observerCallback);
+
+        if ($item instanceof StopItem) {
+            $this->endAllAsyncOperations();
+        }
 
         for ($chainNumber = $startAt; $chainNumber < count($this->chainLinks); $chainNumber++) {
             $item = $this->processItemWithOperation($item, $chainNumber, $context);
