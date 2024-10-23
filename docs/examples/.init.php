@@ -67,7 +67,7 @@ function getChainProcessor($fileName, $options = []): ChainProcessor
     return getBuilder()->buildChainProcessor(
         Yaml::parse(file_get_contents($fileName)),
         $options,
-        1
+        5
     );
 }
 
