@@ -41,7 +41,6 @@ class MermaidRunOutput
         $text .= $this->generateLinks($operationStates);
         $text .= "end\n";
 
-
         return $text;
     }
 
@@ -52,12 +51,16 @@ class MermaidRunOutput
             $newId = $prefix . $id;
 
             if ($state['subStates']) {
-                $text .= "\t" . $newId . "B(" . $this->generateName($state) . ")@{ shape: hex}\n";
+                $text .= $newId . "B(" . $this->generateName($state) . ")@{ shape: hex}\n";
+                $text .= "subgraph $newId" . "S[{$state['operationName']}]\n";
+
                 foreach ($state['subStates'] as $branchId => $subState) {
                     $text .= $this->generateNodes($subState, $newId . $branchId);
                 }
+
+                $text .= "end\n";
             } else {
-                $text .= "\t" . $newId . "B(" . $this->generateName($state) . ")\n";
+                $text .= $newId . "B(" . $this->generateName($state) . ")\n";
             }
 
             if ($state['state'] == "Not Initialized") {
@@ -81,15 +84,23 @@ class MermaidRunOutput
     protected function generateLinks(array $operationStates, string $prefix = "", $previousId = null): string
     {
         $text = "";
+        $previousId2 = null;
+
         foreach ($operationStates as $id => $state) {
             /** @var OperationState $state */
             $newId = $prefix . $id;
             if (!is_null($previousId)) {
                 $text .= "$previousId --> {$newId}B\n";
             }
+            if (!is_null($previousId2)) {
+                $text .= "$previousId2 ~~~ {$newId}B\n";
+                $previousId2 = null;
+            }
+
             $previousId = $newId . "B";
 
             if ($state['subStates']) {
+                $previousId2 = $newId . "S";
                 foreach ($state['subStates'] as $branchId => $subState) {
                     $text .= $this->generateLinks($subState, $prefix . $newId . $branchId, $previousId);
                 }
