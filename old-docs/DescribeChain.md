@@ -325,7 +325,7 @@ and by executing `php docs/examples/00-describe/06-csv-transform.php`
 
 ### Example 07 - Flatten yml files to csv
 
-Complex `json` files can be flattened and have multiple columns using the rule engine. In our example [json](./examples/products.json) 
+Complex `json` files can be flattened and have multiple columns using the rule engine. In our example [json](examples/products.json) 
 we have a list of products with their name, their skus etc. The name of the product is different for each locale. 
 
 We could manually create a list of columns for each locale using the rule engine, but this will not be very generic, 

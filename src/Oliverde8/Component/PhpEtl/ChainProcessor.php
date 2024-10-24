@@ -185,6 +185,8 @@ class ChainProcessor extends LoggerContext implements ChainProcessorInterface
 
     protected function processAsyncOperations()
     {
+        $toProcess = [];
+
         foreach ($this->asyncItems as $id => $item) {
             if (!$item['item']->isRunning()) {
                 // Item has finished.
@@ -194,10 +196,13 @@ class ChainProcessor extends LoggerContext implements ChainProcessorInterface
                 // We consider that the process finished only once the async operation is done.
                 $this->chainObserver->onAfterProcess($chainNumber, $this->chainLinks[$chainNumber], $newItem);
                 unset($this->asyncItems[$id]);
-                $this->processItemWithChain($newItem, $chainNumber + 1, $item['context']);
+                $toProcess[] = [$newItem, $chainNumber + 1, $item['context']];
             }
         }
 
+        foreach ($toProcess as $arguments) {
+            $this->processItemWithChain(...$arguments);
+        }
     }
 
     protected function endAllAsyncOperations()

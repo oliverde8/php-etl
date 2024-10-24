@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% include head.html %}
+</head>
+<body>
+    <div class="main ui container" style="width: 100vw">
+        {% include menu.html %}
+
+        <div style="width: 83vw; height: 100vh; float: right">
+            {% include title-block.html %}
+
+            <div class="ui container">
+                <div class="ui hidden divider"></div>
+                {{ content }}
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

@@ -67,12 +67,12 @@ function getChainProcessor($fileName, $options = []): ChainProcessor
     return getBuilder()->buildChainProcessor(
         Yaml::parse(file_get_contents($fileName)),
         $options,
-        1
+        5
     );
 }
 
 function getProcessFilePath($dir, $filName): string
 {
     $cwd = getcwd();
-    return str_replace($cwd, "", $dir) . "$filName";
+    return str_replace($cwd, "", $dir) . ".init.php";
 }
