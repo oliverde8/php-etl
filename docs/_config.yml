@@ -26,6 +26,8 @@ github_username:  oliverde8
 
 # Build settings
 markdown: kramdown
+highlighter: rouge
+input: GFM
 plugins: []
 
 # exclude:

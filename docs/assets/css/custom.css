@@ -1,4 +1,4 @@
-
+@import "code.css";
 #main-div {
     width: 100%
 }
@@ -18,4 +18,61 @@
     width: 83%;
     height: 100vh;
     float: right
+}
+
+blockquote.block-tip {
+    background-color: #e2ecf5;
+    border: solid 1px #4283b9;
+    border-left: solid 4px #356994;
+    color: #21425d;
+    padding: 4px 12px;
+    width: 100%;
+
+    h5::before {
+        margin-right: 4px;
+        content: "💡"
+    }
+}
+
+
+blockquote.block-info {
+    background-color: #e2f5ec;
+    border: solid 1px #42b983;
+    border-left: solid 4px #359469;
+    color: #215d42;
+    padding: 4px 12px;
+    width: 100%;
+
+    h5::before {
+        margin-right: 6px;
+        content: "ℹ️"
+    }
+}
+
+blockquote.block-warning {
+    background-color: rgba(255, 229, 100, .25);
+    border: solid 1px #e7c000;
+    border-left: solid 4px #b29400;
+    color: #6b5900;
+    padding: 4px 12px;
+    width: 100%;
+
+    h5::before {
+        margin-right: 6px;
+        content: "⚠️"
+    }
+}
+
+blockquote.block-error {
+    background-color: #ffe0e0;
+    border: solid 1px #c00;
+    border-left: solid 4px #c00;
+    color: #600;
+    padding: 4px 12px;
+    width: 100%;
+
+    h5::before {
+        margin-right: 6px;
+        content: "‼️"
+    }
 }
