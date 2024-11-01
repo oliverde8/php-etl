@@ -1,0 +1,21 @@
+<div class="ui grid etl-step-block">
+    <div class="ten wide column  description">
+        {{ include.description| markdownify }}
+    </div>
+
+    <div class="six wide column code">
+        <div class="ui card">
+            <div class="content">
+                <div class="description">
+                    {{ include.code| markdownify }}
+                </div>
+            </div>
+            <div class="extra content">
+                <span class="left floated like">
+                  <i class="copy icon"></i>
+                  Copy (WIP)
+                </span>
+            </div>
+        </div>
+    </div>
+</div>

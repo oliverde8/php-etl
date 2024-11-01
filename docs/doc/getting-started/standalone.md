@@ -1,7 +1,7 @@
 ---
 layout: base
 title: PHP-ETL - Getting Started
-subTitle: Standalone 
+subTitle: 🐘 Standalone 
 ---
 
 ## Introduction
@@ -19,7 +19,7 @@ That said that does not mean the ETL can't be run standalone, it's just that the
     composer require oliverde8/php-etl
 ```
 
-- We will also need a factgory to create execution context's, you can read more about what an execution context is
+- We will also need a factory to create execution context's, you can read more about what an execution context is
 [here](/doc/01-understand-the-etl/execution-context.html). 
 ```php
 $executionContextFaxtory = new ExecutionContextFactory();
