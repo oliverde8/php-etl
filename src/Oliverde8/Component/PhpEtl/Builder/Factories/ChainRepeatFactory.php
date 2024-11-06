@@ -17,9 +17,12 @@ class ChainRepeatFactory extends AbstractFactory
 
     public function build(string $operation, array $options): ChainOperationInterface
     {
+        $maxAsync = $options['maxASynchronousItems'] ?? 0;
+        $allowAsync = $maxAsync > 0;
+
         // Do not allow 
-        $chainProcessor = $this->builder->buildChainProcessor($options['chain'],[], 0);
-        return $this->create($chainProcessor,  $options['validationExpr']);
+        $chainProcessor = $this->builder->buildChainProcessor($options['chain'],[], $maxAsync);
+        return $this->create($chainProcessor,  $options['validationExpr'], $allowAsync);
     }
 
     protected function configureValidator(): Constraint
@@ -33,6 +36,9 @@ class ChainRepeatFactory extends AbstractFactory
                 new Assert\Type(["type" => "string"]),
                 new Assert\NotBlank(),
             ],
+            'maxASynchronousItems' => [
+                new Assert\Type(["type" => "int"]),
+            ]
         ]);
     }
 }

@@ -8,6 +8,8 @@
 
 namespace Oliverde8\Component\PhpEtl\Tests;
 
+use Oliverde8\Component\PhpEtl\Model\ExecutionContext;
+use Oliverde8\Component\PhpEtl\Model\File\LocalFileSystem;
 use Oliverde8\Component\PhpEtl\Tests\Item\TestAsyncItem;
 use Oliverde8\Component\PhpEtl\ChainOperation\Grouping\SimpleGroupingOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\CallbackTransformerOperation;
@@ -199,11 +201,35 @@ class ChainProcessorTest extends TestCase
             return $item;
         });
 
-        $chainProcessor = new ChainProcessor(
-            ['mock' => $mock, 'mocked_end' => $mockEnd],
-            new ExecutionContextFactory()
-        );
+        $chainProcessor = new ChainProcessor(['mock' => $mock, 'mocked_end' => $mockEnd], new ExecutionContextFactory());
         $chainProcessor->process(new \ArrayIterator([1, 2]), ['toto']);
+
+        // Order of items changes
+        $this->assertEquals(["I am fast", "I am slow"], $results);
+    }
+
+    public function testReturnOfAsyncItems()
+    {
+        $callNum = 0;
+
+        $mock = new CallbackTransformerOperation(function (ItemInterface $item) use (&$callNum) {
+            $callNum++;
+            if ($callNum == 1) {
+                return new TestAsyncItem(new DataItem('I am slow'), 2);
+            } else {
+                return new TestAsyncItem(new DataItem('I am fast'), 1);
+            }
+        });
+        $mockEnd = new CallbackTransformerOperation(function (ItemInterface $item) use (&$results) {
+            return $item;
+        });
+
+        $chainProcessor = new ChainProcessor(['mock' => $mock, 'mocked_end' => $mockEnd], new ExecutionContextFactory());
+        foreach ($chainProcessor->processGenerator(new \ArrayIterator([1, 2]), new ExecutionContext([], new LocalFileSystem())) as $item) {
+            if ($item instanceof DataItem) {
+                $results[] = $item->getData();
+            }
+        }
 
         // Order of items changes
         $this->assertEquals(["I am fast", "I am slow"], $results);
@@ -219,7 +245,7 @@ class ChainProcessorTest extends TestCase
             if ($callNum == 1) {
                 return new TestAsyncItem(new DataItem('I am slow1'), 2);
             } elseif ($callNum == 2) {
-                return new TestAsyncItem(new DataItem('I am slow2'), 3);
+                return new TestAsyncItem(new DataItem('I am slow2'), 4);
             } else {
                 return new TestAsyncItem(new DataItem('I am speed'), 1);
             }

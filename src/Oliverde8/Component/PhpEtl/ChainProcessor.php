@@ -1,5 +1,4 @@
 <?php
-
 declare(strict_types=1);
 
 namespace Oliverde8\Component\PhpEtl;
@@ -11,6 +10,8 @@ use Oliverde8\Component\PhpEtl\Exception\ChainOperationException;
 use Oliverde8\Component\PhpEtl\Item\AsyncItemInterface;
 use Oliverde8\Component\PhpEtl\Item\ChainBreakItem;
 use Oliverde8\Component\PhpEtl\Item\DataItem;
+use Oliverde8\Component\PhpEtl\Item\DataItemInterface;
+use Oliverde8\Component\PhpEtl\Item\GroupedItem;
 use Oliverde8\Component\PhpEtl\Item\GroupedItemInterface;
 use Oliverde8\Component\PhpEtl\Item\ItemInterface;
 use Oliverde8\Component\PhpEtl\Item\MixItem;
@@ -18,14 +19,7 @@ use Oliverde8\Component\PhpEtl\Item\StopItem;
 use Oliverde8\Component\PhpEtl\Model\ExecutionContext;
 use Oliverde8\Component\PhpEtl\Model\LoggerContext;
 
-/**
- * Class ChainProcessor
- *
- * @author    de Cramer Oliver<oliverde8@gmail.com>
- * @copyright 2018 Oliverde8
- * @package Oliverde8\Component\PhpEtl
- */
-class ChainProcessor extends LoggerContext implements ChainProcessorInterface
+final class ChainProcessor extends LoggerContext implements ChainProcessorInterface
 {
     const KEY_LOGGER_ETL_IDENTIFIER = 'etl.identifier';
 
@@ -34,6 +28,8 @@ class ChainProcessor extends LoggerContext implements ChainProcessorInterface
 
     /** @var string[] */
     protected readonly array $chainLinkNames;
+
+    protected readonly int $chainEnd;
 
     protected ?ChainObserverInterface $chainObserver = null;
 
@@ -53,137 +49,150 @@ class ChainProcessor extends LoggerContext implements ChainProcessorInterface
     {
         $this->chainLinkNames = array_keys($chainLinks);
         $this->chainLinks = array_values($chainLinks);
+        $this->chainEnd = count($chainLinks) - 1;
     }
 
-    public function process(\Iterator $items, array $parameters, ?callable $observerCallback = null)
+
+    public function process(\Iterator|ItemInterface $item, array $parameters, ?callable $observerCallback = null, $withStop = true): void
     {
         $context = $this->contextFactory->get($parameters);
         $context->replaceLoggerContext($parameters);
         $context->setLoggerContext(self::KEY_LOGGER_ETL_IDENTIFIER, '');
 
-        $this->initObserver($observerCallback);
+        foreach ($this->processGenerator($item, $context, $observerCallback, $withStop) as $item) {}
 
-        try {
-            $context->getLogger()->info("Starting etl process!");
-            $this->processItems($items, 0, $context);
-            $context->getLogger()->info("Finished etl process!");
-            $context->finalise();
-        } catch (\Exception $e) {
-            $params['exception'] = $e;
-            $context->getLogger()->info("Failed during etl process!", $params);
-            $context->finalise();
-            throw $e;
+        if ($this->chainObserver) {
+            $this->chainObserver->onFinish();
         }
-        $this->chainObserver->onFinish();
     }
 
-    public function isShared(): bool
-    {
-        return $this->isShared;
-    }
-
-    /**
-     * Process list of items with chain starting at $startAt.
-     */
-    protected function processItems(\Iterator $items, int $startAt, ExecutionContext $context, bool $withStop = true)
-    {
-        $identifierPrefix = $context->getParameter('etl.identifier');
-
-        $count = 1;
-        foreach ($items as $item) {
-            $context->setLoggerContext(self::KEY_LOGGER_ETL_IDENTIFIER, $identifierPrefix . $count++);
-
-            if ($item instanceof ItemInterface) {
-                $dataItem = $item;
-            } else {
-                $dataItem = new DataItem($item);
-            }
-            $this->processItemWithChain($dataItem, $startAt, $context);
-        }
-
-
-        $stopItem = new StopItem();
-        if ($withStop) {
-            $stopItem = new StopItem(true);
-            $context->setLoggerContext(self::KEY_LOGGER_ETL_IDENTIFIER, $identifierPrefix . 'STOP');
-            while ($this->processItemWithChain($stopItem, $startAt, $context) !== $stopItem) {
-                // Executing stop until the system stops.
-            }
-        }
-
-        return $stopItem;
-    }
-
-    public function processItemWithChain(
-        ItemInterface $item,
-        int $startAt,
+    public function processGenerator(
+        \Iterator|ItemInterface $item,
         ExecutionContext $context,
-        ?callable $observerCallback = null
-    ): ItemInterface {
+        ?callable $observerCallback = null,
+        bool $withStop = true,
+        bool $allowAsynchronous = true
+    ): \Generator {
+        $context->getLogger()->info("Starting etl process!");
         $this->initObserver($observerCallback);
 
-        if ($item instanceof StopItem) {
-            $this->endAllAsyncOperations();
+        $originalMaxAsynchronousItems = $this->maxAsynchronousItems;
+        if (!$allowAsynchronous) {
+            $this->maxAsynchronousItems = 0;
         }
 
-        for ($chainNumber = $startAt; $chainNumber < count($this->chainLinks); $chainNumber++) {
-            $item = $this->processItemWithOperation($item, $chainNumber, $context);
-            $item = $this->processItem($item, $chainNumber, $context);
+        if ($item instanceof \Iterator) {
+            $item = new GroupedItem($item);
         }
 
-        return $item;
+        foreach($this->processItemAt($item, $context, 0) as $newItem) {
+            yield $newItem;
+        }
+
+        // Finalise all remaining asynchronous items.
+        foreach ($this->handleAsyncItems(0) as $newItem) {
+            yield $newItem;
+        }
+
+        if ($withStop) {
+            $stopItem = new StopItem();
+            $newItem = $stopItem;
+            do {
+                foreach ($this->processItemAt($stopItem, $context, 0) as $newItem) {
+                    yield $newItem;
+                }
+            } while ($newItem !== $stopItem);
+        }
+
+        $this->maxAsynchronousItems = $originalMaxAsynchronousItems;
     }
 
-    public function processItem(ItemInterface $item, int $chainNumber, ExecutionContext $context): ItemInterface
+    protected function processItemAt(ItemInterface $item, ExecutionContext $context, int $chainNumber = 0): \Generator
     {
-        $this->processAsyncOperations();
-
-        if ($item instanceof AsyncItemInterface && $this->maxAsynchronousItems === 0) {
-            while ($item->isRunning()) {
-                usleep(1000);
-            }
-            $item = $item->getItem();
-        }
-        if ($item instanceof AsyncItemInterface) {
-            while (count($this->asyncItems) >= $this->maxAsynchronousItems) {
-                usleep(1000);
-                $this->processAsyncOperations();
-            }
-            $this->asyncItems[] = [
-                'item' => $item,
-                'context' => $context,
-                'chain_number' => $chainNumber,
-            ];
-
-            return new ChainBreakItem();
-        } elseif ($item instanceof MixItem) {
-            $context->setLoggerContext(self::KEY_LOGGER_ETL_IDENTIFIER, "chain link:{$this->chainLinkNames[$chainNumber]}-");
-
-            foreach ($item->getItems() as $mixItem) {
-                if ($mixItem instanceof AsyncItemInterface) {
-                    $item = $this->processItemWithChain($mixItem, $chainNumber, $context);
-                } elseif ($mixItem instanceof GroupedItemInterface) {
-                    $item = $this->processItems($mixItem->getIterator(), $chainNumber + 1, $context, false);
-                } else {
-                    $item = $this->processItemWithChain($mixItem, $chainNumber + 1, $context);
+        if ($chainNumber > $this->chainEnd) {
+            // End chain !!
+            if ($item instanceof GroupedItemInterface) {
+                foreach ($this->getItemsFromGroupItem($item) as $newItem) {
+                    yield $newItem;
                 }
             }
-
-            if ($item instanceof StopItem) {
-                return $item;
+            elseif ($item instanceof MixItem) {
+                foreach ($item->getItems() as $item) {
+                    foreach ($this->processItemAt($item, $context, $chainNumber) as $newItem) {
+                        yield $newItem;
+                    }
+                }
+            } elseif ($item instanceof AsyncItemInterface) {
+                $this->asyncItems[] = ['item' => $item, 'context' => $context, 'chain_number' => $chainNumber];
+                $newItem = $this->handleAsyncItems();
+                foreach($newItem as $resultItem) {
+                    yield $resultItem;
+                }
+            }else {
+                yield $item;
             }
-            return new ChainBreakItem();
-        } elseif ($item instanceof GroupedItemInterface) {
-            $context->setLoggerContext(self::KEY_LOGGER_ETL_IDENTIFIER, "chain link:{$this->chainLinkNames[$chainNumber]}-");
-            return $this->processItems($item->getIterator(), $chainNumber + 1, $context, false);
-        } else if ($item instanceof ChainBreakItem) {
-            return $item;
-        }
 
-        return $item;
+        } else if ($item instanceof GroupedItemInterface) {
+            foreach ($this->getItemsFromGroupItem($item) as $groupedItem) {
+                foreach ($this->processItemAt($groupedItem, $context, $chainNumber) as $newItem) {
+                    yield $newItem;
+                }
+            }
+        } elseif ($item instanceof ChainBreakItem) {
+            yield $item;
+        } elseif ($item instanceof MixItem) {
+            foreach ($item->getItems() as $mixItem) {
+                foreach($this->processItemAt($mixItem, $context, $chainNumber) as $newItem) {
+                    yield $newItem;
+                }
+            }
+        } elseif ($item instanceof AsyncItemInterface) {
+            $this->asyncItems[] = ['item' => $item, 'context' => $context, 'chain_number' => $chainNumber];
+            $newItem = $this->handleAsyncItems();
+            foreach($newItem as $resultItem) {
+                yield $resultItem;
+            }
+        } else {
+            $newItem = $this->processItemWithOperation($item, $context, $chainNumber);
+            foreach($this->processItemAt($newItem, $context, $chainNumber + 1) as $resultItem) {
+                yield $resultItem;
+            }
+        }
     }
 
-    protected function processAsyncOperations()
+    protected function getItemsFromGroupItem(GroupedItem $item): \Generator
+    {
+        foreach ($item->getIterator() as $item) {
+            if (!is_object($item)) {
+                $item = new DataItem($item);
+            } elseif (!($item instanceof DataItemInterface)) {
+                $item = new DataItem($item);
+            }
+            yield $item;
+        }
+    }
+
+    protected function handleAsyncItems(int $maxItems = null): \Generator
+    {
+        if ($maxItems === null) {
+            $maxItems = $this->maxAsynchronousItems;
+        }
+
+        // Start by checking if in item is finished.
+        foreach ($this->checkAsyncItems() as $newItem) {
+            yield $newItem;
+        }
+
+        // If we have to many items in queue, well wait until it improves.
+        while (count($this->asyncItems) != 0 && count($this->asyncItems) >= $maxItems) {
+            usleep(1000);
+            foreach ($this->checkAsyncItems() as $newItem) {
+                yield $newItem;
+            }
+        }
+    }
+
+    protected function checkAsyncItems(): \Generator
     {
         $toProcess = [];
 
@@ -194,49 +203,44 @@ class ChainProcessor extends LoggerContext implements ChainProcessorInterface
                 $newItem = $item['item']->getItem();
 
                 // We consider that the process finished only once the async operation is done.
-                $this->chainObserver->onAfterProcess($chainNumber, $this->chainLinks[$chainNumber], $newItem);
+                if (isset($this->chainLinks[$chainNumber])) {
+                    $this->chainObserver->onAfterProcess($chainNumber, $this->chainLinks[$chainNumber], $newItem);
+                }
                 unset($this->asyncItems[$id]);
-                $toProcess[] = [$newItem, $chainNumber + 1, $item['context']];
+                $toProcess[] = [$newItem, $item['context'], $chainNumber];
             }
         }
 
         foreach ($toProcess as $arguments) {
-            $this->processItemWithChain(...$arguments);
-        }
-    }
-
-    protected function endAllAsyncOperations()
-    {
-        while (!empty($this->asyncItems)) {
-            $this->processAsyncOperations();
-
-            if (!empty($this->asyncItems)) {
-                usleep(1000);
+            foreach ($this->processItemAt(...$arguments) as $newItem) {
+                yield $newItem;
             }
         }
     }
 
-    /**
-     * Process an item and handle errors during the process.
-     *
-     * @throws ChainOperationException
-     */
-    protected function processItemWithOperation(ItemInterface $item, int $chainNumber, ExecutionContext &$context): ItemInterface
+
+
+    protected function processItemWithOperation(ItemInterface $item, ExecutionContext $context, int $chainNumber = 0): ItemInterface
     {
         try {
+            $context->setLoggerContext(self::KEY_LOGGER_ETL_IDENTIFIER, "chain link:{$this->chainLinkNames[$chainNumber]}-");
             $this->chainObserver->onBeforeProcess($chainNumber, $this->chainLinks[$chainNumber], $item);
-            $result = $this->chainLinks[$chainNumber]->process($item, $context);
-            $this->chainObserver->onAfterProcess($chainNumber, $this->chainLinks[$chainNumber], $result);
+            $context->getLogger()->info("Starting etl process!");
 
-            return $result;
+            $newItem = $this->chainLinks[$chainNumber]->process($item, $context);
+
+            $context->getLogger()->info("Finished etl process!");
+            $this->chainObserver->onAfterProcess($chainNumber, $this->chainLinks[$chainNumber], $newItem);
+
+            return $newItem;
         } catch (\Exception $exception) {
             throw new ChainOperationException(
                 "An exception was thrown during the handling of the chain link : "
-                    . "{$this->chainLinkNames[$chainNumber]} "
-                    . "with the item {$context->getParameter(self::KEY_LOGGER_ETL_IDENTIFIER)}.",
+                . "{$this->chainLinkNames[$chainNumber]} "
+                . "with the item {$context->getParameter(self::KEY_LOGGER_ETL_IDENTIFIER)}.",
                 0,
                 $exception,
-                $this->chainLinkNames[$chainNumber]
+                (string) $this->chainLinkNames[$chainNumber]
             );
         }
     }
@@ -254,21 +258,5 @@ class ChainProcessor extends LoggerContext implements ChainProcessorInterface
         $this->chainObserver->init($this->chainLinks, $this->chainLinkNames);
 
         return $this->chainObserver;
-    }
-
-    /**
-     * @return ChainOperationInterface[]
-     */
-    public function getChainLinks(): array
-    {
-        return $this->chainLinks;
-    }
-
-    /**
-     * @return string[]
-     */
-    public function getChainLinkNames(): array
-    {
-        return $this->chainLinkNames;
     }
 }

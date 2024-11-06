@@ -1,3 +1,19 @@
+# 🌟 2.0.0 🌟
+
+- :star2: - Complete rewrite of the ChainProcessor 
+- :star2: - Optimized chain processor not to send as many stop items when multiple chains are involved
+- :star2: - Allows ChainProcessor to output through generators the items at the end. This is great to remove all limitations of the current sub chains.
+- :star2: - ChainRepeatOperation now can handle more complex cases & asynchronous tasks. The operation is not considered as experimental anymore.
+- :star2: - Added FailSafe operation allowing to execute sub-chains and catching exception in them.
+
+- -:exclamation: **Deprecation** The chainProcessorInterface was changed significantly. 
+  - This means any complex custom operations using the chainProcessor needs to be redone. => This shouldn't affect any load/extract or transform operation.
+  - This means any integrations using the ETL also needs to be updated. 
+  - For context, this change was not done lightly, the ETL was initially developed using php5.5. The php language
+    has evolved and some complex cases the ETL didn't handle well could be easily fixed by using the new features of 
+    the language (mostly using Generators). 
+- -:exclamation: **Deprecation** Support for symfony 4 and 5 was dropped.
+
 # 1.2.0
 - :star2: Feature #14 - Added possibility to create subchains.
 - :star2: Feature #34 - Allow chain's to be observed to see progress.

@@ -16,11 +16,6 @@ class GroupedItem implements GroupedItemInterface
 
     protected \Iterator $iterator;
 
-    /**
-     * GroupedItem constructor.
-     *
-     * @param $iterator
-     */
     public function __construct(\Iterator $iterator)
     {
         $this->iterator = $iterator;
