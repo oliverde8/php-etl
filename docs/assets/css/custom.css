@@ -11,7 +11,9 @@ img {
 .header-big {
     font-size: 1.4em!important;
 }
-
+.sub-menu {
+    padding-left: 8px;
+}
 .ui.container.width-large {
     width: 84vw;
     padding: 0 64px;
@@ -19,7 +21,6 @@ img {
 
 #main-menu {
     width: 16vw;
-    height: 100vmax;
     float: left;
 
     > .menu {

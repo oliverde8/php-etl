@@ -35,7 +35,7 @@ StopItems should never be manually created, only utilized when they naturally oc
 When a GroupedItem is encountered, the items it contains are processed as individual DataItems downstream, 
 so a GroupedItem can not be in the input of an operation, they can only be the output.
 
-You can find the list of all native item types [here](doc/01-understand-the-etl/item-types.html).
+You can find the list of all native item types [here](/doc/01-understand-the-etl/item-types.html).
 
 
 ### How does it works
