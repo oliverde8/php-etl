@@ -8,6 +8,10 @@ img {
     width: 100%
 }
 
+.header-big {
+    font-size: 1.4em!important;
+}
+
 .ui.container.width-large {
     width: 84vw;
     padding: 0 64px;
