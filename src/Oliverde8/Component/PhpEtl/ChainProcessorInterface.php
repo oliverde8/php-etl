@@ -18,4 +18,8 @@ interface ChainProcessorInterface
         bool $withStop = true,
         bool $allowAsynchronous = true
     ): \Generator;
+
+    public function getChainLinkNames(): array;
+
+    public function getChainLinks(): array;
 }
