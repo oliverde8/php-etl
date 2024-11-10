@@ -26,10 +26,8 @@ For this we will first create a new ContextFactory using PerExecutionContextFact
 This context factory will create unique contexts for each execution. This means a unique directory to run the etl
 in; and a unique logger. 
 
-This is only needed if you are running the etl in **🐘 standalone**. With any integration this should be automatically $
-handled for you. This chapter will be the last one where we do mention standalone integrations.
-
-
+This is only needed if you are running the etl in **🐘 standalone**. With any integration this should be automatically
+handled for you.
 {% endcapture %}
 {% capture code %}
 ```php
