@@ -1,4 +1,9 @@
 @import "code.css";
+
+img {
+    width: 100%;
+}
+
 #main-div {
     width: 100%
 }

@@ -37,6 +37,61 @@ so a GroupedItem can not be in the input of an operation, they can only be the o
 
 You can find the list of all native item types [here](doc/01-understand-the-etl/item-types.html).
 
+
+### How does it works
+
+We will have more detailed real use cases with sample data a bit further in the document.
+
+{% capture column1 %}
+In the simplest case the chains receive an iterator containing 2 items in input, both items are processed by each chain operation. 
+This could be for example a list of customer. Each operation changes the items.
+images/concept-flows
+{% endcapture %}
+{% capture column2 %}
+![rr](/assets/images/concept-flows/flow-1.png)
+{% endcapture %}
+{% include block/2column.html column1=column1 column2=column2 %}
+
+{% include block/divider.html %}
+
+{% capture column1 %}
+In the following example the iterator sends a single item. The first operation will then send GroupedItems containing 2 items. 
+The first item could be a customer, and then we fetch each order of the customer in the operation1.
+{% endcapture %}
+{% capture column2 %}
+![rr](/assets/images/concept-flows/flow-2.png)
+{% endcapture %}
+{% include block/2column.html column1=column1 column2=column2 %}
+
+{% include block/divider.html %}
+
+{% capture column1 %}
+We can also group items, to make aggregations. The chain receives an iterator containg 2 items, the first operation processes both items. 
+It breaks the chain for the first item, and returns an aggregation of item1 & item 2. 
+This can be used to count the number of customers. This kind of grouping can use more memory and should therefore be used with care.
+{% endcapture %}
+{% capture column2 %}
+![rr](/assets/images/concept-flows/flow-3.png)
+{% endcapture %}
+{% include block/2column.html column1=column1 column2=column2 %}
+
+{% include block/divider.html %}
+
+{% capture column1 %}
+Chains can also be split, this would allow 2 different operations to be executed on the same item.
+{% endcapture %}
+{% capture column2 %}
+![rrr](/assets/images/concept-flows/flow-4.png)
+{% endcapture %}
+{% include block/2column.html column1=column1 column2=column2 %}
+
+{% include block/divider.html %}
+
+The split operations is among the building blocks of complex executions. There are additional operations to merge
+multiple branches or to repeat a part of the chain. 
+
+
+
 ## Example: Simple CSV Transformation
 
 To demonstrate PHP-ETL’s capabilities, let’s walk through a basic example where we read a CSV file, 
@@ -148,7 +203,7 @@ $chainProcessor->process(
 #### 🎵 Symfony
 For instance, the following command will process two input files and merge their output:
 ```bash
-./bin/console etl:execute myetl.yaml "['./customers1.csv', './customers2.csv']"
+./bin/console etl:execute myetl "['./customers1.csv', './customers2.csv']"
 ```
 {% endcapture %}
 
