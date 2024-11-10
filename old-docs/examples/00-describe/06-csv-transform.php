@@ -11,6 +11,6 @@ $context = ['filewriter' =>
 $chainProcessor = getChainProcessor(__FILE__, $context);
 
 $chainProcessor->process(
-    new ArrayIterator([__DIR__ . "/customers.csv"]),
+    new ArrayIterator(["/customers.csv"]),
     $context
 );
