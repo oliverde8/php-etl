@@ -59,10 +59,20 @@ final class ChainProcessor extends LoggerContext implements ChainProcessorInterf
         $context->replaceLoggerContext($parameters);
         $context->setLoggerContext(self::KEY_LOGGER_ETL_IDENTIFIER, '');
 
-        foreach ($this->processGenerator($item, $context, $observerCallback, $withStop) as $item) {}
+        try {
+            $context->getLogger()->info("Starting etl process!");
+            foreach ($this->processGenerator($item, $context, $observerCallback, $withStop) as $item) {
+            }
+            $context->getLogger()->info("Finished etl process!");
+        } catch (\Exception $e) {
+            $context->getLogger()->info("Failed during etl process!");
+            throw $e;
+        } finally {
+            $context->finalise();
 
-        if ($this->chainObserver) {
-            $this->chainObserver->onFinish();
+            if ($this->chainObserver) {
+                $this->chainObserver->onFinish();
+            }
         }
     }
 
@@ -73,7 +83,6 @@ final class ChainProcessor extends LoggerContext implements ChainProcessorInterf
         bool $withStop = true,
         bool $allowAsynchronous = true
     ): \Generator {
-        $context->getLogger()->info("Starting etl process!");
         $this->initObserver($observerCallback);
 
         $originalMaxAsynchronousItems = $this->maxAsynchronousItems;
@@ -225,11 +234,8 @@ final class ChainProcessor extends LoggerContext implements ChainProcessorInterf
         try {
             $context->setLoggerContext(self::KEY_LOGGER_ETL_IDENTIFIER, "chain link:{$this->chainLinkNames[$chainNumber]}-");
             $this->chainObserver->onBeforeProcess($chainNumber, $this->chainLinks[$chainNumber], $item);
-            $context->getLogger()->info("Starting etl process!");
 
             $newItem = $this->chainLinks[$chainNumber]->process($item, $context);
-
-            $context->getLogger()->info("Finished etl process!");
             $this->chainObserver->onAfterProcess($chainNumber, $this->chainLinks[$chainNumber], $newItem);
 
             return $newItem;
