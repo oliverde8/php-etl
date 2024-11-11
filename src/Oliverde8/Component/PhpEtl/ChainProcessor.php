@@ -104,7 +104,7 @@ final class ChainProcessor extends LoggerContext implements ChainProcessorInterf
         }
 
         if ($withStop) {
-            $stopItem = new StopItem();
+            $stopItem = new StopItem(true);
             $newItem = $stopItem;
             do {
                 foreach ($this->processItemAt($stopItem, $context, 0) as $newItem) {

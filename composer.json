@@ -15,7 +15,8 @@
     "require-dev": {
         "phpunit/php-code-coverage": "^9.2",
         "phpunit/phpunit": "^9.6",
-        "rector/rector": "^1.2"
+        "rector/rector": "^1.2",
+        "symfony/console": "^7.1"
     },
     "suggest": {
         "league/flysystem": "For transfaring files from external file systems",

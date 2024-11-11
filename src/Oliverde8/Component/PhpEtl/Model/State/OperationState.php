@@ -7,6 +7,7 @@ use Oliverde8\Component\PhpEtl\ChainOperation\DetailedObservableOperation;
 use Oliverde8\Component\PhpEtl\Item\AsyncItemInterface;
 use Oliverde8\Component\PhpEtl\Item\ChainBreakItem;
 use Oliverde8\Component\PhpEtl\Item\ItemInterface;
+use Oliverde8\Component\PhpEtl\Item\MixItem;
 use Oliverde8\Component\PhpEtl\Item\StopItem;
 
 class OperationState implements \JsonSerializable
@@ -96,6 +97,13 @@ class OperationState implements \JsonSerializable
             if (!$asynInProgress->isRunning()) {
                 unset($this->asynInProgress[$key]);
             }
+        }
+
+        // This is a bit of a workaround to detect the stop. It does not work perfectly for all
+        // cases at might switch the operation to "stopped" to early.
+        if ($item instanceof MixItem && !empty($item->getItems())) {
+            $items = $item->getItems();
+            $item = array_pop($items);
         }
 
         if ($item instanceof StopItem && $item->isFinal) {
