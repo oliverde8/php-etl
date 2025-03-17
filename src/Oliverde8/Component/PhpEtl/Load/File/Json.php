@@ -29,6 +29,7 @@ class Json implements FileWriterInterface
 
     public function getResource()
     {
+        $this->init();
         return $this->file;
     }
 }
