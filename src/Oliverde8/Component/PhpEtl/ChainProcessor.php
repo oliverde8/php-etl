@@ -119,17 +119,24 @@ class ChainProcessor extends LoggerContext implements ChainProcessorInterface
         $this->processAsyncOperations();
 
         if ($item instanceof AsyncItemInterface) {
-            while (count($this->asyncItems) >= $this->maxAsynchronousItems) {
-                usleep(1000);
-                $this->processAsyncOperations();
-            }
-            $this->asyncItems[] = [
-                'item' => $item,
-                'context' => $context,
-                'chain_number' => $chainNumber,
-            ];
+            if ($this->maxAsynchronousItems !== 0) {
+                while (count($this->asyncItems) >= $this->maxAsynchronousItems) {
+                    usleep(1000);
+                    $this->processAsyncOperations();
+                }
+                $this->asyncItems[] = [
+                    'item' => $item,
+                    'context' => $context,
+                    'chain_number' => $chainNumber,
+                ];
 
-            return new ChainBreakItem();
+                return new ChainBreakItem();
+            } else {
+                while ($item->isRunning()) {
+                    usleep(1000);
+                }
+                return $item->getItem();
+            }
         } elseif ($item instanceof MixItem) {
             $context->setLoggerContext(self::KEY_LOGGER_ETL_IDENTIFIER, "chain link:{$this->chainLinkNames[$chainNumber]}-");
 
