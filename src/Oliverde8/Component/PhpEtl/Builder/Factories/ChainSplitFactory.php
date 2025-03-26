@@ -25,7 +25,7 @@ class ChainSplitFactory extends AbstractFactory
     {
         $chainProcessors = [];
         foreach ($options['branches'] as $branch) {
-            $chainProcessors[] = $this->builder->buildChainProcessor($branch, maxAsynchronousItems: $options['maxAsynchronousItems']);
+            $chainProcessors[] = $this->builder->buildChainProcessor($branch, maxAsynchronousItems: $options['maxAsynchronousItems'] ?? 10);
         }
 
         return $this->create($chainProcessors);
@@ -41,6 +41,8 @@ class ChainSplitFactory extends AbstractFactory
             'maxAsynchronousItems' => [
                 new Assert\Type(["type" => "integer"]),
             ],
-        ]);
+        ],
+        allowMissingFields: true
+        );
     }
 }

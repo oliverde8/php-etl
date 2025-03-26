@@ -7,6 +7,8 @@
 - :star2: Feature #45 - Added a repeat operation allowing part of a chain to be repeated (Experimental 🧪)
 - :wrench: Fix - Boolean false values being converted to string by the rule engine.
 - :wrench: Fix - Http client operation not handling empty response properly when response is json.
+- :wrench: Fix - [Core]Issues with asynchronous items & split chains
+- :wrench: Fix - Writing empty json files causes error
 
 # 1.1.4
 - :star2: Split item operation can now return more complex data sets using the `keyName` option
