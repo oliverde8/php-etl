@@ -70,7 +70,7 @@ abstract class AbstractFactory
      */
     protected function configureValidator(): Constraint
     {
-        return new Assert\Collection(fields: null);
+        return new Assert\Collection(fields: []);
     }
 
     /**
