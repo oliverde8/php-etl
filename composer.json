@@ -16,7 +16,8 @@
         "phpunit/php-code-coverage": "^9.2",
         "phpunit/phpunit": "^9.6",
         "rector/rector": "^1.2",
-        "symfony/console": "^7.1"
+        "symfony/console": "^7.1",
+        "symfony/http-client": "^7.2"
     },
     "suggest": {
         "league/flysystem": "For transfaring files from external file systems",
