@@ -1,3 +1,6 @@
+# 1.2.1
+- :wrench: Fix - Temporary files not being deleted when using file load operations.
+
 # 1.2.0
 - :star2: Feature #14 - Added possibility to create subchains.
 - :star2: Feature #34 - Allow chain's to be observed to see progress.
