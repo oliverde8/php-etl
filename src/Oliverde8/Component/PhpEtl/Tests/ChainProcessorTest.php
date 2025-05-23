@@ -10,6 +10,8 @@ namespace Oliverde8\Component\PhpEtl\Tests;
 
 use Oliverde8\Component\PhpEtl\Model\ExecutionContext;
 use Oliverde8\Component\PhpEtl\Model\File\LocalFileSystem;
+use Oliverde8\Component\PhpEtl\ChainOperation\ChainSplitOperation;
+use Oliverde8\Component\PhpEtl\Item\StopItem;
 use Oliverde8\Component\PhpEtl\Tests\Item\TestAsyncItem;
 use Oliverde8\Component\PhpEtl\ChainOperation\Grouping\SimpleGroupingOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\CallbackTransformerOperation;
@@ -289,6 +291,37 @@ class ChainProcessorTest extends TestCase
 
         // Order of items changes
         $this->assertEquals(["I am fast", "I am slow"], $results);
+    }
+
+    public function testAsyncDisabledWithSplit()
+    {
+        $results = [];
+        $mockBranch1 = new CallbackTransformerOperation(function (ItemInterface $item) use (&$callNum) {
+            return new TestAsyncItem(new DataItem('I am slow'), 2);
+        });
+        $mockBranch2 = new CallbackTransformerOperation(function (ItemInterface $item) use (&$callNum) {
+            return new TestAsyncItem(new DataItem('I am fast'), 1);
+        });
+        $mockEnd = new CallbackTransformerOperation(function (ItemInterface $item) use (&$results) {
+            $results[] = $item->getData();
+            return $item;
+        });
+
+
+        $executionContext = new ExecutionContextFactory();
+        $chainProcessor = new ChainProcessor(
+            [
+                'split' => new ChainSplitOperation([
+                    new ChainProcessor(["mock1" => $mockBranch1, 'mockEnd' => $mockEnd], $executionContext, 0),
+                    new ChainProcessor(["mock2" => $mockBranch2, 'mockEnd' => $mockEnd], $executionContext, 0),
+                ])
+            ],
+            $executionContext
+        );
+        $chainProcessor->process(new \ArrayIterator([1]), ['toto']);
+
+        // Order of items changes
+        $this->assertEquals(["I am slow", "I am fast"], $results);
     }
 
     public function testException()

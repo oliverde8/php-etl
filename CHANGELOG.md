@@ -1,18 +1,21 @@
 # 🌟 2.0.0 🌟
 
-- :star2: - Complete rewrite of the ChainProcessor 
+- :star2: - Complete rewrite of the ChainProcessor
 - :star2: - Optimized chain processor not to send as many stop items when multiple chains are involved
 - :star2: - Allows ChainProcessor to output through generators the items at the end. This is great to remove all limitations of the current sub chains.
 - :star2: - ChainRepeatOperation now can handle more complex cases & asynchronous tasks. The operation is not considered as experimental anymore.
 - :star2: - Added FailSafe operation allowing to execute sub-chains and catching exception in them.
 
-- -:exclamation: **Deprecation** The chainProcessorInterface was changed significantly. 
+- :exclamation: **Deprecation** The chainProcessorInterface was changed significantly.
   - This means any complex custom operations using the chainProcessor needs to be redone. => This shouldn't affect any load/extract or transform operation.
-  - This means any integrations using the ETL also needs to be updated. 
+  - This means any integrations using the ETL also needs to be updated.
   - For context, this change was not done lightly, the ETL was initially developed using php5.5. The php language
-    has evolved and some complex cases the ETL didn't handle well could be easily fixed by using the new features of 
-    the language (mostly using Generators). 
-- -:exclamation: **Deprecation** Support for symfony 4 and 5 was dropped.
+    has evolved and some complex cases the ETL didn't handle well could be easily fixed by using the new features of
+    the language (mostly using Generators).
+- :exclamation: **Deprecation** Support for symfony 4 and 5 was dropped.
+
+# 1.2.1
+- :wrench: Fix - Temporary files not being deleted when using file load operations.
 
 # 1.2.0
 - :star2: Feature #14 - Added possibility to create subchains.
@@ -23,6 +26,8 @@
 - :star2: Feature #45 - Added a repeat operation allowing part of a chain to be repeated (Experimental 🧪)
 - :wrench: Fix - Boolean false values being converted to string by the rule engine.
 - :wrench: Fix - Http client operation not handling empty response properly when response is json.
+- :wrench: Fix - [Core]Issues with asynchronous items & split chains
+- :wrench: Fix - Writing empty json files causes error
 
 # 1.1.4
 - :star2: Split item operation can now return more complex data sets using the `keyName` option

@@ -48,10 +48,15 @@ class FileWriterOperation extends AbstractChainOperation implements DataChainOpe
     {
         $resource = $this->writer->getResource();
 
-        $meta_data = stream_get_meta_data($resource);
-        $filename = $meta_data["uri"];
+        if(is_resource($resource)) {
+            $meta_data = stream_get_meta_data($resource);
+            $filename = $meta_data["uri"];
 
-        $context->getFileSystem()->writeStream($this->fileName, fopen($filename, 'r'));
+            $context->getFileSystem()->writeStream($this->fileName, fopen($filename, 'r'));
+
+            fclose($resource);
+            unlink($filename);
+        }
 
         return new MixItem([new FileLoadedItem($this->fileName), $stopItem]);
     }
