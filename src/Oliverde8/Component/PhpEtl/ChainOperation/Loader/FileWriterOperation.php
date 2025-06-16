@@ -48,7 +48,7 @@ class FileWriterOperation extends AbstractChainOperation implements DataChainOpe
     {
         $resource = $this->writer->getResource();
 
-        if(is_resource($resource)) {
+        if(is_resource($resource) && $stopItem->isFinal) {
             $meta_data = stream_get_meta_data($resource);
             $filename = $meta_data["uri"];
 
