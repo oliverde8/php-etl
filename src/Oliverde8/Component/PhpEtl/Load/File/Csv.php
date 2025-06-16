@@ -69,10 +69,11 @@ class Csv extends AbstractCsvFile implements FileWriterInterface
      */
     public function close()
     {
-        // Create an empty file.
-        $this->init([]);
-
-        fclose($this->file);
+        if (is_resource($this->file)) {
+            // Create an empty file.
+            $this->init([]);
+            fclose($this->file);
+        }
     }
 
     /**
