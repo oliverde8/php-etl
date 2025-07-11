@@ -140,7 +140,7 @@ from each branch is returned to the next steps.
 
 **⚠** If branches don't filter or transform items then steps after the ChainMerge will receive the same items multiple 
 times. There is no detection of duplicate data. This means ChainMergeOperation can actually be also used to split data 
-using more complex rules. If for example a single line of a csv file contains both information on the configurable
+using more complex rules. If for example a single line of a csv file contains both inforremation on the configurable
 product and the single product. 
 
 #### 🔧 Options
