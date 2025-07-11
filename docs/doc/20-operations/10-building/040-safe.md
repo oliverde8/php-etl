@@ -1,7 +1,7 @@
 ---
 layout: base
 title: PHP-ETL - Operations
-subTitle: Building Blocks - Fail Safe
+subTitle: Building Blocks - Fail Safe(safe)
 ---
 
 Sub operations within a fail safe are allowed to fail. 

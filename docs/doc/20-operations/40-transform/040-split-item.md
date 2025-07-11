@@ -1,7 +1,7 @@
 ---
 layout: base
 title: PHP-ETL - Operations
-subTitle: Transform - Split Item
+subTitle: Transform - Split Item(item-split)
 ---
 
 Allow us to split a single DataItem into multiple data items. For example we receive a list of customers and their

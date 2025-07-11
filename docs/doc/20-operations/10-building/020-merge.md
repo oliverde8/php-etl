@@ -1,7 +1,7 @@
 ---
 layout: base
 title: PHP-ETL - Operations
-subTitle: Building Blocks - Chain Merge
+subTitle: Building Blocks - Chain Merge(merge)
 ---
 
 Allows us to execute multiple chain operations as with the ChainSplitOperation but at the end the items returned

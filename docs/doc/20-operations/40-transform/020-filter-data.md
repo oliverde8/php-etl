@@ -1,7 +1,7 @@
 ---
 layout: base
 title: PHP-ETL - Operations
-subTitle: Transform - Filter Data
+subTitle: Transform - Filter Data(filter)
 ---
 
 Allow to ignore some items and prevent them from being propagated to the rest of the chain using the 
