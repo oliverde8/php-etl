@@ -40,7 +40,22 @@ img {
 #main-content {
     width: 83%;
     height: 100vh;
-    float: right
+    float: right;
+
+    table {
+        border-spacing: 0px;
+        thead {
+            text-align: left;
+        }
+        th {
+            font-size: 1.2rem;
+            border-bottom: 1px solid rgba(34,36,38,.15);
+            padding: 2px 12px;
+        }
+        td {
+            padding: 2px 12px;
+        }
+    }
 }
 
 .etl-step-block {
@@ -109,3 +124,4 @@ blockquote.block-error {
         content: "‼️"
     }
 }
+
