@@ -13,9 +13,14 @@ This means having multiple chains running together, or having a list of files ea
 Both the 🎵 Symfony Bundle(and therefore the 🦢 Sylius integration) and the Magento2 Module will use contextual chains.
 This means the "main" operations have only access to a particular directory created for the execution of the chain.
 
+This directory might be locally available on the server or it might be a remote file system. This can be usefull if 
+php-etl is used on a multi server setup for example to share files between the servers. 
+
 Additional operations such as the ExternalFileFinderOperation and ExternalFileProcessor will be use to 
 process files that are either on a remote directory (sftp, bucket s3...) or files that are on the local file system. 
 Because operations such as the CsvLoader will not have access to those files unless they are copied into the contextual directory of the current execution.
+
+So both or ExternalFile & our context can be a remote, they could be the same remote, or 2 different remotes.
 
 Let start by a simple example.
 
