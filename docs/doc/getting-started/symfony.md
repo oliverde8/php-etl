@@ -11,76 +11,12 @@ to make the etl easy to use.
 
 ### Install
 
-1. Start by installing the necessary dependencies
-```sh
-    composer require oliverde8/php-etl-bundle
-```
+{% include doc/getting-started/install-symfony.md %}
 
-2. in `/config/` create a directory `etl`
-
-3. Enable bundle:
-```php
-\Oliverde8\PhpEtlBundle\Oliverde8PhpEtlBundle::class => ['all' => true],
-```
-
-4. **Optional** You can enable queue's if you have an interface allowing users to execute etl processes (Easy Admin for example). 
-```yaml
-framework:
-  messenger:
-    routing:
-        "Oliverde8\PhpEtlBundle\Message\EtlExecutionMessage": async
-```
-
-5. **Optional:** Enable creation of individual files for each log by editing the monolog.yaml
-```yaml
-etl:
-  type: service
-  id: Oliverde8\PhpEtlBundle\Services\ChainExecutionLogger
-  level: debug
-  channels: ["!event"] 
-```
 
 ### Usage
 
-#### Creating an ETL chain
-
-Each chain is declared in a single file. The name of the chain is the name of the file created in `/config/etl/`. 
-
-Example:
-```yaml
-chain:
-  "Dummy Step":
-    operation: rule-engine-transformer
-    options:
-      add: true
-      columns:
-        test:
-          rules:
-            - get : {field: [0, 'uid']}
-```
-
-#### Executing a chain
-
-```sh
-./bin/console etl:execute demo '[["test1"],["test2"]]' '{"opt1": "val1"}'
-```
-
-The first argument is the input, depending on your chain it can be empty. 
-The second are parameters that will be available in the context of each link in the chain.
-
-#### Get a definition
-
-```sh
-./bin/console etl:get-definition demo
-```
-
-#### Get definition graph
-
-```sh
-./bin/console etl:definition:graph demo
-```
-
-This will return a mermaid graph. Adding a `-u` will return the url to the mermaid graph image.
+{% include doc/getting-started/usage-symfony.md %}
 
 ## Adding an Easyadmin interface
 
