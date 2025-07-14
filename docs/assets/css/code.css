@@ -8,8 +8,23 @@ highlight {
     /* overflow: scroll; Prefer no word wrap? Uncomment this line and comment out the 2 lines below. */
     word-break: break-all;
     word-wrap: break-word;
+    /*&::after {*/
+    /*    content: "\f0c5";*/
+    /*    font-family: "Icons";*/
+    /*    position: absolute;*/
+    /*    top: 8px;*/
+    /*    right: 8px;*/
+    /*}*/
+    /*&:hover::after {*/
+    /*    content: "\f0c5";*/
+    /*    font-family: "Icons";*/
+    /*    position: absolute;*/
+    /*    top: 8px;*/
+    /*    right: 8px;*/
+    /*    color: #0000FF;*/
+    /*    cursor: pointer;*/
+    /*}*/
 }
-
 
 code {
     font-family:'Bitstream Vera Sans Mono','Courier', monospace;
