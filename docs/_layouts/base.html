@@ -17,7 +17,7 @@
 
             <div class="ui hidden divider"></div>
             <div class="ui hidden divider"></div>
-            <div class="ui  vertical footer segment">
+            <div class="ui  vertical footer segment main-footer">
                 <div class="ui center aligned container">
                     <div class="ui stackable grid">
                         <div class="three wide column">
@@ -42,5 +42,17 @@
             </div>
         </div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggleButton = document.getElementById('mobile-menu-toggle');
+            const mainMenu = document.getElementById('main-menu');
+
+            if (toggleButton && mainMenu) {
+                toggleButton.addEventListener('click', function() {
+                    mainMenu.classList.toggle('open');
+                });
+            }
+        });
+    </script>
 </body>
 </html>
