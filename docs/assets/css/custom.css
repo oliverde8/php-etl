@@ -306,7 +306,6 @@ code {
 }
 
 pre {
-    background-color: var(--code-background-color);
     color: var(--code-text-color);
     padding: 20px;
     border-radius: 8px;
