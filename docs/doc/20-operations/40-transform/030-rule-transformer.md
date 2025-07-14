@@ -110,4 +110,93 @@ options:
 
 ## Adding your own rules
 
-🚧 TODO 🚧
+While PHP-ETL provides a powerful set of built-in rules, you may encounter situations where you need to implement your own custom logic. You can extend the `RuleApplier` class to add your own rules.
+
+Here's how you can create and use a custom rule:
+
+**1. Create a custom `RuleApplier` class:**
+
+First, create a new class that extends `Oliverde8\Component\RuleEngine\RuleApplier`.
+
+```php
+<?php
+
+namespace App\Etl\RuleEngine;
+
+use Oliverde8\Component\RuleEngine\RuleApplier;
+
+class CustomRuleApplier extends RuleApplier
+{
+    public function apply($data, $rowData, $params)
+    {
+        // Implement your custom rule logic here.
+        return "new value";
+    }
+}
+```
+
+**2. Use your custom `RuleApplier` in the `ChainProcessor`:**
+
+When you create your `ChainProcessor`, you need to tell it to use your custom `RuleApplier`.
+
+{% capture column1 %}
+#### 🐘 Standalone
+```php
+<?php
+
+use App\Etl\RuleEngine\CustomRuleApplier;
+use Oliverde8\Component\PhpEtl\ChainBuilder;
+use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\RuleTransformOperation;
+use Oliverde8\Component\PhpEtl\ChainProcessor;
+
+$customRuleApplier = new CustomRuleApplier();
+
+$chainBuilder = new ChainBuilder();
+$chainBuilder->add(
+    new RuleTransformOperation(
+        $customRuleApplier,
+        [
+            'my_custom_field' => [
+                'rules' => [
+                    'myCustomRule' => [
+                        'field1' => ['get' => ['field' => 'FirstName']],
+                        'field2' => ['get' => ['field' => 'LastName']],
+                    ],
+                ],
+            ],
+        ],
+        false
+    )
+);
+
+$processor = new ChainProcessor($chainBuilder);
+```
+{% endcapture %}
+{% capture column2 %}
+#### 🎵 Symfony
+
+```yaml
+services:
+  App\Etl\RuleEngine\CustomRuleApplier:
+    class: App\Etl\RuleEngine\CustomRuleApplier
+    autowire: true
+    tags:
+      - { name: etl.rule }
+```
+{% endcapture %}
+{% include block/2column.html column1=column1 column2=column2 %}
+
+**3. Use your custom rule in your YAML configuration:**
+
+Once you have configured your `ChainProcessor` to use your custom `RuleApplier`, you can use your custom rule in your YAML files.
+
+```yaml
+operation: rule-engine-transformer
+options:
+  columns:
+    MyCustomField:
+      rules:
+        - myCustomRule:
+            field1: { get: { field: "FirstName" } }
+            field2: { get: { field: "LastName" } }
+```

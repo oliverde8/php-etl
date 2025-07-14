@@ -4,18 +4,45 @@ title: PHP-ETL - Operations
 subTitle: Building Blocks - Chain Merge(merge)
 ---
 
-Allows us to execute multiple chain operations as with the ChainSplitOperation but at the end the items returned
-from each branch is returned to the next steps.
+The `merge` operation executes multiple chains of operations (branches) with the same input data, then combines their results back into the main chain.
+This is useful for performing different transformations on the same data and combining the outcomes.
 
-**⚠** If branches don't filter or transform items then steps after the ChainMerge will receive the same items multiple
-times. There is no detection of duplicate data. This means ChainMergeOperation can actually be also used to split data
-using more complex rules. If for example a single line of a csv file contains both information on the configurable
-product and the single product.
+**Warning:** If branches don't filter or modify items, subsequent steps will receive duplicate data,
+as `merge` doesn't handle duplicates automatically. 
+This behavior can be leveraged to create multiple versions of an item.
 
 ## Options
 
-**branches:** A list of etl chains
+- **branches:** An array of chains of operations.
 
-## Example Use
+## Example
 
-🚧 TODO 🚧
+Here's an example of how to use the `merge` operation to create two different versions of a product from a single input item:
+
+```yaml
+chain:
+  - operation: extract-csv
+    options:
+      path: /path/to/products.csv
+
+  - operation: merge
+    options:
+      branches:
+        - - operation: rule-transformer
+            options:
+              # Rules to create a simple product.
+              rules:
+                sku: "{{ item.sku }}-simple"
+                type: simple
+
+        - - operation: rule-transformer
+            options:
+              # Rules to create a configurable product.
+              rules:
+                sku: "{{ item.sku }}-configurable"
+                type: configurable
+
+  - operation: load-csv
+    options:
+      path: /path/to/merged-products.csv
+```
