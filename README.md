@@ -10,6 +10,9 @@
 
 Php etl is a ETL that will allow transformation of data in a simple and efficient way.
 
-<h3 align="center">
+<p align="center">
+<img src="docs/assets/images/logo.png" width="300" height="300" alt="PHP etl Logo"/>
+</p>
+<h2 align="center">
 See the dedicated website <a href="https://php-etl.oliver-decramer.com/">🚀 here 🚀</a> 
-</h3>
+</h2>
