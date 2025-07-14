@@ -89,6 +89,60 @@ img {
     .mobile-only {
         display: none;
     }
+
+    .search-box {
+        padding: 10px 15px;
+        border-bottom: 1px solid var(--sidebar-hover);
+
+        input {
+            color: var(--sidebar-text);
+        }
+        .search.icon {
+            color: var(--sidebar-text);
+        }
+    }
+
+    #menu-search-results {
+        margin-top: 10px;
+        padding: 0 15px;
+        max-height: 300px; /* Limit height for scrollability */
+        overflow-y: auto; /* Enable vertical scrolling */
+        background-color: var(--sidebar-bg); /* Match sidebar background */
+        border-radius: 4px;
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        li {
+            margin-bottom: 5px;
+            padding: 5px 0;
+            border-bottom: 1px solid var(--sidebar-hover); /* Separator for results */
+        }
+
+        li:last-child {
+            border-bottom: none;
+        }
+
+        a {
+            color: var(--sidebar-text); /* Use sidebar text color */
+            text-decoration: none;
+            font-weight: normal;
+            display: block; /* Make the whole list item clickable */
+        }
+
+        a:hover {
+            color: var(--primary-color); /* Highlight on hover */
+            text-decoration: underline;
+        }
+
+        p {
+            color: var(--secondary-color);
+            padding: 10px 0;
+        }
+    }
 }
 
 #main-content {

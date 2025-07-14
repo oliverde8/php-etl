@@ -1,0 +1,23 @@
+---
+layout: null
+permalink: /search.json
+---
+[
+  {% for page in site.pages %}
+    {% if page.url contains '.html' %}
+      {
+        "title": {{ page.title | append: " - " | append: page.subTitle | jsonify }},
+        "url": {{ page.url | relative_url | jsonify }},
+        "content": {{ page.content | strip_html | strip_newlines | remove_liquid_tags | normalize_whitespace | jsonify }}
+      }{% unless forloop.last %},{% endunless %}
+    {% endif %}
+  {% endfor %}
+  {% for post in site.posts %}
+    ,
+    {
+      "title": {{ post.title | jsonify }},
+      "url": {{ post.url | relative_url | jsonify }},
+      "content": {{ post.content | strip_html | strip_newlines | remove_liquid_tags | normalize_whitespace | jsonify }}
+    }
+  {% endfor %}
+]

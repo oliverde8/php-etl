@@ -13,6 +13,7 @@
             <div class="ui container width-{{page.width}}">
                 <div class="ui hidden divider"></div>
                 {{ content }}
+                <div id="search-results"></div>
             </div>
 
             <div class="ui hidden divider"></div>
@@ -54,5 +55,7 @@
             }
         });
     </script>
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/assets/js/search.js"></script>
 </body>
 </html>
