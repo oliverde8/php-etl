@@ -57,6 +57,9 @@ images/concept-flows
 {% capture column1 %}
 In the following example the iterator sends a single item. The first operation will then send GroupedItems containing 2 items. 
 The first item could be a customer, and then we fetch each order of the customer in the operation1.
+
+Operation 2 will then receive each order as a DataItem. It will therefore receive 2 GroupedItems, each containing a single order.
+Group Items uses iterators, therefore all the orders are not necessarily in memory at the same time. This will depend on your implementation.
 {% endcapture %}
 {% capture column2 %}
 ![rr](/assets/images/concept-flows/flow-2.png)
@@ -68,7 +71,14 @@ The first item could be a customer, and then we fetch each order of the customer
 {% capture column1 %}
 We can also group items, to make aggregations. The chain receives an iterator containg 2 items, the first operation processes both items. 
 It breaks the chain for the first item, and returns an aggregation of item1 & item 2. 
-This can be used to count the number of customers. This kind of grouping can use more memory and should therefore be used with care.
+
+This can be used to: 
+- count the number of customers. 
+- to get customers grouped by country.
+- to create chunks and improving performance while inserting items in a database.
+- ...
+
+⚠️This kind of grouping can use more memory and should therefore be used with care.
 {% endcapture %}
 {% capture column2 %}
 ![rr](/assets/images/concept-flows/flow-3.png)
@@ -79,6 +89,10 @@ This can be used to count the number of customers. This kind of grouping can use
 
 {% capture column1 %}
 Chains can also be split, this would allow 2 different operations to be executed on the same item.
+
+This can be usefull to :
+- store data in 2 different places.
+
 {% endcapture %}
 {% capture column2 %}
 ![rrr](/assets/images/concept-flows/flow-4.png)
@@ -88,14 +102,13 @@ Chains can also be split, this would allow 2 different operations to be executed
 {% include block/divider.html %}
 
 The split operations is among the building blocks of complex executions. There are additional operations to merge
-multiple branches or to repeat a part of the chain. 
-
+multiple branches or to repeat a part of the chain.
 
 
 ## Example: Simple CSV Transformation
 
-To demonstrate PHP-ETL’s capabilities, let’s walk through a basic example where we read a CSV file, 
-modify each line, and output a new CSV file with selected columns.
+To demonstrate PHP-ETL’s capabilities, let’s walk through a basic example where we read multiple CSV files, 
+modify each line, and output a new CSV file with selected columns containing the rows of all the files.
 
 ### Step 1: Read the Input CSV File
 
@@ -109,15 +122,16 @@ chain:
 {% endcapture %}
 
 {% capture description %}
-The first step is reading the input CSV. PHP-ETL can handle large volumes of data efficiently by processing each row individually, allowing memory-efficient transformations.
+The first step is reading the input CSV. PHP-ETL can handle large volumes of data efficiently by processing each row individually, 
+allowing memory-efficient transformations.
 
 This operation reads the input file line by line, it does this by: 
 - Creating an iterator that will iterate on the csv file. 
 - Returning a GroupedItem containing this iterator. 
 
 The internals in the ETL will then transform each line returned by the iterator into a DataItem and send it to the
-next step. While this step will return a single `GroupedItem` the next step will receive as many `DataItem`'s as theye
-are lines in the csv file.
+next step. While this step will return a single `GroupedItem` the next step will receive as many `DataItem`'s as the
+lines of the csv file.
 {% endcapture %}
 
 {% include block/etl-step.html code=code description=description %}
@@ -155,6 +169,10 @@ In this example:
 - **Name** is created by concatenating FirstName and LastName with a space.
 - **SubscriptionStatus** copies the IsSubscribed field without any transformation.
 {% endcapture %}
+
+Let's also note that `add: false` is used to replace existing columns with transformed columns. Without
+this option, the operation would add new columns while keeping the original ones. This mean FirstName, LastName 
+and IsSubscribed would remain in the output.
 
 {% include block/etl-step.html code=code description=description %}
 
@@ -211,5 +229,5 @@ For instance, the following command will process two input files and merge their
 
 ### Output
 
-The output of this ETL will be a output.csv file containg all customer data from files customers1.csv and customers2.csv.
+The output of this ETL will be a output.csv file containing all customer data from files customers1.csv and customers2.csv.
 
