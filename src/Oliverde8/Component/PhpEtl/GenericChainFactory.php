@@ -28,7 +28,6 @@ class GenericChainFactory
         $refClass = new \ReflectionClass($this->operationClassName);
         $constructor = $refClass->getConstructor();
 
-        var_dump("GOGOGOGO");
         if ($constructor) {
             $params = $constructor->getParameters();
 

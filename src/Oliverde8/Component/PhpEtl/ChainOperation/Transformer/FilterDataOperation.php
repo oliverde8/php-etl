@@ -3,27 +3,22 @@
 namespace Oliverde8\Component\PhpEtl\ChainOperation\Transformer;
 
 use Oliverde8\Component\PhpEtl\ChainOperation\AbstractChainOperation;
+use Oliverde8\Component\PhpEtl\ChainOperation\ConfigurableChainOperationInterface;
 use Oliverde8\Component\PhpEtl\ChainOperation\DataChainOperationInterface;
 use Oliverde8\Component\PhpEtl\Item\ChainBreakItem;
 use Oliverde8\Component\PhpEtl\Item\DataItemInterface;
 use Oliverde8\Component\PhpEtl\Item\ItemInterface;
 use Oliverde8\Component\PhpEtl\Model\ExecutionContext;
+use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\FilterDataConfig;
 use Oliverde8\Component\RuleEngine\RuleApplier;
 
-class FilterDataOperation extends AbstractChainOperation implements DataChainOperationInterface
+class FilterDataOperation extends AbstractChainOperation implements DataChainOperationInterface, ConfigurableChainOperationInterface
 {
-    protected RuleApplier $ruleApplier;
 
-    protected array $rule;
-
-    protected bool $negate;
-
-    public function __construct(RuleApplier $ruleApplier, array $rule, bool $negate)
-    {
-        $this->ruleApplier = $ruleApplier;
-        $this->rule = $rule;
-        $this->negate = $negate;
-    }
+    public function __construct(
+        private readonly RuleApplier $ruleApplier,
+        private readonly FilterDataConfig $config
+    ) {}
 
 
     public function processData(DataItemInterface $item, ExecutionContext $context): ItemInterface
@@ -31,9 +26,9 @@ class FilterDataOperation extends AbstractChainOperation implements DataChainOpe
         $data = $item->getData();
 
         $resultData = [];
-        $result = $this->ruleApplier->apply($data, $resultData, $this->rule);
+        $result = $this->ruleApplier->apply($data, $resultData, $this->config->rules);
 
-        if (($this->negate && $result == false) || (!$this->negate && $result == true)) {
+        if (($this->config->negate && $result == false) || (!$this->config->negate && $result == true)) {
             return $item;
         }
 
