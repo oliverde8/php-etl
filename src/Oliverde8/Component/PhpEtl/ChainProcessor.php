@@ -181,7 +181,7 @@ final class ChainProcessor extends LoggerContext implements ChainProcessorInterf
         }
     }
 
-    protected function handleAsyncItems(int $maxItems = null): \Generator
+    protected function handleAsyncItems(?int $maxItems = null): \Generator
     {
         if ($maxItems === null) {
             $maxItems = $this->maxAsynchronousItems;

@@ -21,7 +21,7 @@ class ChainOperationException extends \Exception
     /**
      * ChainOperationException constructor.
      */
-    public function __construct(string $message = "", int $code = 0, \Exception $previous = null, string $chainOperationName = '')
+    public function __construct(string $message = "", int $code = 0, ?\Exception $previous = null, string $chainOperationName = '')
     {
         $this->chainOperationName = $chainOperationName;
 

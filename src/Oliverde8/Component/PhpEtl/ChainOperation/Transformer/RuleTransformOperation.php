@@ -6,42 +6,25 @@ namespace Oliverde8\Component\PhpEtl\ChainOperation\Transformer;
 
 use oliverde8\AssociativeArraySimplified\AssociativeArray;
 use Oliverde8\Component\PhpEtl\ChainOperation\AbstractChainOperation;
+use Oliverde8\Component\PhpEtl\ChainOperation\ConfigurableChainOperationInterface;
 use Oliverde8\Component\PhpEtl\ChainOperation\DataChainOperationInterface;
 use Oliverde8\Component\PhpEtl\Item\DataItem;
 use Oliverde8\Component\PhpEtl\Item\DataItemInterface;
 use Oliverde8\Component\PhpEtl\Item\ItemInterface;
 use Oliverde8\Component\PhpEtl\Model\ExecutionContext;
+use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\RuleTransformConfig;
 use Oliverde8\Component\RuleEngine\RuleApplier;
 
-/**
- * Class RuleTransformOperation
- *
- * @author    de Cramer Oliver<oiverde8@gmail.com>
- * @copyright 2018 Oliverde8
- * @package Oliverde8\Component\PhpEtl\ChainOperation\Transformer
- */
-class RuleTransformOperation extends AbstractChainOperation implements DataChainOperationInterface
+
+class RuleTransformOperation extends AbstractChainOperation implements DataChainOperationInterface, ConfigurableChainOperationInterface
 {
     const VARIABLE_MATCH_REGEX = '/{(?<variables>[^{}]+)}/';
 
     /** @var string[] */
     protected array $parsedColumns = [];
 
-    /** @var RuleApplier */
-    protected RuleApplier $ruleApplier;
-
-    /** @var array */
-    protected array $rules;
-
-    /** @var boolean */
-    protected bool $add;
-
-    public function __construct(RuleApplier $ruleApplier, array $rules, bool $add)
-    {
-        $this->ruleApplier = $ruleApplier;
-        $this->rules = $rules;
-        $this->add = $add;
-    }
+    public function __construct(private readonly RuleApplier $ruleApplier, private readonly RuleTransformConfig $config)
+    {}
 
     public function processData(DataItemInterface $item, ExecutionContext $context): DataItemInterface
     {
@@ -49,11 +32,11 @@ class RuleTransformOperation extends AbstractChainOperation implements DataChain
         $newData = [];
 
         // We add data and don't send new data.
-        if ($this->add) {
+        if ($this->config->add) {
             $newData = $data;
         }
 
-        foreach ($this->rules as $column => $rule) {
+        foreach ($this->config->rules as $column => $rule) {
             // Add context to the data.
             $data['@context'] = array_merge($context->getParameters(), $rule['context'] ?? []);
 
