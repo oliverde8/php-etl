@@ -2,12 +2,14 @@
 
 use Oliverde8\Component\PhpEtl\ChainBuilderV2;
 use Oliverde8\Component\PhpEtl\ChainOperation\Extract\CsvExtractOperation;
+use Oliverde8\Component\PhpEtl\ChainOperation\Grouping\SimpleGroupingOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Loader\FileWriterOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\CallbackTransformerOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\RuleTransformOperation;
 use Oliverde8\Component\PhpEtl\ExecutionContextFactory;
 use Oliverde8\Component\PhpEtl\GenericChainFactory;
 use Oliverde8\Component\PhpEtl\OperationConfig\Extract\CsvExtractConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\Grouping\SimpleGroupingConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Loader\CsvFileWriterConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\CallBackTransformerConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\RuleTransformConfig;
@@ -39,5 +41,6 @@ $chainBuilder = new ChainBuilderV2(
         new GenericChainFactory(CallbackTransformerOperation::class, CallBackTransformerConfig::class),
         new GenericChainFactory(RuleTransformOperation::class, RuleTransformConfig::class, injections: ['ruleApplier' => $ruleApplier]),
         new GenericChainFactory(FileWriterOperation::class, CsvFileWriterConfig::class),
+        new GenericChainFactory(SimpleGroupingOperation::class, SimpleGroupingConfig::class),
     ],
 );

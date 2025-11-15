@@ -36,8 +36,6 @@ $chainConfig->addLink(New CsvExtractConfig())
 
 $chainProcessor = $chainBuilder->createChain($chainConfig);
 $chainProcessor->process(
-    new DataItem([
-        'file' => 'data/customers.csv',
-    ]),
+    new ArrayIterator([new DataItem(['file' => 'data/customers.csv',]), new DataItem(['file' => 'data/customers2.csv',])]),
     []
 );

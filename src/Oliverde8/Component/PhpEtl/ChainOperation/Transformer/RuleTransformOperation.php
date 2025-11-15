@@ -36,7 +36,7 @@ class RuleTransformOperation extends AbstractChainOperation implements DataChain
             $newData = $data;
         }
 
-        foreach ($this->config->rules as $column => $rule) {
+        foreach ($this->config->getRules() as $column => $rule) {
             // Add context to the data.
             $data['@context'] = array_merge($context->getParameters(), $rule['context'] ?? []);
 
