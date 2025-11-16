@@ -2,6 +2,7 @@
 
 use Oliverde8\Component\PhpEtl\ChainBuilderV2;
 
+use Oliverde8\Component\PhpEtl\ChainOperation\ChainMergeOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\ChainSplitOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Extract\CsvExtractOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Extract\JsonExtractOperation;
@@ -16,6 +17,7 @@ use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\SplitItemOperation;
 use Oliverde8\Component\PhpEtl\ExecutionContextFactory;
 use Oliverde8\Component\PhpEtl\GenericChainFactory;
 
+use Oliverde8\Component\PhpEtl\OperationConfig\ChainMergeConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\ChainSplitConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Extract\CsvExtractConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Extract\JsonExtractConfig;
@@ -72,6 +74,7 @@ $chainBuilder = new ChainBuilderV2(
         new GenericChainFactory(FileWriterOperation::class, CsvFileWriterConfig::class),
         new GenericChainFactory(SimpleGroupingOperation::class, SimpleGroupingConfig::class),
         new GenericChainFactory(FilterDataOperation::class, FilterDataConfig::class, injections: ['ruleApplier' => $ruleApplier]),
+        new GenericChainFactory(ChainMergeOperation::class, ChainMergeConfig::class),
         new GenericChainFactory(ChainSplitOperation::class, ChainSplitConfig::class),
         new GenericChainFactory(JsonExtractOperation::class, JsonExtractConfig::class),
         new GenericChainFactory(SimpleHttpOperation::class, SimpleHttpConfig::class),
