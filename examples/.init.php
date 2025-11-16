@@ -15,6 +15,7 @@ use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\LogOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\RuleTransformOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\SimpleHttpOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\SplitItemOperation;
+use Oliverde8\Component\PhpEtl\ChainOperation\FailSafeOperation;
 use Oliverde8\Component\PhpEtl\ExecutionContextFactory;
 use Oliverde8\Component\PhpEtl\GenericChainFactory;
 
@@ -31,6 +32,7 @@ use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\LogConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\RuleTransformConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\SimpleHttpConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\SplitItemConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\FailSafeConfig;
 
 use Oliverde8\Component\RuleEngine\RuleApplier;
 use Oliverde8\Component\RuleEngine\Rules\ExpressionLanguage;
@@ -83,5 +85,6 @@ $chainBuilder = new ChainBuilderV2(
         new GenericChainFactory(SimpleHttpOperation::class, SimpleHttpConfig::class),
         new GenericChainFactory(SplitItemOperation::class, SplitItemConfig::class),
         new GenericChainFactory(LogOperation::class, LogConfig::class),
+        new GenericChainFactory(FailSafeOperation::class, FailSafeConfig::class),
     ],
 );
