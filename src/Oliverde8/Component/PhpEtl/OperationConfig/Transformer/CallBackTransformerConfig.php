@@ -19,7 +19,7 @@ class CallBackTransformerConfig extends AbstractOperationConfig
         return $this->callable;
     }
 
-    function validate(): void
+    function validate(bool $constructOnly): void
     {
         // All callables are valid. Maybe add check on signature in the future.
     }

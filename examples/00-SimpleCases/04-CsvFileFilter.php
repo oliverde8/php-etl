@@ -24,4 +24,3 @@ $chainProcessor->process(
     new ArrayIterator([new DataItem(['file' => 'data/customers.csv',]), new DataItem(['file' => 'data/customers2.csv',])]),
     []
 );
-

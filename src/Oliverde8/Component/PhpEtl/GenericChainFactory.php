@@ -23,7 +23,7 @@ class GenericChainFactory
         }
     }
 
-    public function build(OperationConfigInterface $linkConfig): ConfigurableChainOperationInterface
+    public function build(OperationConfigInterface $linkConfig, ChainBuilderV2 $chainBuilder): ConfigurableChainOperationInterface
     {
         $refClass = new \ReflectionClass($this->operationClassName);
         $constructor = $refClass->getConstructor();
@@ -39,8 +39,9 @@ class GenericChainFactory
                     $args[] = $linkConfig;
                 } elseif ($param->getType() !== null && $param->getType()->getName() === 'string' && $name === 'flavor') {
                     $args[] = $this->flavor;
-                } else
-                if (array_key_exists($name, $this->injections)) {
+                } elseif ($param->getType() !== null && $this->reflectionIsOfType($param->getType(), ChainBuilderV2::class)) {
+                    $args[] = $chainBuilder;
+                } elseif (array_key_exists($name, $this->injections)) {
                     $args[] = $this->injections[$name];
                 } elseif ($param->isDefaultValueAvailable()) {
                     $args[] = $param->getDefaultValue();

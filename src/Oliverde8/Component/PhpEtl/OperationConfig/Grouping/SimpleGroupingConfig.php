@@ -15,7 +15,7 @@ class SimpleGroupingConfig extends AbstractOperationConfig
     }
 
 
-    protected function validate(): void
+    protected function validate(bool $constructOnly): void
     {
         if (empty($this->groupKey)) {
             throw new \InvalidArgumentException('Group key cannot be empty');

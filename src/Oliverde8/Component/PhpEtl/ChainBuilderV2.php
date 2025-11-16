@@ -30,7 +30,7 @@ class ChainBuilderV2
     {
         foreach ($this->factories as $factory) {
             if ($factory->supports($linkConfig)) {
-                return $factory->build($linkConfig);
+                return $factory->build($linkConfig, $this);
             }
         }
 

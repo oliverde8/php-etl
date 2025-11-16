@@ -8,22 +8,22 @@ use Oliverde8\Component\PhpEtl\Exception\ChainBuilderValidationException;
 
 abstract class AbstractOperationConfig implements OperationConfigInterface
 {
-    private bool $validated = false;
+    private bool $constructed = false;
 
-    public function __construct(protected readonly string $flavor)
+    public function __construct(protected readonly string $flavor = 'default')
     {
-        $this->validated = true;
-        $this->validate();
+        $this->constructed = true;
+        $this->validate(true);
     }
 
     /**
      * @throws ChainBuilderValidationException
      */
-    abstract protected function validate(): void;
+    abstract protected function validate(bool $constructOnly): void;
 
     public function getFlavor(): string
     {
-        if (!$this->validated) {
+        if (!$this->constructed) {
             throw new ChainBuilderException("Impossible to get flavor are you sure the config calls it's parent constructor?");
         }
         return $this->flavor;

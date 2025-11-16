@@ -30,6 +30,6 @@ class CsvFileWriterConfig extends AbstractOperationConfig implements FileWriterC
         return new Csv($tmp, $this->hasHeader, $this->delimiter, $this->enclosure, $this->escape);
     }
 
-    protected function validate(): void
+    protected function validate(bool $constructOnly): void
     {}
 }
