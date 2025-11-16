@@ -8,7 +8,7 @@ class RuleTransformConfig extends AbstractOperationConfig
 {
     protected array $rules = [];
 
-    public function __construct(public readonly bool $add, string $flavor)
+    public function __construct(public readonly bool $add = true, string $flavor = 'default')
     {
         parent::__construct($flavor);
     }

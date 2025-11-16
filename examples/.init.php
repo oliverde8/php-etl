@@ -4,6 +4,7 @@ use Oliverde8\Component\PhpEtl\ChainBuilderV2;
 
 use Oliverde8\Component\PhpEtl\ChainOperation\ChainSplitOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Extract\CsvExtractOperation;
+use Oliverde8\Component\PhpEtl\ChainOperation\Extract\JsonExtractOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Grouping\SimpleGroupingOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Loader\FileWriterOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\CallbackTransformerOperation;
@@ -14,6 +15,7 @@ use Oliverde8\Component\PhpEtl\GenericChainFactory;
 
 use Oliverde8\Component\PhpEtl\OperationConfig\ChainSplitConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Extract\CsvExtractConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\Extract\JsonExtractConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Grouping\SimpleGroupingConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Loader\CsvFileWriterConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\CallBackTransformerConfig;
@@ -51,5 +53,6 @@ $chainBuilder = new ChainBuilderV2(
         new GenericChainFactory(SimpleGroupingOperation::class, SimpleGroupingConfig::class),
         new GenericChainFactory(FilterDataOperation::class, FilterDataConfig::class, injections: ['ruleApplier' => $ruleApplier]),
         new GenericChainFactory(ChainSplitOperation::class, ChainSplitConfig::class),
+        new GenericChainFactory(JsonExtractOperation::class, JsonExtractConfig::class),
     ],
 );
