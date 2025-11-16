@@ -10,6 +10,8 @@ use Oliverde8\Component\PhpEtl\ChainOperation\Loader\FileWriterOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\CallbackTransformerOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\FilterDataOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\RuleTransformOperation;
+use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\SimpleHttpOperation;
+use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\SplitItemOperation;
 use Oliverde8\Component\PhpEtl\ExecutionContextFactory;
 use Oliverde8\Component\PhpEtl\GenericChainFactory;
 
@@ -21,6 +23,8 @@ use Oliverde8\Component\PhpEtl\OperationConfig\Loader\CsvFileWriterConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\CallBackTransformerConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\FilterDataConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\RuleTransformConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\SimpleHttpConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\SplitItemConfig;
 
 use Oliverde8\Component\RuleEngine\RuleApplier;
 use Oliverde8\Component\RuleEngine\Rules\ExpressionLanguage;
@@ -29,6 +33,7 @@ use Oliverde8\Component\RuleEngine\Rules\Implode;
 use Oliverde8\Component\RuleEngine\Rules\StrToLower;
 use Oliverde8\Component\RuleEngine\Rules\StrToUpper;
 use Psr\Log\NullLogger;
+use Symfony\Component\HttpClient\HttpClient;
 
 require __DIR__ . '/../vendor/autoload.php';
 
@@ -43,6 +48,9 @@ $ruleApplier = new RuleApplier(
     ]
 );
 
+$client = HttpClient::create(['headers' => ['Accept' => 'application/json']]);
+
+
 $chainBuilder = new ChainBuilderV2(
     new ExecutionContextFactory(),
     [
@@ -54,5 +62,7 @@ $chainBuilder = new ChainBuilderV2(
         new GenericChainFactory(FilterDataOperation::class, FilterDataConfig::class, injections: ['ruleApplier' => $ruleApplier]),
         new GenericChainFactory(ChainSplitOperation::class, ChainSplitConfig::class),
         new GenericChainFactory(JsonExtractOperation::class, JsonExtractConfig::class),
+        new GenericChainFactory(SimpleHttpOperation::class, SimpleHttpConfig::class, injections: ['client' => $client]),
+        new GenericChainFactory(SplitItemOperation::class, SplitItemConfig::class),
     ],
 );
