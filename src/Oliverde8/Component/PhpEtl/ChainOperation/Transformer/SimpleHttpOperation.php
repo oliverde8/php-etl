@@ -45,9 +45,4 @@ class SimpleHttpOperation extends AbstractChainOperation implements DataChainOpe
 
         return new AsyncHttpClientResponseItem($this->client, $response, $this->config->responseIsJson, $this->config->responseKey, $data);
     }
-
-    public function getConfigurationClass(): string
-    {
-        return SimpleHttpConfig::class;
-    }
 }

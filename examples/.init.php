@@ -9,6 +9,7 @@ use Oliverde8\Component\PhpEtl\ChainOperation\Grouping\SimpleGroupingOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Loader\FileWriterOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\CallbackTransformerOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\FilterDataOperation;
+use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\LogOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\RuleTransformOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\SimpleHttpOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\SplitItemOperation;
@@ -22,6 +23,7 @@ use Oliverde8\Component\PhpEtl\OperationConfig\Grouping\SimpleGroupingConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Loader\CsvFileWriterConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\CallBackTransformerConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\FilterDataConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\LogConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\RuleTransformConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\SimpleHttpConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\SplitItemConfig;
@@ -37,10 +39,20 @@ use Symfony\Component\HttpClient\HttpClient;
 
 require __DIR__ . '/../vendor/autoload.php';
 
+// Simple logger that outputs to console
+class ConsoleLogger extends \Psr\Log\AbstractLogger
+{
+    public function log($level, $message, array $context = []): void
+    {
+        $contextStr = !empty($context) ? ' | Context: ' . json_encode($context) : '';
+        echo "[{$level}] {$message}{$contextStr}\n";
+    }
+}
+
 $ruleApplier = new RuleApplier(
     new NullLogger(),
     [
-        new Get(new NullLogger()),
+        new Get(new ConsoleLogger()),
         new Implode(new NullLogger()),
         new StrToLower(new NullLogger()),
         new StrToUpper(new NullLogger()),
@@ -62,7 +74,8 @@ $chainBuilder = new ChainBuilderV2(
         new GenericChainFactory(FilterDataOperation::class, FilterDataConfig::class, injections: ['ruleApplier' => $ruleApplier]),
         new GenericChainFactory(ChainSplitOperation::class, ChainSplitConfig::class),
         new GenericChainFactory(JsonExtractOperation::class, JsonExtractConfig::class),
-        new GenericChainFactory(SimpleHttpOperation::class, SimpleHttpConfig::class, injections: ['client' => $client]),
+        new GenericChainFactory(SimpleHttpOperation::class, SimpleHttpConfig::class),
         new GenericChainFactory(SplitItemOperation::class, SplitItemConfig::class),
+        new GenericChainFactory(LogOperation::class, LogConfig::class),
     ],
 );

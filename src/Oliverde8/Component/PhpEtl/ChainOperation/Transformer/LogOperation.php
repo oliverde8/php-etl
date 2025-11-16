@@ -5,39 +5,38 @@ namespace Oliverde8\Component\PhpEtl\ChainOperation\Transformer;
 
 use oliverde8\AssociativeArraySimplified\AssociativeArray;
 use Oliverde8\Component\PhpEtl\ChainOperation\AbstractChainOperation;
+use Oliverde8\Component\PhpEtl\ChainOperation\ConfigurableChainOperationInterface;
 use Oliverde8\Component\PhpEtl\ChainOperation\DataChainOperationInterface;
 use Oliverde8\Component\PhpEtl\Item\DataItemInterface;
 use Oliverde8\Component\PhpEtl\Item\ItemInterface;
 use Oliverde8\Component\PhpEtl\Model\ExecutionContext;
+use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\LogConfig;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
-class LogOperation extends AbstractChainOperation implements DataChainOperationInterface
+class LogOperation extends AbstractChainOperation implements DataChainOperationInterface, ConfigurableChainOperationInterface
 {
     protected readonly ExpressionLanguage $expressionLanguage;
 
-    public function __construct(
-        protected readonly string $message,
-        protected readonly string $level,
-        protected readonly array $context,
-    ){
+    public function __construct(protected readonly LogConfig $config)
+    {
         $this->expressionLanguage = new ExpressionLanguage();
     }
 
     public function processData(DataItemInterface $item, ExecutionContext $context): ItemInterface
     {
         $data = new AssociativeArray($item->getData());
-        $message = $this->message;
+        $message = $this->config->message;
         if (strpos($message, "@") === 0) {
             $message = ltrim($message, "@");
             $message = $this->expressionLanguage->evaluate($message, ['data' => $item->getData(), 'context' => $context->getParameters()]);
         }
 
         $logContext = [];
-        foreach ($this->context as $key => $valueKey) {
+        foreach ($this->config->context as $key => $valueKey) {
             $logContext[$key] = $data->get($valueKey);
         }
 
-        switch ($this->level) {
+        switch ($this->config->level) {
             case 'debug':
                 $context->getLogger()->debug($message, $logContext);
                 break;

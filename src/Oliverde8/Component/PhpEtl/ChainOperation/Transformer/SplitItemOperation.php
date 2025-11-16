@@ -74,9 +74,4 @@ class SplitItemOperation extends AbstractChainOperation implements DataChainOper
 
         return new MixItem($items);
     }
-
-    public function getConfigurationClass(): string
-    {
-        return SplitItemConfig::class;
-    }
 }
