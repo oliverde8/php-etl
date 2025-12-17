@@ -9,18 +9,12 @@ use Oliverde8\Component\PhpEtl\Model\File\FileSystemInterface;
 
 class ExecutionContext extends LoggerContext
 {
-    protected array $parameters;
-
-    protected FileSystemInterface $fileSystem;
-
     /**
      * @param array $parameters
      * @param FileSystemInterface $fileSystem
      */
-    public function __construct(array $parameters, FileSystemInterface $fileSystem)
+    public function __construct(protected array $parameters, protected FileSystemInterface $fileSystem)
     {
-        $this->parameters = $parameters;
-        $this->fileSystem = $fileSystem;
     }
 
 

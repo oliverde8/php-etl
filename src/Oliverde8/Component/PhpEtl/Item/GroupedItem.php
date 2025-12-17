@@ -14,16 +14,14 @@ namespace Oliverde8\Component\PhpEtl\Item;
 class GroupedItem implements GroupedItemInterface
 {
 
-    protected \Iterator $iterator;
-
-    public function __construct(\Iterator $iterator)
+    public function __construct(protected \Iterator $iterator)
     {
-        $this->iterator = $iterator;
     }
 
     /**
      * @inheritdoc
      */
+    #[\Override]
     public function getIterator(): \Iterator
     {
         return $this->iterator;

@@ -12,20 +12,12 @@ use Oliverde8\Component\RuleEngine\RuleApplier;
 
 class FilterDataOperation extends AbstractChainOperation implements DataChainOperationInterface
 {
-    protected RuleApplier $ruleApplier;
-
-    protected array $rule;
-
-    protected bool $negate;
-
-    public function __construct(RuleApplier $ruleApplier, array $rule, bool $negate)
+    public function __construct(protected RuleApplier $ruleApplier, protected array $rule, protected bool $negate)
     {
-        $this->ruleApplier = $ruleApplier;
-        $this->rule = $rule;
-        $this->negate = $negate;
     }
 
 
+    #[\Override]
     public function processData(DataItemInterface $item, ExecutionContext $context): ItemInterface
     {
         $data = $item->getData();

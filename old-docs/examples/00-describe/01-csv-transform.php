@@ -10,7 +10,7 @@ $symfonyOutput = new \Oliverde8\Component\PhpEtl\Output\SymfonyConsoleOutput($ou
 $chainProcessor->process(
     new ArrayIterator(["/customers.csv"]),
     [],
-    function (array $operationStates, int $itemsProcessed, int $itemsReturned, bool $hasEnded) use ($symfonyOutput) {
+    function (array $operationStates, int $itemsProcessed, int $itemsReturned, bool $hasEnded) use ($symfonyOutput): void {
         $symfonyOutput->output($operationStates, $hasEnded);
     }
 );

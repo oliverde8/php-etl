@@ -23,11 +23,12 @@ class LogOperation extends AbstractChainOperation implements DataChainOperationI
         $this->expressionLanguage = new ExpressionLanguage();
     }
 
+    #[\Override]
     public function processData(DataItemInterface $item, ExecutionContext $context): ItemInterface
     {
         $data = new AssociativeArray($item->getData());
         $message = $this->message;
-        if (strpos($message, "@") === 0) {
+        if (str_starts_with($message, "@")) {
             $message = ltrim($message, "@");
             $message = $this->expressionLanguage->evaluate($message, ['data' => $item->getData(), 'context' => $context->getParameters()]);
         }
@@ -37,32 +38,17 @@ class LogOperation extends AbstractChainOperation implements DataChainOperationI
             $logContext[$key] = $data->get($valueKey);
         }
 
-        switch ($this->level) {
-            case 'debug':
-                $context->getLogger()->debug($message, $logContext);
-                break;
-            case 'info':
-                $context->getLogger()->info($message, $logContext);
-                break;
-            case 'notice':
-                $context->getLogger()->notice($message, $logContext);
-                break;
-            case 'warning':
-                $context->getLogger()->warning($message, $logContext);
-                break;
-            case 'error':
-                $context->getLogger()->error($message, $logContext);
-                break;
-            case 'critical':
-                $context->getLogger()->critical($message, $logContext);
-                break;
-            case 'alert':
-                $context->getLogger()->alert($message, $logContext);
-                break;
-            case 'emergency':
-                $context->getLogger()->emergency($message, $logContext);
-                break;
-        }
+        match ($this->level) {
+            'debug' => $context->getLogger()->debug($message, $logContext),
+            'info' => $context->getLogger()->info($message, $logContext),
+            'notice' => $context->getLogger()->notice($message, $logContext),
+            'warning' => $context->getLogger()->warning($message, $logContext),
+            'error' => $context->getLogger()->error($message, $logContext),
+            'critical' => $context->getLogger()->critical($message, $logContext),
+            'alert' => $context->getLogger()->alert($message, $logContext),
+            'emergency' => $context->getLogger()->emergency($message, $logContext),
+            default => $item,
+        };
 
         return $item;
     }

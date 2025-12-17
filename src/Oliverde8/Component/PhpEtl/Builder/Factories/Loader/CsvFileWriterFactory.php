@@ -22,6 +22,7 @@ class CsvFileWriterFactory extends AbstractFactory
     /**
      * @inheritdoc
      */
+    #[\Override]
     protected function configureValidator(): Constraint
     {
         return new Assert\Collection([
@@ -32,6 +33,7 @@ class CsvFileWriterFactory extends AbstractFactory
     /**
      * @inheritdoc
      */
+    #[\Override]
     protected function build($operation, $options): ChainOperationInterface
     {
         $tmp = tempnam(sys_get_temp_dir(), 'etl');

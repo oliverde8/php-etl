@@ -18,12 +18,8 @@ use Psr\Log\LoggerInterface;
  */
 class RuleApplier
 {
-    protected LoggerInterface $logger;
-
     /** @var RuleInterface[] */
     protected array $rules;
-
-    protected bool $validate;
 
     protected array $currentIdentity;
 
@@ -35,11 +31,8 @@ class RuleApplier
      * @param boolean         $validate When validation is active rules are validated and clear messages are displayed
      *                                  when a rule is not well coded. But performance is worsened.
      */
-    public function __construct(LoggerInterface $logger, array $rules, bool $validate = false)
+    public function __construct(protected LoggerInterface $logger, array $rules, protected bool $validate = false)
     {
-        $this->logger = $logger;
-        $this->validate = $validate;
-
         foreach ($rules as $rule) {
             $this->registerRule($rule);
         }

@@ -24,7 +24,7 @@ class ChainBuilderValidationException extends \Exception
      * @param int $code
      * @param Throwable|null $previous
      */
-    public function __construct(string $operation, array $violations, int $code = 0, Throwable $previous = null)
+    public function __construct(string $operation, array $violations, int $code = 0, ?Throwable $previous = null)
     {
         $msg = "There was an error building the operation '$operation' : ";
         foreach ($violations as $violation) {

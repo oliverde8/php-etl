@@ -10,16 +10,6 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class AsyncHttpClientResponseItem implements AsyncItemInterface
 {
-    private HttpClientInterface $client;
-
-    private ResponseInterface $response;
-
-    private bool $responseIsJson;
-
-    private ?string $responseKey;
-
-    private array $baseData;
-
     private bool $isRunning = true;
 
     /**
@@ -28,21 +18,12 @@ class AsyncHttpClientResponseItem implements AsyncItemInterface
      * @param string|null $responseKey
      * @param array $baseData
      */
-    public function __construct(
-        HttpClientInterface $client,
-        ResponseInterface $response,
-        bool $responseIsJson,
-        ?string $responseKey,
-        array $baseData
-    ) {
-        $this->client = $client;
-        $this->response = $response;
-        $this->responseIsJson = $responseIsJson;
-        $this->responseKey = $responseKey;
-        $this->baseData = $baseData;
+    public function __construct(private readonly HttpClientInterface $client, private readonly ResponseInterface $response, private readonly bool $responseIsJson, private readonly ?string $responseKey, private readonly array $baseData)
+    {
     }
 
 
+    #[\Override]
     public function isRunning(): bool
     {
         try {
@@ -51,13 +32,14 @@ class AsyncHttpClientResponseItem implements AsyncItemInterface
                     return false;
                 }
             }
-        } catch (TimeoutException $exception) {
+        } catch (TimeoutException) {
             // This is normal, we have used a very low stream timeout because we wish to continue processing
             // other items while this item is being downloaded.
             return true;
         }
     }
 
+    #[\Override]
     public function getItem(): ItemInterface
     {
         $responseData = [

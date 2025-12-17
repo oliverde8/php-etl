@@ -15,16 +15,11 @@ use Throwable;
  */
 class ChainOperationException extends \Exception
 {
-    /** @var string */
-    protected string $chainOperationName;
-
     /**
      * ChainOperationException constructor.
      */
-    public function __construct(string $message = "", int $code = 0, \Exception $previous = null, string $chainOperationName = '')
+    public function __construct(string $message = "", int $code = 0, ?\Exception $previous = null, protected string $chainOperationName = '')
     {
-        $this->chainOperationName = $chainOperationName;
-
         parent::__construct($message, $code, $previous);
     }
 

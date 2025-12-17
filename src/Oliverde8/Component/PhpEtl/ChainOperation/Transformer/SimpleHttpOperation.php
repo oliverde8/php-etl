@@ -17,38 +17,21 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class SimpleHttpOperation extends AbstractChainOperation implements DataChainOperationInterface
 {
-    private HttpClientInterface $client;
-
-    private string $method = "GET";
-    private string $url;
-
-    private bool $responseIsJson;
-
-    private ?string $optionsKey;
-
-    protected ?string $responseKey;
-
-    private ExpressionLanguage $expressionLanguage;
+    private readonly ExpressionLanguage $expressionLanguage;
 
     public function __construct(
-        HttpClientInterface $client,
-        string $method,
-        string $url,
-        bool $responseIsJson,
-        ?string $optionsKey,
-        ?string $responseKey
+        private readonly HttpClientInterface $client,
+        private readonly string $method,
+        private readonly string $url,
+        private readonly bool $responseIsJson,
+        private readonly ?string $optionsKey,
+        protected ?string $responseKey
     ) {
-        $this->client = $client;
-        $this->method = $method;
-        $this->url = $url;
-        $this->responseIsJson = $responseIsJson;
-        $this->optionsKey = $optionsKey;
-        $this->responseKey = $responseKey;
-
         $this->expressionLanguage = new ExpressionLanguage();
     }
 
 
+    #[\Override]
     public function processData(DataItemInterface $item, ExecutionContext $context): ItemInterface
     {
         $data = $item->getData();
@@ -59,7 +42,7 @@ class SimpleHttpOperation extends AbstractChainOperation implements DataChainOpe
         }
 
         $url = $this->url;
-        if (strpos($url, "@") === 0) {
+        if (str_starts_with($url, "@")) {
             $url = ltrim($url, '@');
             $url = $this->expressionLanguage->evaluate($url, ['data' => $data]);
         }

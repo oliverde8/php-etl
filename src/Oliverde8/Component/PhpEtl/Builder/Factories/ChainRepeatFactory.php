@@ -15,6 +15,7 @@ class ChainRepeatFactory extends AbstractFactory
         parent::__construct($operation, $class);
     }
 
+    #[\Override]
     public function build(string $operation, array $options): ChainOperationInterface
     {
         $maxAsync = $options['maxASynchronousItems'] ?? 0;
@@ -25,6 +26,7 @@ class ChainRepeatFactory extends AbstractFactory
         return $this->create($chainProcessor,  $options['validationExpr'], $allowAsync);
     }
 
+    #[\Override]
     protected function configureValidator(): Constraint
     {
         return new Assert\Collection([

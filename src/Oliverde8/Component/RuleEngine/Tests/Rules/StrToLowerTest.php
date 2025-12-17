@@ -25,6 +25,7 @@ class StrToLowerTest extends AbstractRule
     /**
      * @inheritdoc
      */
+    #[\Override]
     protected function getRule()
     {
         return new StrToLower(new NullLogger());

@@ -25,17 +25,13 @@ class ChainBuilder
     /** @var ChainProcessor[] */
     protected array $subChainProcessors = [];
 
-    protected ExecutionContextFactoryInterface $contextFactory;
-
     protected ExpressionLanguage $expressionLanguage;
 
     /**
      * @param ExecutionContextFactoryInterface $contextFactory
      */
-    public function __construct(ExecutionContextFactoryInterface $contextFactory)
+    public function __construct(protected ExecutionContextFactoryInterface $contextFactory)
     {
-        $this->contextFactory = $contextFactory;
-
         $this->expressionLanguage = new ExpressionLanguage();
     }
 
@@ -70,7 +66,7 @@ class ChainBuilder
         foreach ($configs['subChains'] ?? [] as $subChainName => $subChainConfigs) {
             $chainOperations = [];
             foreach ($subChainConfigs['chain'] as $id => $operation) {
-                $chainOperations[$id] = $this->getOperationFromConfig($operation, $inputOptions, $subChainProcessors);
+                $chainOperations[$id] = $this->getOperationFromConfig($operation, $inputOptions);
             }
             $this->subChainProcessors[$subChainName] = new ChainProcessor(
                 $chainOperations,
@@ -97,13 +93,13 @@ class ChainBuilder
     protected function getOperationFromConfig(array $config, array $inputOptions): ChainOperationInterface
     {
         foreach ($config['options'] as &$option) {
-            if (is_string($option) && strpos($option, "!") === 0) {
+            if (is_string($option) && str_starts_with($option, "!")) {
                 $option = ltrim($option, '!');
                 $option = $this->expressionLanguage->evaluate($option, $inputOptions);
             }
         }
 
-        if (strtolower($config['operation']) == 'subchain') {
+        if (strtolower((string) $config['operation']) == 'subchain') {
             $subChain = $config['options']['name'];
             if (!isset($this->subChainProcessors[$subChain])) {
                 throw new UnknownOperationException("No subchain '$subChain' was found to create operation");

@@ -38,6 +38,7 @@ class RuleTransformFactory extends AbstractFactory
     /**
      * @inheritdoc
      */
+    #[\Override]
     public function build(string $operation, array $options): ChainOperationInterface
     {
         return $this->create($this->ruleApplier, $options['columns'], $options['add']);
@@ -46,6 +47,7 @@ class RuleTransformFactory extends AbstractFactory
     /**
      * @inheritdoc
      */
+    #[\Override]
     protected function configureValidator(): Constraint
     {
         return new Assert\Collection([

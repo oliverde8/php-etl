@@ -31,7 +31,7 @@ $chainProcessor->process(
             ["id"=> 19],
         ]),
     [],
-    function (array $operationStates, int $itemsProcessed, int $itemsReturned, bool $hasEnded) use ($symfonyOutput) {
+    function (array $operationStates, int $itemsProcessed, int $itemsReturned, bool $hasEnded) use ($symfonyOutput): void {
         $symfonyOutput->output($operationStates, $hasEnded);
     }
 );

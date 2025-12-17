@@ -27,22 +27,11 @@ class RuleTransformOperation extends AbstractChainOperation implements DataChain
     /** @var string[] */
     protected array $parsedColumns = [];
 
-    /** @var RuleApplier */
-    protected RuleApplier $ruleApplier;
-
-    /** @var array */
-    protected array $rules;
-
-    /** @var boolean */
-    protected bool $add;
-
-    public function __construct(RuleApplier $ruleApplier, array $rules, bool $add)
+    public function __construct(protected RuleApplier $ruleApplier, protected array $rules, protected bool $add)
     {
-        $this->ruleApplier = $ruleApplier;
-        $this->rules = $rules;
-        $this->add = $add;
     }
 
+    #[\Override]
     public function processData(DataItemInterface $item, ExecutionContext $context): DataItemInterface
     {
         $data = $item->getData();

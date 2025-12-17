@@ -22,20 +22,17 @@ class ChainMergeOperation extends AbstractChainOperation implements DataChainOpe
 {
     use SplittedChainOperationTrait;
 
-    /** @var ChainProcessor[] */
-    protected array $chainProcessors;
-
     /**
      * ChainSplitOperation constructor.
      *
      * @param ChainProcessor[] $chainProcessors
      */
-    public function __construct(array $chainProcessors)
+    public function __construct(protected array $chainProcessors)
     {
-        $this->chainProcessors = $chainProcessors;
-        $this->onSplittedChainOperationConstruct($chainProcessors);
+        $this->onSplittedChainOperationConstruct($this->chainProcessors);
     }
 
+    #[\Override]
     public function processData(DataItemInterface $item, ExecutionContext $context): ItemInterface
     {
         $returnItems = [];

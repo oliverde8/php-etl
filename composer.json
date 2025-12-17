@@ -4,7 +4,7 @@
     "license": "MIT",
     "description": "A small etl coded in php, to extract/transform/load Edit with ease.",
     "require": {
-        "php": ">=8.2",
+        "php": ">=8.4",
         "oliverde8/associative-array-simplified": "^1.0",
         "psr/log": "^2.0|^3.0",
         "symfony/expression-language": "^6.0|^7.0",

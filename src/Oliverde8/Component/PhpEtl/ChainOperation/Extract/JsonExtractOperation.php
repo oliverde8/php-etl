@@ -14,16 +14,11 @@ use Oliverde8\Component\PhpEtl\Model\ExecutionContext;
 
 class JsonExtractOperation extends AbstractChainOperation implements DataChainOperationInterface
 {
-    protected string $fileKey;
-
-    protected bool $scoped;
-
-    public function __construct(string $fileKey, bool $scoped)
+    public function __construct(protected string $fileKey, protected bool $scoped)
     {
-        $this->fileKey = $fileKey;
-        $this->scoped = $scoped;
     }
 
+    #[\Override]
     public function processData(DataItemInterface $item, ExecutionContext $context): ItemInterface
     {
         $filename = $item->getData();

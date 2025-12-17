@@ -10,16 +10,14 @@ use Oliverde8\Component\PhpEtl\Model\File\LocalFileSystem;
 
 class LocalFileSystemFactory implements FileSystemFactoryInterface
 {
-    private ChainWorkDirManager $chainWorkDirManager;
-
     /** @var FileSystemInterface[] */
     private array $fileSystems;
 
-    public function __construct(ChainWorkDirManager $chainWorkDirManager)
+    public function __construct(private readonly ChainWorkDirManager $chainWorkDirManager)
     {
-        $this->chainWorkDirManager = $chainWorkDirManager;
     }
 
+    #[\Override]
     public function get(ExecutionInterface $execution): FileSystemInterface
     {
         if (!isset($this->fileSystems[$execution->getId()])) {

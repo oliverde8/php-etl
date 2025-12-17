@@ -22,6 +22,7 @@ class FailSafeOperation implements ChainOperationInterface, DetailedObservableOp
         protected readonly int $nbAttempts,
     ){}
 
+    #[\Override]
     public function process(ItemInterface $item, ExecutionContext $context)
     {
         if ($item instanceof StopItem) {

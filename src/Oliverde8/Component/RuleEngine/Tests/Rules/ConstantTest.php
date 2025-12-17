@@ -20,6 +20,7 @@ class ConstantTest extends AbstractRule
         $this->assertRuleResults(['test' => 'toto 1'], [], ['value' => ['1' => ['toto']]], ['1' => ['toto']]);
     }
 
+    #[\Override]
     protected function getRule()
     {
         return new Constant(new NullLogger());

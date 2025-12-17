@@ -19,21 +19,19 @@ use Oliverde8\Component\PhpEtl\Model\ExecutionContext;
  */
 class CallbackTransformerOperation extends AbstractChainOperation implements DataChainOperationInterface
 {
-    protected $callback;
-
     /**
      * CallbackTransformerOperation constructor.
      *
      * @param $callback
      */
-    public function __construct($callback)
+    public function __construct(protected $callback)
     {
-        $this->callback = $callback;
     }
 
     /**
      * @inheritdoc
      */
+    #[\Override]
     public function processData(DataItemInterface $item, ExecutionContext $context): ItemInterface
     {
         $method = $this->callback;

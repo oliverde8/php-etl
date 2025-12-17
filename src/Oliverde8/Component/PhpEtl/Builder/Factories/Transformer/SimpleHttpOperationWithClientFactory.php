@@ -12,18 +12,15 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class SimpleHttpOperationWithClientFactory extends AbstractFactory
 {
-    private HttpClientInterface $httpClient;
-
     /**
      * @param HttpClientInterface $httpClient
      */
-    public function __construct(string $operation, HttpClientInterface $httpClient)
+    public function __construct(string $operation, private readonly HttpClientInterface $httpClient)
     {
-        $this->httpClient = $httpClient;
-
         parent::__construct($operation, SimpleHttpOperation::class);
     }
 
+    #[\Override]
     protected function build(string $operation, array $options): ChainOperationInterface
     {
         return new SimpleHttpOperation(
@@ -36,6 +33,7 @@ class SimpleHttpOperationWithClientFactory extends AbstractFactory
         );
     }
 
+    #[\Override]
     protected function configureValidator(): Constraint
     {
         return new Assert\Collection([

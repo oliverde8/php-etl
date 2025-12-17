@@ -15,26 +15,12 @@ use Oliverde8\Component\PhpEtl\Model\ExecutionContext;
 
 class CsvExtractOperation extends AbstractChainOperation implements DataChainOperationInterface
 {
-    protected string $delimiter;
-
-    protected string $enclosure;
-
-    protected string $escape;
-
-    protected string $fileKey;
-
-    protected bool $scoped;
-
-    public function __construct(string $delimiter, string $enclosure, string $escape, string $fileKey, bool $scoped)
+    public function __construct(protected string $delimiter, protected string $enclosure, protected string $escape, protected string $fileKey, protected bool $scoped)
     {
-        $this->delimiter = $delimiter;
-        $this->enclosure = $enclosure;
-        $this->escape = $escape;
-        $this->fileKey = $fileKey;
-        $this->scoped = $scoped;
     }
 
 
+    #[\Override]
     public function processData(DataItemInterface $item, ExecutionContext $context): ItemInterface
     {
         $filename = $item->getData();

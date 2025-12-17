@@ -74,10 +74,9 @@ abstract class AbstractFactory
     }
 
     /**
-     * @param mixed ...$arguments
      * @return ChainOperationInterface
      */
-    protected function create(...$arguments): ChainOperationInterface
+    protected function create(mixed ...$arguments): ChainOperationInterface
     {
         $class = $this->class;
         return new $class(...$arguments);

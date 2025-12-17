@@ -15,28 +15,14 @@ use Oliverde8\Component\PhpEtl\Model\ExecutionContext;
 
 class SplitItemOperation extends AbstractChainOperation implements DataChainOperationInterface
 {
-    protected bool $singleElement;
-
-    protected bool $keepKeys;
-
-    protected array $keys;
-
-    protected ?string $keyName;
-
-    protected array $duplicateKeys;
-
-    public function __construct(bool $singleElement, array $keys, bool $keepKeys, string $keyName = null, array $duplicatekeys = [])
+    public function __construct(protected bool $singleElement, protected array $keys, protected bool $keepKeys, protected ?string $keyName = null, protected array $duplicateKeys = [])
     {
-        $this->singleElement = $singleElement;
-        $this->keepKeys = $keepKeys;
-        $this->keys = $keys;
-        $this->keyName = $keyName;
-        $this->duplicateKeys = $duplicatekeys;
     }
 
     /**
      * @throws ChainOperationException
      */
+    #[\Override]
     public function processData(DataItemInterface $item, ExecutionContext $context): ItemInterface
     {
         if ($this->singleElement) {

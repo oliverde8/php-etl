@@ -26,17 +26,15 @@ class FileWriterOperation extends AbstractChainOperation implements DataChainOpe
     /** @var FileWriterInterface */
     protected $writer;
 
-    protected string $fileName;
-
-    public function __construct(FileWriterInterface $writer, string $fileName)
+    public function __construct(FileWriterInterface $writer, protected string $fileName)
     {
         $this->writer = $writer;
-        $this->fileName = $fileName;
     }
 
     /**
      * @inheritdoc
      */
+    #[\Override]
     public function processData(DataItemInterface $item, ExecutionContext $context): DataItemInterface
     {
         $this->writer->write($item->getData());

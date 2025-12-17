@@ -16,6 +16,7 @@ class ExpressionLanguage extends AbstractRule
     /**
      * @inheritdoc
      */
+    #[\Override]
     public function apply(array $rowData, array &$transformedData, array $options = [])
     {
         $values = [
@@ -40,6 +41,7 @@ class ExpressionLanguage extends AbstractRule
      *
      * @return string
      */
+    #[\Override]
     public function getRuleCode(): string
     {
         return 'expression_language';
@@ -49,6 +51,7 @@ class ExpressionLanguage extends AbstractRule
     /**
      * @inheritdoc
      */
+    #[\Override]
     public function validate(array $options): void
     {
         $this->requireOption('expression', $options);

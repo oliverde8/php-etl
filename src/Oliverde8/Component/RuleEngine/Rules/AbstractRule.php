@@ -19,16 +19,13 @@ abstract class AbstractRule implements RuleInterface
 {
     protected RuleApplier $ruleApplier;
 
-    protected LoggerInterface $logger;
-
     /**
      * AbstractRule constructor.
      *
      * @param LoggerInterface $logger Standard logger to log information.
      */
-    public function __construct(LoggerInterface $logger)
+    public function __construct(protected LoggerInterface $logger)
     {
-        $this->logger = $logger;
     }
 
     /**
@@ -37,6 +34,7 @@ abstract class AbstractRule implements RuleInterface
      * @param RuleApplier $ruleApplier The rule applier that is using this rule.
      * @return $this
      */
+    #[\Override]
     public function setApplier(RuleApplier $ruleApplier): self
     {
         $this->ruleApplier = $ruleApplier;

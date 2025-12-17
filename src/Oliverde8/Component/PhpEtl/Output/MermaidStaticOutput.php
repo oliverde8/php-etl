@@ -60,7 +60,7 @@ class MermaidStaticOutput
     /**
      * @param ChainProcessor[] $chainProcessors
      */
-    protected function generateLinks(array $chainProcessors, string $prefix = "", string $previous = null): string
+    protected function generateLinks(array $chainProcessors, string $prefix = "", ?string $previous = null): string
     {
         $text = '';
         $originalPrevious = $previous;

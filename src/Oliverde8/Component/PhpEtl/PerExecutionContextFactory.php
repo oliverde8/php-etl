@@ -11,23 +11,12 @@ use Oliverde8\Component\PhpEtl\Model\PerExecutionExecutionContext;
 
 class PerExecutionContextFactory implements ExecutionContextFactoryInterface
 {
-    private ChainWorkDirManager $dirManager;
-
-    private FileSystemFactoryInterface $fileSystemFactory;
-
-    private LoggerFactoryInterface $loggerFactory;
-
-    public function __construct(
-        ChainWorkDirManager $dirManager,
-        FileSystemFactoryInterface $fileSystemFactory,
-        LoggerFactoryInterface $loggerFactory
-    ) {
-        $this->dirManager = $dirManager;
-        $this->fileSystemFactory = $fileSystemFactory;
-        $this->loggerFactory = $loggerFactory;
+    public function __construct(private readonly ChainWorkDirManager $dirManager, private readonly FileSystemFactoryInterface $fileSystemFactory, private readonly LoggerFactoryInterface $loggerFactory)
+    {
     }
 
 
+    #[\Override]
     public function get(array $parameters): ExecutionContext
     {
         $execution = $parameters['etl']['execution'] ?? null;

@@ -23,21 +23,16 @@ class ChainSplitOperation extends AbstractChainOperation implements DataChainOpe
     use SplittedChainOperationTrait;
 
     /**
-     * @var ChainProcessor[]
-     */
-    private array $chainProcessors;
-
-    /**
      * ChainSplitOperation constructor.
      *
      * @param ChainProcessor[] $chainProcessors
      */
-    public function __construct(array $chainProcessors)
+    public function __construct(private array $chainProcessors)
     {
-        $this->chainProcessors = $chainProcessors;
-        $this->onSplittedChainOperationConstruct($chainProcessors);
+        $this->onSplittedChainOperationConstruct($this->chainProcessors);
     }
 
+    #[\Override]
     public function processData(DataItemInterface $item, ExecutionContext $context): ItemInterface
     {
         foreach ($this->chainProcessors as $chainProcessor) {

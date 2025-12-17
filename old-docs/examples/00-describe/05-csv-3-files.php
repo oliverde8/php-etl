@@ -10,7 +10,7 @@ $symfonyOutput = new \Oliverde8\Component\PhpEtl\Output\SymfonyConsoleOutput($ou
 $chainProcessor->process(
     new ArrayIterator(["/customers.csv", "/customers2.csv"]),
     [],
-    function (array $operationStates, int $itemsProcessed, int $itemsReturned, bool $hasEnded) use ($symfonyOutput) {
+    function (array $operationStates, int $itemsProcessed, int $itemsReturned, bool $hasEnded) use ($symfonyOutput): void {
         $symfonyOutput->output($operationStates, $hasEnded);
         // Just so that the output is nicer.
         usleep(100000);

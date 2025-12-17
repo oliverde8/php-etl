@@ -41,7 +41,7 @@ class FailSafeOperationTest extends TestCase
     public function testToManyFail()
     {
         $callNum = 0;
-        $failOperation = new CallbackTransformerOperation(function (ItemInterface $item) use (&$callNum) {
+        $failOperation = new CallbackTransformerOperation(function (ItemInterface $item) use (&$callNum): void {
             $callNum++;
             throw new \Exception("Exception at $callNum");
         });

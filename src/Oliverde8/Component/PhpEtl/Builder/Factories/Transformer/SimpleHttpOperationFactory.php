@@ -13,6 +13,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 class SimpleHttpOperationFactory extends AbstractFactory
 {
+    #[\Override]
     protected function build(string $operation, array $options): ChainOperationInterface
     {
         if (!class_exists(HttpClient::class)) {
@@ -31,6 +32,7 @@ class SimpleHttpOperationFactory extends AbstractFactory
         );
     }
 
+    #[\Override]
     protected function configureValidator(): Constraint
     {
         return new Assert\Collection([
