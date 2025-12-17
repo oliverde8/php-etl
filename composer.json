@@ -7,17 +7,17 @@
         "php": ">=8.4",
         "oliverde8/associative-array-simplified": "^1.0",
         "psr/log": "^2.0|^3.0",
-        "symfony/expression-language": "^6.0|^7.0",
-        "symfony/filesystem": "^6.0|^7.0",
-        "symfony/validator": "^6.0|^7.0",
-        "symfony/yaml": "^6.0|^7.0"
+        "symfony/expression-language": "^8.0",
+        "symfony/filesystem": "^8.0",
+        "symfony/validator": "^8.0",
+        "symfony/yaml": "^8.0"
     },
     "require-dev": {
         "phpunit/php-code-coverage": "^9.2",
         "phpunit/phpunit": "^9.6",
         "rector/rector": "^1.2",
-        "symfony/console": "^7.1",
-        "symfony/http-client": "^7.2"
+        "symfony/console": "^8.0",
+        "symfony/http-client": "^8.0"
     },
     "suggest": {
         "league/flysystem": "For transfaring files from external file systems",
