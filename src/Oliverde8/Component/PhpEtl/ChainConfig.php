@@ -7,7 +7,7 @@ use Oliverde8\Component\PhpEtl\OperationConfig\OperationConfigInterface;
 class ChainConfig implements OperationConfigInterface
 {
     /** @var array<OperationConfigInterface> */
-    private array $configs;
+    private array $configs = [];
 
     /**
      * @param OperationConfigInterface[] $configs

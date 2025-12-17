@@ -14,6 +14,7 @@ use Oliverde8\Component\PhpEtl\Item\StopItem;
 use Oliverde8\Component\PhpEtl\Load\File\Csv;
 use Oliverde8\Component\PhpEtl\Load\File\FileWriterInterface;
 use Oliverde8\Component\PhpEtl\Model\ExecutionContext;
+use Oliverde8\Component\PhpEtl\OperationConfig\Loader\FileWriterConfigInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -32,7 +33,13 @@ class FileWriterOperationTest extends TestCase
         $this->writerMock = $this->getMockBuilder(FileWriterInterface::class)
             ->getMock();
 
-        $this->writerOperation = new FileWriterOperation($this->writerMock, 'fileName');
+        $configMock = $this->getMockBuilder(FileWriterConfigInterface::class)
+            ->getMock();
+
+        $configMock->method('getFile')->willReturn($this->writerMock);
+        $configMock->method('getFileName')->willReturn('fileName');
+
+        $this->writerOperation = new FileWriterOperation($configMock);
     }
 
     public function testWrite()
@@ -50,7 +57,13 @@ class FileWriterOperationTest extends TestCase
     {
         $tmpFile = tempnam(sys_get_temp_dir(), 'etl');
         $csv = new Csv($tmpFile);
-        $operation = new FileWriterOperation($csv, basename($tmpFile));
+
+        $configMock = $this->getMockBuilder(FileWriterConfigInterface::class)
+            ->getMock();
+        $configMock->method('getFile')->willReturn($csv);
+        $configMock->method('getFileName')->willReturn(basename($tmpFile));
+
+        $operation = new FileWriterOperation($configMock);
         $context = $this->getMockBuilder(ExecutionContext::class)->disableOriginalConstructor()->getMock();
 
         $operation->process(new DataItem(['test' => 'val1']), $context);

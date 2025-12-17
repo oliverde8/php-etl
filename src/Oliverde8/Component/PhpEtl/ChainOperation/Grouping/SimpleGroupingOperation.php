@@ -18,9 +18,10 @@ use Oliverde8\Component\PhpEtl\OperationConfig\Grouping\SimpleGroupingConfig;
 
 class SimpleGroupingOperation extends AbstractChainOperation implements DataChainOperationInterface, ConfigurableChainOperationInterface
 {
+    private array $data = [];
+
     public function __construct(private readonly SimpleGroupingConfig $config)
     {}
-
 
     /**
      * @inheritdoc
@@ -29,7 +30,7 @@ class SimpleGroupingOperation extends AbstractChainOperation implements DataChai
     {
         $groupingValue = AssociativeArray::getFromKey($item->getData(), $this->config->groupKey);
 
-        if (!empty($this->groupIdentifierKey)) {
+        if (!empty($this->config->groupIdentifierKey)) {
             $groupIdValue = AssociativeArray::getFromKey($item->getData(), $this->config->groupIdentifierKey);
             $this->data[$groupingValue][$groupIdValue] = $item->getData();
         } else {

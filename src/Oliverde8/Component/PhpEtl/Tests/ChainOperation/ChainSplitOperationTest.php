@@ -8,12 +8,14 @@
 
 namespace Oliverde8\Component\PhpEtl\Tests\ChainOperation;
 
+use Oliverde8\Component\PhpEtl\ChainBuilderV2;
+use Oliverde8\Component\PhpEtl\ChainConfig;
 use Oliverde8\Component\PhpEtl\ChainOperation\ChainSplitOperation;
-use Oliverde8\Component\PhpEtl\ChainProcessor;
 use Oliverde8\Component\PhpEtl\ChainProcessorInterface;
 use Oliverde8\Component\PhpEtl\Item\DataItem;
 use Oliverde8\Component\PhpEtl\Item\StopItem;
 use Oliverde8\Component\PhpEtl\Model\ExecutionContext;
+use Oliverde8\Component\PhpEtl\OperationConfig\ChainSplitConfig;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -21,7 +23,6 @@ class ChainSplitOperationTest extends TestCase
 {
     public function testDataProcessing()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject[] $processors */
         $processors = [
             $this->getMockBuilder(ChainProcessorInterface::class)->getMock(),
             $this->getMockBuilder(ChainProcessorInterface::class)->getMock(),
@@ -39,8 +40,21 @@ class ChainSplitOperationTest extends TestCase
                 ->withConsecutive([$datas[0], $context], [$datas[1], $context]);
         }
 
+        // Create ChainSplitConfig with empty ChainConfigs (since we're mocking the processors)
+        $splitConfig = new ChainSplitConfig();
+        $splitConfig->addSplit(new ChainConfig());
+        $splitConfig->addSplit(new ChainConfig());
 
-        $splitOperation = new ChainSplitOperation($processors);
+        // Mock ChainBuilderV2 to return our mocked processors
+        $chainBuilder = $this->getMockBuilder(ChainBuilderV2::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $chainBuilder->expects($this->exactly(2))
+            ->method('createChain')
+            ->willReturnOnConsecutiveCalls($processors[0], $processors[1]);
+
+        $splitOperation = new ChainSplitOperation($chainBuilder, $splitConfig);
         $splitOperation->process($datas[0], $context);
         $splitOperation->process($datas[1], $context);
     }
@@ -67,7 +81,21 @@ class ChainSplitOperationTest extends TestCase
             ->method('processGenerator')
             ->withConsecutive([$datas[0], $context], [$datas[1], $context], [$stopItem, $context, null, true]);
 
-        $splitOperation = new ChainSplitOperation($processors);
+        // Create ChainSplitConfig with empty ChainConfigs (since we're mocking the processors)
+        $splitConfig = new ChainSplitConfig();
+        $splitConfig->addSplit(new ChainConfig());
+        $splitConfig->addSplit(new ChainConfig());
+
+        // Mock ChainBuilderV2 to return our mocked processors
+        $chainBuilder = $this->getMockBuilder(ChainBuilderV2::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $chainBuilder->expects($this->exactly(2))
+            ->method('createChain')
+            ->willReturnOnConsecutiveCalls($processors[0], $processors[1]);
+
+        $splitOperation = new ChainSplitOperation($chainBuilder, $splitConfig);
         $splitOperation->process($datas[0], $context);
         $splitOperation->process($datas[1], $context);
 

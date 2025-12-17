@@ -28,6 +28,6 @@ class JsonExtractOperation extends AbstractChainOperation implements DataChainOp
 
         $data = json_decode($context->getFileSystem()->read($filename), true);
 
-        return new MixItem([new GroupedItem(new \ArrayIterator($data)), new FileExtractedItem($item->getData())]);
+        return new MixItem([new GroupedItem(new \ArrayIterator($data)), new FileExtractedItem($filename)]);
     }
 }

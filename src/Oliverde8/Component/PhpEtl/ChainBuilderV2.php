@@ -34,6 +34,6 @@ class ChainBuilderV2
             }
         }
 
-        throw new \RuntimeException('No factory found for link config of type ' . get_class($linkConfig));
+        throw new \RuntimeException('No factory found to link config of type ' . get_class($linkConfig));
     }
 }
