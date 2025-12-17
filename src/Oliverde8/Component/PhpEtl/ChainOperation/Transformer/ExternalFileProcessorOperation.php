@@ -4,14 +4,19 @@ declare(strict_types=1);
 namespace Oliverde8\Component\PhpEtl\ChainOperation\Transformer;
 
 use Oliverde8\Component\PhpEtl\ChainOperation\AbstractChainOperation;
+use Oliverde8\Component\PhpEtl\ChainOperation\ConfigurableChainOperationInterface;
 use Oliverde8\Component\PhpEtl\Item\DataItem;
 use Oliverde8\Component\PhpEtl\Item\ExternalFileItem;
 use Oliverde8\Component\PhpEtl\Item\ItemInterface;
 use Oliverde8\Component\PhpEtl\Item\MixItem;
 use Oliverde8\Component\PhpEtl\Model\ExecutionContext;
+use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\ExternalFileProcessorConfig;
 
-class ExternalFileProcessorOperation extends AbstractChainOperation
+class ExternalFileProcessorOperation extends AbstractChainOperation implements ConfigurableChainOperationInterface
 {
+    public function __construct(private readonly ExternalFileProcessorConfig $config)
+    {}
+
     public function processFile(ExternalFileItem $item, ExecutionContext $context): ItemInterface
     {
         $externalFilePath = $item->getFilePath();

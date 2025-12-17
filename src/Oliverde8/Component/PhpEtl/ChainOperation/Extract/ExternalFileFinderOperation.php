@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Oliverde8\Component\PhpEtl\ChainOperation\Extract;
 
 use Oliverde8\Component\PhpEtl\ChainOperation\AbstractChainOperation;
+use Oliverde8\Component\PhpEtl\ChainOperation\ConfigurableChainOperationInterface;
 use Oliverde8\Component\PhpEtl\ChainOperation\DataChainOperationInterface;
 use Oliverde8\Component\PhpEtl\Item\DataItemInterface;
 use Oliverde8\Component\PhpEtl\Item\ExternalFileItem;
@@ -11,34 +12,29 @@ use Oliverde8\Component\PhpEtl\Item\ItemInterface;
 use Oliverde8\Component\PhpEtl\Item\MixItem;
 use Oliverde8\Component\PhpEtl\Model\ExecutionContext;
 use Oliverde8\Component\PhpEtl\Model\File\FileSystemInterface;
+use Oliverde8\Component\PhpEtl\OperationConfig\Extract\ExternalFileFinderConfig;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
-class ExternalFileFinderOperation extends AbstractChainOperation implements DataChainOperationInterface
+class ExternalFileFinderOperation extends AbstractChainOperation implements DataChainOperationInterface, ConfigurableChainOperationInterface
 {
-    protected FileSystemInterface $fileSystem;
-
-    protected string $directory;
-
     private ExpressionLanguage $expressionLanguage;
 
-
-    public function __construct(FileSystemInterface $fileSystem, string $directory)
-    {
-        $this->fileSystem = $fileSystem;
-        $this->directory = $directory;
-
+    public function __construct(
+        private readonly FileSystemInterface $fileSystem,
+        private readonly ExternalFileFinderConfig $config
+    ) {
         $this->expressionLanguage = new ExpressionLanguage();
 
     }
 
-    function processData(DataItemInterface $item, ExecutionContext $context): ItemInterface
+    public function processData(DataItemInterface $item, ExecutionContext $context): ItemInterface
     {
         $pattern = $item->getData();
         $files = [];
 
-        $directory = $this->directory;
-        if (strpos($this->directory, "@") === 0) {
-            $directory = ltrim($this->directory, '@');
+        $directory = $this->config->directory;
+        if (strpos($this->config->directory, "@") === 0) {
+            $directory = ltrim($this->config->directory, '@');
             $directory = $this->expressionLanguage->evaluate($directory, ['context' => $context->getParameters()]);
         }
 

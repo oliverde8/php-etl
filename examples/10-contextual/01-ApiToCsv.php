@@ -6,10 +6,10 @@ use Oliverde8\Component\PhpEtl\Item\DataItem;
 use Oliverde8\Component\PhpEtl\OperationConfig\Loader\CsvFileWriterConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\SimpleHttpConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\SplitItemConfig;
-use Symfony\Component\HttpClient\HttpClient;
 
-require_once __DIR__ . '/../.init.php';
+require_once __DIR__ . '/.init.php';
 /** @var ChainBuilderV2 $chainBuilder */
+/** @var array $options */
 
 $chainConfig = new ChainConfig();
 $chainConfig->addLink(new SimpleHttpConfig(
@@ -21,11 +21,7 @@ $chainConfig->addLink(new SimpleHttpConfig(
         keys: ['content'],
         singleElement: true
     ))
-    ->addLink(new CsvFileWriterConfig('output.csv'));
+    ->addLink(New CsvFileWriterConfig('test.csv'));
 
 $chainProcessor = $chainBuilder->createChain($chainConfig);
-$chainProcessor->process(
-    new ArrayIterator([new DataItem([])]),
-    []
-);
-
+$chainProcessor->process(new ArrayIterator([new DataItem([])]), $options);
