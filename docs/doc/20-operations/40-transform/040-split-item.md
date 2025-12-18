@@ -32,16 +32,18 @@ This example shows how to split an array of addresses into separate items.
 }
 ```
 
-**YAML Configuration:**
+**Configuration:**
 
-```yaml
-chain:
-  - operation: item-split
-    options:
-      keys: ["addresses"]
-      single_element: true
-      duplicate_keys:
-        customer_id: customer_id
+```php
+use Oliverde8\Component\PhpEtl\ChainConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\SplitItemConfig;
+
+$chainConfig = new ChainConfig();
+$chainConfig->addLink(new SplitItemConfig(
+    keys: ['addresses'],
+    singleElement: true,
+    duplicateKeys: ['customer_id' => 'customer_id']
+));
 ```
 
 **Output:**
@@ -78,15 +80,18 @@ This example shows how to create separate items for the `billing_address` and `s
 }
 ```
 
-**YAML Configuration:**
+**Configuration:**
 
-```yaml
-chain:
-  - operation: item-split
-    options:
-      keys: ["billing_address", "shipping_address"]
-      keep_keys: true
-      key_name: "address"
+```php
+use Oliverde8\Component\PhpEtl\ChainConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\SplitItemConfig;
+
+$chainConfig = new ChainConfig();
+$chainConfig->addLink(new SplitItemConfig(
+    keys: ['billing_address', 'shipping_address'],
+    keepKeys: true,
+    keyName: 'address'
+));
 ```
 
 **Output:**

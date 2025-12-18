@@ -1,12 +1,12 @@
 ---
 layout: base
 title: PHP-ETL - Operations
-subTitle: Transform - Rule Engine – Data Transformation(rule-engine-transformer)
+subTitle: Transform - Rule Engine – Data Transformation
 ---
 
-The Rule Engine is a lightweight transformation component that converts an associative array into another associative array using a flexible set of rules.
+The **Rule Engine** is a lightweight transformation component that converts an associative array into another associative array using a flexible set of rules.
 
-It is designed to be used within PHP-ETL through the `RuleTransformOperation`.
+It is designed to be used within PHP-ETL through the `RuleTransformConfig`.
 
 
 ## Available Rules
@@ -108,7 +108,9 @@ options:
             expression: "rowData['IsSubscribed'] == 'yes'"
 ```
 
-## Adding your own rules
+---
+
+## Adding Your Own Rules
 
 While PHP-ETL provides a powerful set of built-in rules, you may encounter situations where you need to implement your own custom logic. You can extend the `RuleApplier` class to add your own rules.
 
@@ -135,9 +137,9 @@ class CustomRuleApplier extends RuleApplier
 }
 ```
 
-**2. Use your custom `RuleApplier` in the `ChainProcessor`:**
+**2. Register your custom `RuleApplier` with the `ChainBuilderV2`:**
 
-When you create your `ChainProcessor`, you need to tell it to use your custom `RuleApplier`.
+When creating your `ChainBuilderV2`, pass your custom `RuleApplier` to the `GenericChainFactory` for `RuleTransformConfig`.
 
 {% capture column1 %}
 #### 🐘 Standalone
@@ -145,31 +147,35 @@ When you create your `ChainProcessor`, you need to tell it to use your custom `R
 <?php
 
 use App\Etl\RuleEngine\CustomRuleApplier;
-use Oliverde8\Component\PhpEtl\ChainBuilder;
+use Oliverde8\Component\PhpEtl\ChainBuilderV2;
+use Oliverde8\Component\PhpEtl\ChainConfig;
 use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\RuleTransformOperation;
-use Oliverde8\Component\PhpEtl\ChainProcessor;
+use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\RuleTransformConfig;
+use Oliverde8\Component\PhpEtl\Builder\Factories\GenericChainFactory;
 
 $customRuleApplier = new CustomRuleApplier();
 
-$chainBuilder = new ChainBuilder();
-$chainBuilder->add(
-    new RuleTransformOperation(
-        $customRuleApplier,
-        [
-            'my_custom_field' => [
-                'rules' => [
-                    'myCustomRule' => [
-                        'field1' => ['get' => ['field' => 'FirstName']],
-                        'field2' => ['get' => ['field' => 'LastName']],
-                    ],
-                ],
-            ],
-        ],
-        false
-    )
+$chainBuilder = new ChainBuilderV2([
+    new GenericChainFactory(
+        RuleTransformOperation::class,
+        RuleTransformConfig::class,
+        injections: ['ruleApplier' => $customRuleApplier]
+    ),
+    // ... other factories
+]);
+
+// Use the custom rule in your chain
+$chainConfig = new ChainConfig();
+$chainConfig->addLink((new RuleTransformConfig(add: false))
+    ->addColumn('MyCustomField', [
+        ['myCustomRule' => [
+            'field1' => ['get' => ['field' => 'FirstName']],
+            'field2' => ['get' => ['field' => 'LastName']],
+        ]]
+    ])
 );
 
-$processor = new ChainProcessor($chainBuilder);
+$processor = $chainBuilder->createChain($chainConfig);
 ```
 {% endcapture %}
 {% capture column2 %}
@@ -182,21 +188,25 @@ services:
     autowire: true
     tags:
       - { name: etl.rule }
+
+  # The GenericChainFactory will automatically use your custom RuleApplier
+  # when it's injected via dependency injection
 ```
 {% endcapture %}
 {% include block/2column.html column1=column1 column2=column2 %}
 
-**3. Use your custom rule in your YAML configuration:**
+**3. Use your custom rule in your chain configuration:**
 
-Once you have configured your `ChainProcessor` to use your custom `RuleApplier`, you can use your custom rule in your YAML files.
+Once you have configured your `ChainBuilderV2` to use your custom `RuleApplier`, you can use your custom rule in your chain.
 
-```yaml
-operation: rule-engine-transformer
-options:
-  columns:
-    MyCustomField:
-      rules:
-        - myCustomRule:
-            field1: { get: { field: "FirstName" } }
-            field2: { get: { field: "LastName" } }
+```php
+$chainConfig = new ChainConfig();
+$chainConfig->addLink((new RuleTransformConfig(add: false))
+    ->addColumn('MyCustomField', [
+        ['myCustomRule' => [
+            'field1' => ['get' => ['field' => 'FirstName']],
+            'field2' => ['get' => ['field' => 'LastName']],
+        ]]
+    ])
+);
 ```

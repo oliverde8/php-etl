@@ -5,30 +5,30 @@ subTitle: Api to CSV
 width: large
 ---
 
-### Simple API to CSV
-
 The php etl also provides a basic http client operation, this operation will allow us to get or push data using rest api's.
 
 {% capture description %}
 Let's call a mock api returning a list of users.
 
-Using `response_is_json` allow us to decode the json returned by the api automatically. `option_key` will allow us to
+Using `responseIsJson` allows us to decode the json returned by the api automatically. `optionKey` will allow us to
 pass additional options to the query. This can be used to add dynamic headers, or data that needs to be posted.
-If `response_key` is set that the response data will be added to the original data object. If not the response will
+If `responseKey` is set then the response data will be added to the original data object. If not, the response will
 replace the input data.
 {% endcapture %}
 {% capture code %}
-```yaml
-  get-from-api:
-    operation: http
-    options:
-      url: https://63b687951907f863aaf90ab1.mockapi.io/test
-      method: GET
-      response_is_json: true
-      option_key: ~
-      response_key: ~
-      options:
-        headers: {'Accept': 'application/json'}
+```php
+use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\SimpleHttpConfig;
+
+$chainConfig->addLink(new SimpleHttpConfig(
+    url: 'https://63b687951907f863aaf90ab1.mockapi.io/test',
+    method: 'GET',
+    responseIsJson: true,
+    optionKey: null,
+    responseKey: null,
+    options: [
+        'headers' => ['Accept' => 'application/json']
+    ]
+));
 ```
 {% endcapture %}
 {% include block/etl-step.html code=code description=description %}
@@ -38,12 +38,13 @@ This will return a single DataItem with all the users of the api. We will need t
 each users individually.
 {% endcapture %}
 {% capture code %}
-```yaml
-  split-item:
-    operation: split-item
-    options:
-      keys: ['content']
-      singleElement: true
+```php
+use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\SplitItemConfig;
+
+$chainConfig->addLink(new SplitItemConfig(
+    keys: ['content'],
+    singleElement: true
+));
 ```
 {% endcapture %}
 {% include block/etl-step.html code=code description=description %}
@@ -54,29 +55,37 @@ Now we can write the users into the csv file, as we have done so in our previous
 
 #### Complete Code
 
-```yaml
-chain:
-  get-from-api:
-    operation: http
-    options:
-      url: https://63b687951907f863aaf90ab1.mockapi.io/test
-      method: GET
-      response_is_json: true
-      option_key: ~
-      response_key: ~
-      options:
-        headers: {'Accept': 'application/json'}
+```php
+use Oliverde8\Component\PhpEtl\ChainConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\SimpleHttpConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\SplitItemConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\Loader\CsvFileWriterConfig;
+use Oliverde8\Component\PhpEtl\Item\DataItem;
 
-  split-item:
-    operation: split-item
-    options:
-      keys: ['content']
-      singleElement: true
+$chainConfig = new ChainConfig();
+$chainConfig
+    ->addLink(new SimpleHttpConfig(
+        url: 'https://63b687951907f863aaf90ab1.mockapi.io/test',
+        method: 'GET',
+        responseIsJson: true,
+        optionKey: null,
+        responseKey: null,
+        options: [
+            'headers' => ['Accept' => 'application/json']
+        ]
+    ))
+    ->addLink(new SplitItemConfig(
+        keys: ['content'],
+        singleElement: true
+    ))
+    ->addLink(new CsvFileWriterConfig('output.csv'));
 
-  write-new-file:
-    operation: csv-write
-    options:
-      file: "output.csv"
+// Create and execute the chain
+$chainProcessor = $chainBuilder->createChain($chainConfig);
+$chainProcessor->process(
+    new ArrayIterator([new DataItem([])]),
+    []
+);
 ```
 
 
@@ -89,27 +98,29 @@ user id.
 {% capture description %}
 We can achieve this by using symfony expressions in the url key. To tell the operation that a symfony expression
 is being used just prefix it with a `@`. (`!` is for using values from the input, @ is for using data from the current data.
-All fields do not support `@` as it's handled by each operation. but all fields support `!` as it's generated before the etl starts
+All fields do not support `@` as it's handled by each operation, but all fields support `!` as it's generated before the etl starts
 processing).
 
-We will also change the `option_key`, if not our data (id = 1), will be sent into the options of the HttpClient, which
+We will also change the `optionKey`, if not our data (id = 1), will be sent into the options of the HttpClient, which
 will cause an error. Having an invalid key here will allow us not to have any options.
 
 Let us note that this operation runs multiple queries with concurrency. A single Symfony HttpClient is created for this
 operation. And using the AsyncItems functionality of the ETL, we can run all the http requests in parallel.
 {% endcapture %}
 {% capture code %}
-```yaml
-  get-from-api:
-    operation: http
-    options:
-      url: '@"https://63b687951907f863aaf90ab1.mockapi.io/test/"~data["id"]'
-      method: GET
-      response_is_json: true
-      option_key: "-placeholder-"
-      response_key: ~
-      options:
-        headers: {'Accept': 'application/json'}
+```php
+use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\SimpleHttpConfig;
+
+$chainConfig->addLink(new SimpleHttpConfig(
+    url: '@"https://63b687951907f863aaf90ab1.mockapi.io/test/"~data["id"]',
+    method: 'GET',
+    responseIsJson: true,
+    optionKey: '-placeholder-',
+    responseKey: null,
+    options: [
+        'headers' => ['Accept' => 'application/json']
+    ]
+));
 ```
 {% endcapture %}
 {% include block/etl-step.html code=code description=description %}
@@ -120,40 +131,56 @@ Now we can write the users into the csv file, as we have done so in our previous
 
 #### Complete Code
 
-```yaml
-chain:
-  get-from-api:
-    operation: http
-    options:
-      url: '@"https://63b687951907f863aaf90ab1.mockapi.io/test/"~data["id"]'
-      method: GET
-      response_is_json: true
-      option_key: "-placeholder-"
-      response_key: ~
-      options:
-        headers: {'Accept': 'application/json'}
+```php
+use Oliverde8\Component\PhpEtl\ChainConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\SimpleHttpConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\RuleTransformConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\Loader\CsvFileWriterConfig;
+use Oliverde8\Component\PhpEtl\Item\DataItem;
 
-  content-only:
-    operation: rule-engine-transformer
-    options:
-      add: false # We want to replace all existing columns with our new columns.
-      columns:
-        createdAt:
-          rules:
-            - get: {field: ['content','createdAt']}
-        name:
-          rules:
-            - get: {field: ['content','name']}
-        avatar:
-          rules:
-            - get: {field: ['content','avatar']}
-        id:
-          rules:
-            - get: {field: ['content','id']}
+$chainConfig = new ChainConfig();
+$chainConfig
+    ->addLink(new SimpleHttpConfig(
+        url: '@"https://63b687951907f863aaf90ab1.mockapi.io/test/"~data["id"]',
+        method: 'GET',
+        responseIsJson: true,
+        optionKey: '-placeholder-',
+        responseKey: null,
+        options: [
+            'headers' => ['Accept' => 'application/json']
+        ]
+    ))
+    ->addLink(new RuleTransformConfig(
+        columns: [
+            'createdAt' => [
+                'rules' => [
+                    ['get' => ['field' => ['content', 'createdAt']]]
+                ]
+            ],
+            'name' => [
+                'rules' => [
+                    ['get' => ['field' => ['content', 'name']]]
+                ]
+            ],
+            'avatar' => [
+                'rules' => [
+                    ['get' => ['field' => ['content', 'avatar']]]
+                ]
+            ],
+            'id' => [
+                'rules' => [
+                    ['get' => ['field' => ['content', 'id']]]
+                ]
+            ]
+        ],
+        add: false
+    ))
+    ->addLink(new CsvFileWriterConfig('output.csv'));
 
-  write-new-file:
-    operation: csv-write
-    options:
-      file: "output.csv"
+// Create and execute the chain
+$chainProcessor = $chainBuilder->createChain($chainConfig);
+$chainProcessor->process(
+    new ArrayIterator([new DataItem(['id' => 1])]),
+    []
+);
 ```
-

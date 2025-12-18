@@ -6,15 +6,16 @@ width: large
 ---
 
 {% capture description %}
-Complex `json` files/api responses can be flattened and have multiple columns using the rule engine. 
-In our example we have a list of products with their name, their skus etc. 
+Complex `json` files/api responses can be flattened and have multiple columns using the rule engine.
+In our example we have a list of products with their name, their skus etc.
 The name of the product is different for each locale.
 
 We could manually create a list of columns for each locale using the rule engine, but this will not be very generic,
 and if we have a lot of locales & a lot of translatable fields on our products this will be complicated to maintain.
 {% endcapture %}
 {% capture code %}
-#### Example products file
+
+## Example products file
 
 ```json
 [
@@ -44,6 +45,7 @@ and if we have a lot of locales & a lot of translatable fields on our products t
   }
 ]
 ```
+
 {% endcapture %}
 {% include block/etl-step.html code=code description=description %}
 
@@ -51,14 +53,18 @@ and if we have a lot of locales & a lot of translatable fields on our products t
 We can use dynamic columns for this purpose. To use this we will need to list locales when starting the process:
 {% endcapture %}
 {% capture code %}
+
 ```php
+use Oliverde8\Component\PhpEtl\Item\DataItem;
+
 $chainProcessor->process(
-    new ArrayIterator([__DIR__ . "/products.json"]),
+    new ArrayIterator([new DataItem(['file' => __DIR__ . "/products.json"])]),
     [
         'locales' => ['fr_FR', 'en_US']
     ]
 );
 ```
+
 {% endcapture %}
 {% include block/etl-step.html code=code description=description %}
 
@@ -70,41 +76,64 @@ data from that product. We could also have used symfony expression language but 
 given locale is missing. `get` will simply return an empty column, symfony expression language rule will fail.
 {% endcapture %}
 {% capture code %}
-```yaml
-        'name-{@context/locales}':
-          rules:
-            - get : {field: ['name', '@context/locales']}
+
+```php
+use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\RuleTransformConfig;
+
+$chainConfig->addLink(new RuleTransformConfig(
+    columns: [
+        'name-{@context/locales}' => [
+            'rules' => [
+                ['get' => ['field' => ['name', '@context/locales']]]
+            ]
+        ]
+    ]
+));
 ```
+
 {% endcapture %}
 {% include block/etl-step.html code=code description=description %}
 
 ### Complete Code
 
-```yaml
-chain:
-  read-file:
-    operation: json-read
-    options: []
+```php
+use Oliverde8\Component\PhpEtl\ChainConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\Extract\JsonExtractConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\RuleTransformConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\Loader\CsvFileWriterConfig;
+use Oliverde8\Component\PhpEtl\Item\DataItem;
 
-  flatten:
-    operation: rule-engine-transformer
-    options:
-      add: false # We want to replace all existing columns with our new columns.
-      columns:
-        productId:
-          rules:
-            - get: {field: 'productId'}
-        sku:
-          rules:
-            - get: {field: 'sku'}
-        'name-{@context/locales}':
-          rules:
-            - get : {field: ['name', '@context/locales']}
+$chainConfig = new ChainConfig();
+$chainConfig
+    ->addLink(new JsonExtractConfig())
+    ->addLink(new RuleTransformConfig(
+        columns: [
+            'productId' => [
+                'rules' => [
+                    ['get' => ['field' => 'productId']]
+                ]
+            ],
+            'sku' => [
+                'rules' => [
+                    ['get' => ['field' => 'sku']]
+                ]
+            ],
+            'name-{@context/locales}' => [
+                'rules' => [
+                    ['get' => ['field' => ['name', '@context/locales']]]
+                ]
+            ]
+        ],
+        add: false
+    ))
+    ->addLink(new CsvFileWriterConfig('output.csv'));
 
-  write-new-file:
-    operation: csv-write
-    options:
-      file: "output.csv"
-
+// Create and execute the chain
+$chainProcessor = $chainBuilder->createChain($chainConfig);
+$chainProcessor->process(
+    new ArrayIterator([new DataItem(['file' => __DIR__ . '/products.json'])]),
+    [
+        'locales' => ['fr_FR', 'en_US']
+    ]
+);
 ```
-

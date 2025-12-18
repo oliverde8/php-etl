@@ -13,7 +13,7 @@ The ETL can be used to fetch files from another filesystem and process them usin
 
 
 {% capture description %}
-We will use the `ExternalFileFinderOperation` to find the files. And use the `ExternalFileProcessorOperation` to copy
+We will use the `ExternalFileFinderConfig` to find the files. And use the `ExternalFileProcessorConfig` to copy
 the files to the context of the ETL execution.
 
 The file finder will use a directory that we will add to the context at the beginning of the execution.
@@ -21,16 +21,15 @@ The file finder will use a directory that we will add to the context at the begi
 We will also need to provide the finder with a regex as chain input so that it can find all the files.
 {% endcapture %}
 {% capture code %}
-```yaml
-  find-file1:
-    operation: external-file-finder-local
-    options:
-      directory: "@context['dir']"
+```php
+use Oliverde8\Component\PhpEtl\OperationConfig\Extract\ExternalFileFinderConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\ExternalFileProcessorConfig;
 
-  process-new-file1:
-    operation: external-file-processor
-    options: []
-
+$chainConfig
+    ->addLink(new ExternalFileFinderConfig(
+        directory: "@context['dir']"
+    ))
+    ->addLink(new ExternalFileProcessorConfig());
 ```
 {% endcapture %}
 {% include block/etl-step.html code=code description=description %}
@@ -38,13 +37,18 @@ We will also need to provide the finder with a regex as chain input so that it c
 {% capture column1 %}
 #### 🐘 Standalone
 ```php
+use Oliverde8\Component\PhpEtl\Item\DataItem;
+use Oliverde8\Component\PhpEtl\Model\PockExecution;
+
 $options = [
-    // ...
+    'etl' => [
+        'execution' => new PockExecution(new DateTime())
+    ],
     'dir' => $dir,
 ];
 
 $chainProcessor->process(
-    new ArrayIterator(['/^file[0-9]\.csv$/']),
+    new ArrayIterator([new DataItem(['pattern' => '/^file[0-9]\.csv$/'])]),
     $options
 );
 ```
@@ -59,27 +63,34 @@ $chainProcessor->process(
 
 #### Complete Code
 
-```yaml
-chain:
-  find-file1:
-    operation: external-file-finder-local
-    options:
-      directory: "@context['dir']"
+```php
+use Oliverde8\Component\PhpEtl\ChainConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\Extract\ExternalFileFinderConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\ExternalFileProcessorConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\Extract\CsvExtractConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\Loader\CsvFileWriterConfig;
+use Oliverde8\Component\PhpEtl\Item\DataItem;
+use Oliverde8\Component\PhpEtl\Model\PockExecution;
 
-  process-new-file1:
-    operation: external-file-processor
-    options: []
+$chainConfig = new ChainConfig();
+$chainConfig
+    ->addLink(new ExternalFileFinderConfig(
+        directory: "@context['dir']"
+    ))
+    ->addLink(new ExternalFileProcessorConfig())
+    ->addLink(new CsvExtractConfig())
+    ->addLink(new CsvFileWriterConfig('output.csv'))
+    ->addLink(new ExternalFileProcessorConfig());
 
-  read-file:
-    operation: csv-read
-    options: [] 
-
-  write-new-file:
-    operation: csv-write
-    options:
-      file: "output.csv"
-
-  process-finalized-file1:
-    operation: external-file-processor
-    options: []
+// Create and execute the chain with context
+$chainProcessor = $chainBuilder->createChain($chainConfig);
+$chainProcessor->process(
+    new ArrayIterator([new DataItem(['pattern' => '/^file[0-9]\.csv$/'])]),
+    [
+        'etl' => [
+            'execution' => new PockExecution(new DateTime())
+        ],
+        'dir' => '/var/import'
+    ]
+);
 ```

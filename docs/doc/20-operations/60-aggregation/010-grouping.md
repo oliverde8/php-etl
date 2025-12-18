@@ -13,7 +13,7 @@ The `simple-grouping` operation groups items based on a common key, useful for d
 
 ## Example
 
-Here's an example of how to use the `simple-grouping` operation to group a list of customers by their city.
+Here's an example of how to use the grouping operation to group a list of customers by their city.
 
 **Input Data (a sequence of items):**
 
@@ -25,24 +25,22 @@ Here's an example of how to use the `simple-grouping` operation to group a list 
 ]
 ```
 
-**YAML Configuration:**
+**Configuration:**
 
-```yaml
-chain:
-  - operation: simple-grouping
-    options:
-      grouping_key: ["city"]
+```php
+use Oliverde8\Component\PhpEtl\ChainConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\Grouping\SimpleGroupingConfig;
 
-  - operation: rule-transformer
-    options:
-      # Rules to process the grouped data.
-      # The input to this operation will be an iterator of groups.
-      # Each group will be an array of customers.
+$chainConfig = new ChainConfig();
+$chainConfig->addLink(new SimpleGroupingConfig(['city']));
+
+// The next operation will receive grouped data
+// Each group will be an array of customers with the same city
 ```
 
 **Output:**
 
-The `rule-transformer` will receive an iterator with two groups:
+The next operation in the chain will receive an iterator with two groups:
 
 - **Group 1 (New York):**
   ```json

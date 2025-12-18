@@ -37,6 +37,11 @@ handled for you.
 {% capture code %}
 ```php
 <?php
+use Oliverde8\Component\PhpEtl\ChainWorkDirManager;
+use Oliverde8\Component\PhpEtl\Factory\NullLoggerFactory;
+use Oliverde8\Component\PhpEtl\Factory\LocalFileSystemFactory;
+use Oliverde8\Component\PhpEtl\PerExecutionContextFactory;
+
 $workdir = __DIR__ . "/var/";
 $dirManager = new ChainWorkDirManager($workdir);
 $loggerFactory = new NullLoggerFactory();
@@ -52,10 +57,46 @@ return new PerExecutionContextFactory(
 {% include block/etl-step.html code=code description=description %}
 
 {% capture description %}
-The execution is identified with objects of type ExecutionInterface set on the processor:
+Next, we configure the ETL chain using the new type-safe configuration approach. We create a ChainConfig object
+and add operation configurations to it. Each operation is configured using typed configuration classes with
+named parameters for better IDE support and validation.
 {% endcapture %}
 {% capture code %}
 ```php
+<?php
+use Oliverde8\Component\PhpEtl\ChainConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\SimpleHttpConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\SplitItemConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\Loader\CsvFileWriterConfig;
+
+$chainConfig = new ChainConfig();
+$chainConfig->addLink(new SimpleHttpConfig(
+        method: 'GET',
+        url: 'https://63b687951907f863aaf90ab1.mockapi.io/test',
+        responseIsJson: true
+    ))
+    ->addLink(new SplitItemConfig(
+        keys: ['content'],
+        singleElement: true
+    ))
+    ->addLink(new CsvFileWriterConfig('output.csv'));
+```
+{% endcapture %}
+{% include block/etl-step.html code=code description=description %}
+
+{% capture description %}
+Finally, we create the chain processor from our configuration and execute it with the execution context. 
+The execution is identified with objects of type ExecutionInterface set in the options array:
+{% endcapture %}
+{% capture code %}
+```php
+use Oliverde8\Component\PhpEtl\ChainBuilderV2;
+use Oliverde8\Component\PhpEtl\Item\DataItem;
+use Oliverde8\Component\PhpEtl\Model\PockExecution;
+
+// Assuming $chainBuilder is a configured ChainBuilderV2 instance
+$chainProcessor = $chainBuilder->createChain($chainConfig);
+
 $options = [
     'etl' => [
         'execution' => new PockExecution(new DateTime())
@@ -63,7 +104,7 @@ $options = [
 ];
 
 $chainProcessor->process(
-    new ArrayIterator([[]]),
+    new ArrayIterator([new DataItem([])]),
     $options
 );
 ```

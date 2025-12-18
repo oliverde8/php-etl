@@ -1,5 +1,6 @@
 # 🌟 2.0.0 🌟
 
+- :star2: - **NEW PARADIGM** - use php for configurations instead of yaml (**Breaking Change**)
 - :star2: - Complete rewrite of the ChainProcessor
 - :star2: - Optimized chain processor not to send as many stop items when multiple chains are involved
 - :star2: - Allows ChainProcessor to output through generators the items at the end. This is great to remove all limitations of the current sub chains.
