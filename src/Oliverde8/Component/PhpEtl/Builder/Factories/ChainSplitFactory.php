@@ -21,6 +21,7 @@ class ChainSplitFactory extends AbstractFactory
     /**
      * @inheritdoc
      */
+    #[\Override]
     public function build(string $operation, array $options): ChainOperationInterface
     {
         $chainProcessors = [];
@@ -31,6 +32,7 @@ class ChainSplitFactory extends AbstractFactory
         return $this->create($chainProcessors);
     }
 
+    #[\Override]
     protected function configureValidator(): Constraint
     {
         return new Assert\Collection([

@@ -24,6 +24,7 @@ class SplitItemOperation extends AbstractChainOperation implements DataChainOper
     /**
      * @throws ChainOperationException
      */
+    #[\Override]
     public function processData(DataItemInterface $item, ExecutionContext $context): ItemInterface
     {
         if ($this->config->singleElement) {

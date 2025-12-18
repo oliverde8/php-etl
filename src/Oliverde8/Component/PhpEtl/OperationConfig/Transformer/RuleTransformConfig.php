@@ -24,6 +24,7 @@ class RuleTransformConfig extends AbstractOperationConfig
         return $this->rules;
     }
 
+    #[\Override]
     protected function validate(bool $constructOnly): void
     {
     }

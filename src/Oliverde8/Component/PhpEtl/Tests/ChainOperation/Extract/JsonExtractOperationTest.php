@@ -16,12 +16,14 @@ class JsonExtractOperationTest extends TestCase
 {
     private string $testJsonFile;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
         $this->testJsonFile = tempnam(sys_get_temp_dir(), 'json_test_');
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         if (file_exists($this->testJsonFile)) {

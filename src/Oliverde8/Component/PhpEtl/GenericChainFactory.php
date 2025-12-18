@@ -58,7 +58,7 @@ class GenericChainFactory
 
     public function supports(OperationConfigInterface $linkConfig): bool
     {
-        if (!$this->isOfType(get_class($linkConfig), $this->configClassName)) {
+        if (!$this->isOfType($linkConfig::class, $this->configClassName)) {
             return false;
         }
         if ($linkConfig->getFlavor() !== $this->flavor) {

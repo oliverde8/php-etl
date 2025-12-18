@@ -21,6 +21,7 @@ class CsvExtractOperation extends AbstractChainOperation implements DataChainOpe
     public function __construct(protected readonly CsvExtractConfig $config)
     {}
 
+    #[\Override]
     public function processData(DataItemInterface $item, ExecutionContext $context): ItemInterface
     {
         $filename = $item->getData();

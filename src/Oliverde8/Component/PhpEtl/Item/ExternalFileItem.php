@@ -12,16 +12,10 @@ class ExternalFileItem implements ItemInterface
 
     const STATE_PROCESSED = "processed";
 
-    protected string $filePath;
-
-    protected FileSystemInterface $fileSystem;
-
     protected string $state;
 
-    public function __construct(string $filePath, FileSystemInterface $fileSystem)
+    public function __construct(protected string $filePath, protected FileSystemInterface $fileSystem)
     {
-        $this->fileSystem = $fileSystem;
-        $this->filePath = $filePath;
         $this->state = self::STATE_NEW;
     }
 

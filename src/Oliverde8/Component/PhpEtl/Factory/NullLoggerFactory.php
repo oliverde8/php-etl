@@ -9,6 +9,7 @@ use Psr\Log\NullLogger;
 
 class NullLoggerFactory implements LoggerFactoryInterface
 {
+    #[\Override]
     public function get(ExecutionInterface $execution): LoggerInterface
     {
         return new NullLogger();

@@ -11,20 +11,19 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 class ExternalFileFinderFactory extends AbstractFactory
 {
-    protected FileSystemInterface $fileSystem;
-
-    public function __construct(string $operation, string $class, FileSystemInterface $fileSystem)
+    public function __construct(string $operation, string $class, protected FileSystemInterface $fileSystem)
     {
         parent::__construct($operation, $class);
-        $this->fileSystem = $fileSystem;
     }
 
 
+    #[\Override]
     protected function build(string $operation, array $options): ChainOperationInterface
     {
         return $this->create($this->fileSystem, $options['directory']);
     }
 
+    #[\Override]
     protected function configureValidator(): Constraint
     {
         return new Assert\Collection([

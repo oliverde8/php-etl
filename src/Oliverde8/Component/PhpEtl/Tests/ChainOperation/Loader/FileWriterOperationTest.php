@@ -26,6 +26,7 @@ class FileWriterOperationTest extends TestCase
     /** @var FileWriterOperation */
     protected $writerOperation;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

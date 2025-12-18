@@ -17,11 +17,13 @@ class LogFactory  extends AbstractFactory
         parent::__construct($operation, $class);
     }
 
+    #[\Override]
     protected function build($operation, $options): ChainOperationInterface
     {
         return $this->create($options['message'], $options['level'], $options['context'] ?? []);
     }
 
+    #[\Override]
     protected function configureValidator(): Constraint
     {
         return new Assert\Collection([

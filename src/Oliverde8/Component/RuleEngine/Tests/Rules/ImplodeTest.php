@@ -52,6 +52,7 @@ class ImplodeTest extends AbstractRule
     /**
      * @inheritdoc
      */
+    #[\Override]
     function getRule()
     {
         return new Implode(new NullLogger());

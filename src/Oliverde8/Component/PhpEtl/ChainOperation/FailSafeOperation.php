@@ -29,6 +29,7 @@ class FailSafeOperation extends AbstractChainOperation implements DataChainOpera
         $this->onSplittedChainOperationConstruct([$this->chainProcessor]);
     }
 
+    #[\Override]
     public function processData(DataItemInterface $item, ExecutionContext $context): ItemInterface
     {
         return new GroupedItem($this->repeatOnItem($item, $context));

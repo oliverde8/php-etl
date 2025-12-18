@@ -16,12 +16,14 @@ class CsvExtractOperationTest extends TestCase
 {
     private string $testCsvFile;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
         $this->testCsvFile = tempnam(sys_get_temp_dir(), 'csv_test_');
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         if (file_exists($this->testCsvFile)) {

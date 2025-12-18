@@ -228,9 +228,7 @@ class ChainProcessorTest extends TestCase
                 return new TestAsyncItem(new DataItem('I am fast'), 1);
             }
         }));
-        $mockEnd = new CallbackTransformerOperation(new CallBackTransformerConfig(function (ItemInterface $item) use (&$results) {
-            return $item;
-        }));
+        $mockEnd = new CallbackTransformerOperation(new CallBackTransformerConfig(fn(ItemInterface $item) => $item));
 
         $chainProcessor = new ChainProcessor(['mock' => $mock, 'mocked_end' => $mockEnd], new ExecutionContextFactory());
         foreach ($chainProcessor->processGenerator(new \ArrayIterator([1, 2]), new ExecutionContext([], new LocalFileSystem())) as $item) {
@@ -278,12 +276,10 @@ class ChainProcessorTest extends TestCase
     {
         $results = [];
 
-        $mock = new CallbackTransformerOperation(new CallBackTransformerConfig(function (ItemInterface $item) use (&$callNum) {
-            return new MixItem([
-                new TestAsyncItem(new DataItem('I am slow'), 2),
-                new TestAsyncItem(new DataItem('I am fast'), 1),
-            ]);
-        }));
+        $mock = new CallbackTransformerOperation(new CallBackTransformerConfig(fn(ItemInterface $item) => new MixItem([
+            new TestAsyncItem(new DataItem('I am slow'), 2),
+            new TestAsyncItem(new DataItem('I am fast'), 1),
+        ])));
         $mockEnd = new CallbackTransformerOperation(new CallBackTransformerConfig(function (ItemInterface $item) use (&$results) {
             $results[] = $item->getData();
             return $item;
@@ -302,12 +298,8 @@ class ChainProcessorTest extends TestCase
     public function testAsyncDisabledWithSplit()
     {
         $results = [];
-        $mockBranch1 = new CallbackTransformerOperation(new CallBackTransformerConfig(function (ItemInterface $item) use (&$callNum) {
-            return new TestAsyncItem(new DataItem('I am slow'), 2);
-        }));
-        $mockBranch2 = new CallbackTransformerOperation(new CallBackTransformerConfig(function (ItemInterface $item) use (&$callNum) {
-            return new TestAsyncItem(new DataItem('I am fast'), 1);
-        }));
+        $mockBranch1 = new CallbackTransformerOperation(new CallBackTransformerConfig(fn(ItemInterface $item) => new TestAsyncItem(new DataItem('I am slow'), 2)));
+        $mockBranch2 = new CallbackTransformerOperation(new CallBackTransformerConfig(fn(ItemInterface $item) => new TestAsyncItem(new DataItem('I am fast'), 1)));
         $mockEnd = new CallbackTransformerOperation(new CallBackTransformerConfig(function (ItemInterface $item) use (&$results) {
             $results[] = $item->getData();
             return $item;

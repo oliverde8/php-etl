@@ -36,7 +36,7 @@ $failSafeConfig = new FailSafeConfig(
 $rootChain = new ChainConfig();
 $rootChain->addLink($failSafeConfig);
 
-$processor = $chainBuilder->createChain($rootChain, new ConsoleLogger());
+$processor = $chainBuilder->createChain($rootChain);
 $processor->process(
     new ArrayIterator([
         new DataItem(['id' => 1]),

@@ -16,6 +16,7 @@ class SimpleGroupingOperationTest extends TestCase
 {
     private ExecutionContext $context;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

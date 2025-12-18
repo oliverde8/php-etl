@@ -18,6 +18,7 @@ class Get extends AbstractRule
     /**
      * @inheritdoc
      */
+    #[\Override]
     public function apply(array $rowData, array &$transformedData, array $options = [])
     {
         if (!is_array($options['field'])) {
@@ -35,6 +36,7 @@ class Get extends AbstractRule
     /**
      * @inheritdoc
      */
+    #[\Override]
     public function validate(array $options): void
     {
         $this->requireOption('field', $options);
@@ -43,6 +45,7 @@ class Get extends AbstractRule
     /**
      * @inheritdoc
      */
+    #[\Override]
     public function getRuleCode(): string
     {
         return 'get';

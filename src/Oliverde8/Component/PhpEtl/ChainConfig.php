@@ -29,6 +29,7 @@ class ChainConfig implements OperationConfigInterface
         return $this->configs;
     }
 
+    #[\Override]
     public function getFlavor(): string
     {
         // Main chain does not have a flavor.

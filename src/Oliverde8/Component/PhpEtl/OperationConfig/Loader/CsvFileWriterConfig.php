@@ -19,17 +19,20 @@ class CsvFileWriterConfig extends AbstractOperationConfig implements FileWriterC
         parent::__construct($flavor);
     }
 
+    #[\Override]
     public function getFileName(): string
     {
         return $this->fileName;
     }
 
+    #[\Override]
     public function getFile(): Csv
     {
         $tmp = tempnam(sys_get_temp_dir(), 'etl');
         return new Csv($tmp, $this->hasHeader, $this->delimiter, $this->enclosure, $this->escape);
     }
 
+    #[\Override]
     protected function validate(bool $constructOnly): void
     {}
 }

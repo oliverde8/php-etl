@@ -5,22 +5,21 @@ namespace Oliverde8\Component\PhpEtl\Model;
 
 class PockExecution implements ExecutionInterface
 {
-    protected \DateTime $createdAt;
-
     protected string $id;
 
-    public function __construct(\DateTime $createdAt)
+    public function __construct(protected \DateTime $createdAt)
     {
-        $this->createdAt = $createdAt;
-        $this->id = (string) rand(1, 100000);
+        $this->id = (string) random_int(1, 100000);
     }
 
 
+    #[\Override]
     public function getId(): string
     {
         return $this->id;
     }
 
+    #[\Override]
     public function GetCreateTime(): \DateTime
     {
         return $this->createdAt;

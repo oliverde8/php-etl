@@ -22,6 +22,7 @@ class ChainRepeatConfig extends AbstractOperationConfig
         return $this->chainConfig;
     }
 
+    #[\Override]
     protected function validate(bool $constructOnly): void
     {
 

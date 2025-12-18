@@ -15,6 +15,7 @@ class FilterDataConfig extends AbstractOperationConfig
         parent::__construct($flavor);
     }
 
+    #[\Override]
     protected function validate(bool $constructOnly): void
     {}
 }

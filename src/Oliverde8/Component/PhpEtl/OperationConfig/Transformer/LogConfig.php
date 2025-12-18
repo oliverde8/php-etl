@@ -17,6 +17,7 @@ class LogConfig extends AbstractOperationConfig
         parent::__construct($flavor);
     }
 
+    #[\Override]
     protected function validate(bool $constructOnly): void
     {
         $validLevels = ['debug', 'info', 'notice', 'warning', 'error', 'critical', 'alert', 'emergency'];

@@ -25,6 +25,7 @@ class Constant extends AbstractRule
      *
      * @return string|null
      */
+    #[\Override]
     public function apply(array $rowData, array &$transformedData, array $options = [])
     {
         return $options['value'];
@@ -33,6 +34,7 @@ class Constant extends AbstractRule
     /**
      * @inheritdoc
      */
+    #[\Override]
     public function validate($options): void
     {
         $this->requireOption('value', $options);
@@ -43,6 +45,7 @@ class Constant extends AbstractRule
      *
      * @return string
      */
+    #[\Override]
     public function getRuleCode(): string
     {
         return 'constant';

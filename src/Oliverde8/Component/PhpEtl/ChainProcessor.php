@@ -21,7 +21,7 @@ use Oliverde8\Component\PhpEtl\Model\LoggerContext;
 
 final class ChainProcessor extends LoggerContext implements ChainProcessorInterface
 {
-    const KEY_LOGGER_ETL_IDENTIFIER = 'etl.identifier';
+    const string KEY_LOGGER_ETL_IDENTIFIER = 'etl.identifier';
 
     /** @var ChainOperationInterface[] */
     protected readonly array $chainLinks;
@@ -53,6 +53,7 @@ final class ChainProcessor extends LoggerContext implements ChainProcessorInterf
     }
 
 
+    #[\Override]
     public function process(\Iterator|ItemInterface $item, array $parameters, ?callable $observerCallback = null, $withStop = true): void
     {
         $context = $this->contextFactory->get($parameters);
@@ -76,6 +77,7 @@ final class ChainProcessor extends LoggerContext implements ChainProcessorInterf
         }
     }
 
+    #[\Override]
     public function processGenerator(
         \Iterator|ItemInterface $item,
         ExecutionContext $context,
@@ -266,11 +268,13 @@ final class ChainProcessor extends LoggerContext implements ChainProcessorInterf
         return $this->chainObserver;
     }
 
+    #[\Override]
     public function getChainLinkNames(): array
     {
         return $this->chainLinkNames;
     }
 
+    #[\Override]
     public function getChainLinks(): array
     {
         return $this->chainLinks;

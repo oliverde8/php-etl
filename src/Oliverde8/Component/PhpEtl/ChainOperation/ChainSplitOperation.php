@@ -38,6 +38,7 @@ class ChainSplitOperation extends AbstractChainOperation implements DataChainOpe
         $this->onSplittedChainOperationConstruct($this->chainProcessors);
     }
 
+    #[\Override]
     public function processData(DataItemInterface $item, ExecutionContext $context): ItemInterface
     {
         foreach ($this->chainProcessors as $chainProcessor) {

@@ -14,6 +14,7 @@ use Oliverde8\Component\RuleEngine\RuleApplier;
  */
 class TestRuleApplier extends RuleApplier
 {
+    #[\Override]
     public function apply($rowData, $transformedData, $rules, $options = [], $identifier = [])
     {
         return $rules;

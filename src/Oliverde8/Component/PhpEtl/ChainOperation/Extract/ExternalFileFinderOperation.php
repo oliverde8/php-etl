@@ -17,7 +17,7 @@ use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
 class ExternalFileFinderOperation extends AbstractChainOperation implements DataChainOperationInterface, ConfigurableChainOperationInterface
 {
-    private ExpressionLanguage $expressionLanguage;
+    private readonly ExpressionLanguage $expressionLanguage;
 
     public function __construct(
         private readonly FileSystemInterface $fileSystem,
@@ -27,19 +27,20 @@ class ExternalFileFinderOperation extends AbstractChainOperation implements Data
 
     }
 
+    #[\Override]
     public function processData(DataItemInterface $item, ExecutionContext $context): ItemInterface
     {
         $pattern = $item->getData();
         $files = [];
 
         $directory = $this->config->directory;
-        if (strpos($this->config->directory, "@") === 0) {
+        if (str_starts_with($this->config->directory, "@")) {
             $directory = ltrim($this->config->directory, '@');
             $directory = $this->expressionLanguage->evaluate($directory, ['context' => $context->getParameters()]);
         }
 
         foreach ($this->fileSystem->listContents($directory) as $file) {
-            if (preg_match($pattern, $file) !== 0) {
+            if (preg_match($pattern, (string) $file) !== 0) {
                 $files[] = new ExternalFileItem($directory . "/" . $file, $this->fileSystem);
             }
         }

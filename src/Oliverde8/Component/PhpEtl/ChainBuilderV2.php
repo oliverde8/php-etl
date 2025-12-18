@@ -14,7 +14,7 @@ class ChainBuilderV2
      */
     public function __construct(
         private readonly ExecutionContextFactoryInterface $contextFactory,
-        private iterable $factories = [],
+        private readonly iterable $factories = [],
     ) {}
 
     public function createChain(ChainConfig $chainConfig): ChainProcessorInterface
@@ -34,6 +34,6 @@ class ChainBuilderV2
             }
         }
 
-        throw new \RuntimeException('No factory found to link config of type ' . get_class($linkConfig));
+        throw new \RuntimeException('No factory found to link config of type ' . $linkConfig::class);
     }
 }

@@ -26,6 +26,7 @@ class SimpleGroupingOperation extends AbstractChainOperation implements DataChai
     /**
      * @inheritdoc
      */
+    #[\Override]
     public function processData(DataItemInterface $item, ExecutionContext $context): ChainBreakItem
     {
         $groupingValue = AssociativeArray::getFromKey($item->getData(), $this->config->groupKey);

@@ -26,6 +26,7 @@ class FileWriterOperation extends AbstractChainOperation implements DataChainOpe
     /**
      * @inheritdoc
      */
+    #[\Override]
     public function processData(DataItemInterface $item, ExecutionContext $context): DataItemInterface
     {
         if ($this->writer === null) {

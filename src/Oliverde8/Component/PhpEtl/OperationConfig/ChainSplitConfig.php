@@ -24,6 +24,7 @@ class ChainSplitConfig extends AbstractOperationConfig
         return $this;
     }
 
+    #[\Override]
     protected function validate(bool $constructOnly): void
     {
         if ($constructOnly) {

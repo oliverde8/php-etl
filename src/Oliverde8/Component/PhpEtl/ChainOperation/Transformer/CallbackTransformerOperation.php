@@ -14,10 +14,11 @@ use Oliverde8\Component\PhpEtl\Model\ExecutionContext;
 
 class CallbackTransformerOperation extends AbstractChainOperation implements DataChainOperationInterface, ConfigurableChainOperationInterface
 {
-    public function __construct(private CallBackTransformerConfig $config)
+    public function __construct(private readonly CallBackTransformerConfig $config)
     {
     }
 
+    #[\Override]
     public function processData(DataItemInterface $item, ExecutionContext $context): ItemInterface
     {
         $method = $this->config->getCallable();

@@ -21,6 +21,7 @@ abstract class AbstractOperationConfig implements OperationConfigInterface
      */
     abstract protected function validate(bool $constructOnly): void;
 
+    #[\Override]
     public function getFlavor(): string
     {
         if (!$this->constructed) {

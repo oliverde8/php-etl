@@ -21,6 +21,7 @@ class FilterDataOperation extends AbstractChainOperation implements DataChainOpe
     ) {}
 
 
+    #[\Override]
     public function processData(DataItemInterface $item, ExecutionContext $context): ItemInterface
     {
         $data = $item->getData();

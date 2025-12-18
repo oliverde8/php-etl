@@ -18,13 +18,14 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class SimpleHttpOperation extends AbstractChainOperation implements DataChainOperationInterface, ConfigurableChainOperationInterface
 {
-    private ExpressionLanguage $expressionLanguage;
+    private readonly ExpressionLanguage $expressionLanguage;
 
     public function __construct(private readonly HttpClientInterface $client, private readonly SimpleHttpConfig $config)
     {
         $this->expressionLanguage = new ExpressionLanguage();
     }
 
+    #[\Override]
     public function processData(DataItemInterface $item, ExecutionContext $context): ItemInterface
     {
         $data = $item->getData();
@@ -35,7 +36,7 @@ class SimpleHttpOperation extends AbstractChainOperation implements DataChainOpe
         }
 
         $url = $this->config->url;
-        if (strpos($url, "@") === 0) {
+        if (str_starts_with($url, "@")) {
             $url = ltrim($url, '@');
             $url = $this->expressionLanguage->evaluate($url, ['data' => $data]);
         }

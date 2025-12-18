@@ -22,6 +22,7 @@ class FailSafeConfig extends AbstractOperationConfig
         return $this->chainConfig;
     }
 
+    #[\Override]
     protected function validate(bool $constructOnly): void
     {
         if ($this->nbAttempts < 1) {

@@ -19,6 +19,7 @@ class JsonExtractOperation extends AbstractChainOperation implements DataChainOp
     public function __construct(private readonly JsonExtractConfig $config)
     {}
 
+    #[\Override]
     public function processData(DataItemInterface $item, ExecutionContext $context): ItemInterface
     {
         $filename = $item->getData();

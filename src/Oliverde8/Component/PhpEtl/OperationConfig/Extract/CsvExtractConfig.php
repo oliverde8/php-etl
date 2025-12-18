@@ -16,6 +16,7 @@ class CsvExtractConfig extends AbstractOperationConfig implements \Oliverde8\Com
         parent::__construct($flavor);
     }
 
+    #[\Override]
     function validate(bool $constructOnly): void
     {
         if (!in_array($this->enclosure, ["'", '"'], true)) {

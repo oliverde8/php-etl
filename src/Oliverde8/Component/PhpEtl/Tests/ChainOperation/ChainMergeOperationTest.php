@@ -23,6 +23,7 @@ class ChainMergeOperationTest extends TestCase
     private ExecutionContext $context;
     private ChainBuilderV2 $chainBuilder;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -38,14 +39,10 @@ class ChainMergeOperationTest extends TestCase
     public function testMergeTwoChains()
     {
         $chain1Config = new ChainConfig();
-        $chain1Config->addLink(new CallBackTransformerConfig(function(ItemInterface $item) {
-            return new DataItem(['chain' => 1, 'data' => $item->getData()]);
-        }));
+        $chain1Config->addLink(new CallBackTransformerConfig(fn(ItemInterface $item) => new DataItem(['chain' => 1, 'data' => $item->getData()])));
 
         $chain2Config = new ChainConfig();
-        $chain2Config->addLink(new CallBackTransformerConfig(function(ItemInterface $item) {
-            return new DataItem(['chain' => 2, 'data' => $item->getData()]);
-        }));
+        $chain2Config->addLink(new CallBackTransformerConfig(fn(ItemInterface $item) => new DataItem(['chain' => 2, 'data' => $item->getData()])));
 
         $mergeConfig = new ChainMergeConfig();
         $mergeConfig->addMerge($chain1Config)->addMerge($chain2Config);
@@ -65,19 +62,13 @@ class ChainMergeOperationTest extends TestCase
     public function testMergeThreeChains()
     {
         $chain1Config = new ChainConfig();
-        $chain1Config->addLink(new CallBackTransformerConfig(function(ItemInterface $item) {
-            return new DataItem('chain1');
-        }));
+        $chain1Config->addLink(new CallBackTransformerConfig(fn(ItemInterface $item) => new DataItem('chain1')));
 
         $chain2Config = new ChainConfig();
-        $chain2Config->addLink(new CallBackTransformerConfig(function(ItemInterface $item) {
-            return new DataItem('chain2');
-        }));
+        $chain2Config->addLink(new CallBackTransformerConfig(fn(ItemInterface $item) => new DataItem('chain2')));
 
         $chain3Config = new ChainConfig();
-        $chain3Config->addLink(new CallBackTransformerConfig(function(ItemInterface $item) {
-            return new DataItem('chain3');
-        }));
+        $chain3Config->addLink(new CallBackTransformerConfig(fn(ItemInterface $item) => new DataItem('chain3')));
 
         $mergeConfig = new ChainMergeConfig();
         $mergeConfig->addMerge($chain1Config)->addMerge($chain2Config)->addMerge($chain3Config);
@@ -97,20 +88,16 @@ class ChainMergeOperationTest extends TestCase
     public function testMergeWithMultipleItemsPerChain()
     {
         $chain1Config = new ChainConfig();
-        $chain1Config->addLink(new CallBackTransformerConfig(function(ItemInterface $item) {
-            return new MixItem([
-                new DataItem('a1'),
-                new DataItem('a2')
-            ]);
-        }));
+        $chain1Config->addLink(new CallBackTransformerConfig(fn(ItemInterface $item) => new MixItem([
+            new DataItem('a1'),
+            new DataItem('a2')
+        ])));
 
         $chain2Config = new ChainConfig();
-        $chain2Config->addLink(new CallBackTransformerConfig(function(ItemInterface $item) {
-            return new MixItem([
-                new DataItem('b1'),
-                new DataItem('b2')
-            ]);
-        }));
+        $chain2Config->addLink(new CallBackTransformerConfig(fn(ItemInterface $item) => new MixItem([
+            new DataItem('b1'),
+            new DataItem('b2')
+        ])));
 
         $mergeConfig = new ChainMergeConfig();
         $mergeConfig->addMerge($chain1Config)->addMerge($chain2Config);
@@ -164,14 +151,10 @@ class ChainMergeOperationTest extends TestCase
     public function testProcessStopCallsAllChains()
     {
         $chain1Config = new ChainConfig();
-        $chain1Config->addLink(new CallBackTransformerConfig(function(ItemInterface $item) {
-            return new DataItem('chain1');
-        }));
+        $chain1Config->addLink(new CallBackTransformerConfig(fn(ItemInterface $item) => new DataItem('chain1')));
 
         $chain2Config = new ChainConfig();
-        $chain2Config->addLink(new CallBackTransformerConfig(function(ItemInterface $item) {
-            return new DataItem('chain2');
-        }));
+        $chain2Config->addLink(new CallBackTransformerConfig(fn(ItemInterface $item) => new DataItem('chain2')));
 
         $mergeConfig = new ChainMergeConfig();
         $mergeConfig->addMerge($chain1Config)->addMerge($chain2Config);
@@ -188,9 +171,7 @@ class ChainMergeOperationTest extends TestCase
     public function testMergeWithEmptyChain()
     {
         $chain1Config = new ChainConfig();
-        $chain1Config->addLink(new CallBackTransformerConfig(function(ItemInterface $item) {
-            return new DataItem('result');
-        }));
+        $chain1Config->addLink(new CallBackTransformerConfig(fn(ItemInterface $item) => new DataItem('result')));
 
         $chain2Config = new ChainConfig();
 
@@ -226,19 +207,13 @@ class ChainMergeOperationTest extends TestCase
     public function testMergeWithDifferentDataTypes()
     {
         $chain1Config = new ChainConfig();
-        $chain1Config->addLink(new CallBackTransformerConfig(function(ItemInterface $item) {
-            return new DataItem(['type' => 'array', 'value' => 1]);
-        }));
+        $chain1Config->addLink(new CallBackTransformerConfig(fn(ItemInterface $item) => new DataItem(['type' => 'array', 'value' => 1])));
 
         $chain2Config = new ChainConfig();
-        $chain2Config->addLink(new CallBackTransformerConfig(function(ItemInterface $item) {
-            return new DataItem('string_value');
-        }));
+        $chain2Config->addLink(new CallBackTransformerConfig(fn(ItemInterface $item) => new DataItem('string_value')));
 
         $chain3Config = new ChainConfig();
-        $chain3Config->addLink(new CallBackTransformerConfig(function(ItemInterface $item) {
-            return new DataItem(123);
-        }));
+        $chain3Config->addLink(new CallBackTransformerConfig(fn(ItemInterface $item) => new DataItem(123)));
 
         $mergeConfig = new ChainMergeConfig();
         $mergeConfig->addMerge($chain1Config)->addMerge($chain2Config)->addMerge($chain3Config);
@@ -329,20 +304,12 @@ class ChainMergeOperationTest extends TestCase
     public function testMergeWithComplexChainOperations()
     {
         $chain1Config = new ChainConfig();
-        $chain1Config->addLink(new CallBackTransformerConfig(function(ItemInterface $item) {
-            return new DataItem(strtoupper($item->getData()));
-        }));
-        $chain1Config->addLink(new CallBackTransformerConfig(function(ItemInterface $item) {
-            return new DataItem($item->getData() . '_PROCESSED');
-        }));
+        $chain1Config->addLink(new CallBackTransformerConfig(fn(ItemInterface $item) => new DataItem(strtoupper($item->getData()))));
+        $chain1Config->addLink(new CallBackTransformerConfig(fn(ItemInterface $item) => new DataItem($item->getData() . '_PROCESSED')));
 
         $chain2Config = new ChainConfig();
-        $chain2Config->addLink(new CallBackTransformerConfig(function(ItemInterface $item) {
-            return new DataItem(strtolower($item->getData()));
-        }));
-        $chain2Config->addLink(new CallBackTransformerConfig(function(ItemInterface $item) {
-            return new DataItem($item->getData() . '_processed');
-        }));
+        $chain2Config->addLink(new CallBackTransformerConfig(fn(ItemInterface $item) => new DataItem(strtolower($item->getData()))));
+        $chain2Config->addLink(new CallBackTransformerConfig(fn(ItemInterface $item) => new DataItem($item->getData() . '_processed')));
 
         $mergeConfig = new ChainMergeConfig();
         $mergeConfig->addMerge($chain1Config)->addMerge($chain2Config);

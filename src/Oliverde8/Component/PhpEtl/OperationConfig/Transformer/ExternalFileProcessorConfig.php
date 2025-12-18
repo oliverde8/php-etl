@@ -12,6 +12,7 @@ class ExternalFileProcessorConfig extends AbstractOperationConfig
         parent::__construct($flavor);
     }
 
+    #[\Override]
     protected function validate(bool $constructOnly): void
     {
         // No validation needed as there are no configuration parameters

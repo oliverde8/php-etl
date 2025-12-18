@@ -15,6 +15,7 @@ class SimpleGroupingConfig extends AbstractOperationConfig
     }
 
 
+    #[\Override]
     protected function validate(bool $constructOnly): void
     {
         if (empty($this->groupKey)) {

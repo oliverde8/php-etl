@@ -16,6 +16,7 @@ class ChainBuilderV2Test extends TestCase
 {
     private ExecutionContextFactory $contextFactory;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -155,7 +156,7 @@ class ChainBuilderV2Test extends TestCase
         $chainConfig->addLink($mockConfig);
 
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessageMatches('/No factory found.*' . preg_quote(get_class($mockConfig)) . '/');
+        $this->expectExceptionMessageMatches('/No factory found.*' . preg_quote($mockConfig::class) . '/');
 
         $chainBuilder->createChain($chainConfig);
     }

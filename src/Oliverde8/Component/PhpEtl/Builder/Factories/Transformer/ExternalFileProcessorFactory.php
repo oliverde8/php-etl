@@ -9,6 +9,7 @@ use Oliverde8\Component\PhpEtl\ChainOperation\Extract\ExternalFileFinderOperatio
 
 class ExternalFileProcessorFactory extends AbstractFactory
 {
+    #[\Override]
     protected function build(string $operation, array $options): ChainOperationInterface
     {
         return $this->create();

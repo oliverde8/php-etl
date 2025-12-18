@@ -12,8 +12,6 @@ use Oliverde8\Component\PhpEtl\Item\StopItem;
 
 class OperationState implements \JsonSerializable
 {
-    private readonly string $operationName;
-
     private OperationStateEnum $state = OperationStateEnum::Waiting;
 
     private int $itemsProcessed = 0;
@@ -29,10 +27,8 @@ class OperationState implements \JsonSerializable
 
     private array $subStates = [];
 
-    public function __construct(string $operationName, ChainOperationInterface $operation)
+    public function __construct(private readonly string $operationName, ChainOperationInterface $operation)
     {
-        $this->operationName = $operationName;
-
         if ($operation instanceof DetailedObservableOperation) {
             $this->subStates = $operation->getLastObservedState();
         }
@@ -126,6 +122,7 @@ class OperationState implements \JsonSerializable
         }
     }
 
+    #[\Override]
     public function jsonSerialize(): mixed
     {
         $vars = get_object_vars($this);

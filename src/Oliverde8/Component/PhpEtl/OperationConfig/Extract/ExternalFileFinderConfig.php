@@ -13,6 +13,7 @@ class ExternalFileFinderConfig extends AbstractOperationConfig
         parent::__construct($flavor);
     }
 
+    #[\Override]
     protected function validate(bool $constructOnly): void
     {
         if (empty($this->directory)) {

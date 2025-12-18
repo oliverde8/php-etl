@@ -9,15 +9,13 @@ use Psr\Log\LoggerInterface;
 
 class PerExecutionExecutionContext extends ExecutionContext
 {
-    protected string $workDir;
-
-    public function __construct(array $parameters, FileSystemInterface $fileSystem, LoggerInterface $logger, string $logPath)
+    public function __construct(array $parameters, FileSystemInterface $fileSystem, LoggerInterface $logger, protected string $workDir)
     {
         parent::__construct($parameters, $fileSystem);
         $this->logger = $logger;
-        $this->workDir = $logPath;
     }
 
+    #[\Override]
     protected function finalise(): void
     {
         if (class_exists("Monolog\Logger") && $this->logger instanceof \Monolog\Logger) {

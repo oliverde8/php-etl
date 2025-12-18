@@ -25,6 +25,7 @@ class StrToUpperTest extends AbstractRule
     /**
      * @inheritdoc
      */
+    #[\Override]
     protected function getRule()
     {
         return new StrToUpper(new NullLogger());

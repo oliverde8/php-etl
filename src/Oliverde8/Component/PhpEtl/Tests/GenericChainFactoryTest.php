@@ -20,6 +20,7 @@ class GenericChainFactoryTest extends TestCase
 {
     private ChainBuilderV2 $chainBuilder;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

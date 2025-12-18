@@ -13,21 +13,17 @@ use Oliverde8\Component\PhpEtl\Model\File\AbstractCsvFile;
  */
 class Csv extends AbstractCsvFile implements FileWriterInterface
 {
-    /** @var bool */
-    protected $hasHeader;
-
     /**
      * Writer constructor.
      *
      * @param $filePath
-     * @param bool $hasHeaders
+     * @param bool $hasHeader
      * @param string $delimiter
      * @param string $enclosure
      * @param string $escape
      */
-    public function __construct($filePath, $hasHeaders = true, $delimiter = ';', $enclosure = '"', $escape = '\\')
+    public function __construct($filePath, protected $hasHeader = true, $delimiter = ';', $enclosure = '"', $escape = '\\')
     {
-        $this->hasHeader = $hasHeaders;
         parent::__construct($filePath, $delimiter, $enclosure, $escape);
     }
 
@@ -46,6 +42,7 @@ class Csv extends AbstractCsvFile implements FileWriterInterface
         }
     }
 
+    #[\Override]
     public function getResource()
     {
         $this->init([]);
@@ -58,6 +55,7 @@ class Csv extends AbstractCsvFile implements FileWriterInterface
      *
      * @param array $rowData data to wrinte in a line of the csv.
      */
+    #[\Override]
     public function write($rowData) {
         $this->init($rowData);
 

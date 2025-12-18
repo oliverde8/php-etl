@@ -11,9 +11,6 @@ namespace Oliverde8\Component\PhpEtl\Model\File;
  */
 class AbstractCsvFile
 {
-    /** @var String */
-    protected $filePath;
-
     /** @var string */
     protected $delimiter;
 
@@ -34,9 +31,8 @@ class AbstractCsvFile
      * @param string $enclosure Enclosure to use for the csv file.
      * @param string $escape    Escape to use for the csv file.
      */
-    public function __construct($filePath, string $delimiter = ';', string $enclosure = '"', string $escape = '\\')
+    public function __construct(protected $filePath, string $delimiter = ';', string $enclosure = '"', string $escape = '\\')
     {
-        $this->filePath = $filePath;
         $this->delimiter = $delimiter;
         $this->enclosure = $enclosure;
         $this->escape = $escape;

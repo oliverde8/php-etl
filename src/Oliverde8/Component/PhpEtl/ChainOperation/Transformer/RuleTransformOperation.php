@@ -26,6 +26,7 @@ class RuleTransformOperation extends AbstractChainOperation implements DataChain
     public function __construct(private readonly RuleApplier $ruleApplier, private readonly RuleTransformConfig $config)
     {}
 
+    #[\Override]
     public function processData(DataItemInterface $item, ExecutionContext $context): DataItemInterface
     {
         $data = $item->getData();
