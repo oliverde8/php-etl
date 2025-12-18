@@ -258,7 +258,7 @@ final class ChainProcessor extends LoggerContext implements ChainProcessorInterf
         }
 
         if (!$observerCallback) {
-            $observerCallback = function (){};
+            $observerCallback = function (): void{};
         }
         $this->chainObserver = new ChainObserver($observerCallback);
         $this->chainObserver->init($this->chainLinks, $this->chainLinkNames);

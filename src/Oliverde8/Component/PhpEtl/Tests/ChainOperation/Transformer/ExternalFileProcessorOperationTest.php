@@ -101,7 +101,7 @@ class ExternalFileProcessorOperationTest extends TestCase
         $localFileSystem->expects($this->once())
             ->method('writeStream')
             ->with('test.csv', $this->anything())
-            ->willReturnCallback(function($filename, $stream) use (&$capturedStream) {
+            ->willReturnCallback(function($filename, $stream) use (&$capturedStream): void {
                 $capturedStream = $stream;
             });
 
@@ -338,7 +338,7 @@ class ExternalFileProcessorOperationTest extends TestCase
         $capturedFilename = null;
         $localFileSystem->expects($this->once())
             ->method('writeStream')
-            ->willReturnCallback(function($filename) use (&$capturedFilename) {
+            ->willReturnCallback(function($filename) use (&$capturedFilename): void {
                 $capturedFilename = $filename;
             });
 

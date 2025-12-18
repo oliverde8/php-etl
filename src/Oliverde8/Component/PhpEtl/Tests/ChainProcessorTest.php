@@ -352,7 +352,7 @@ class ChainProcessorTest extends TestCase
 
     public function testException()
     {
-        $mock1 = new CallbackTransformerOperation(new CallBackTransformerConfig(function (ItemInterface $item) use (&$count1) {
+        $mock1 = new CallbackTransformerOperation(new CallBackTransformerConfig(function (ItemInterface $item) use (&$count1): void {
             throw new \Exception('Test exception');
         }));
 
