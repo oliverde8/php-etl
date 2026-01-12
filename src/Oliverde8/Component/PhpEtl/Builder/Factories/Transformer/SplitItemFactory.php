@@ -6,6 +6,7 @@ namespace Oliverde8\Component\PhpEtl\Builder\Factories\Transformer;
 
 use Oliverde8\Component\PhpEtl\Builder\Factories\AbstractFactory;
 use Oliverde8\Component\PhpEtl\ChainOperation\ChainOperationInterface;
+use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\SplitItemConfig;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -30,11 +31,13 @@ class SplitItemFactory extends AbstractFactory
     public function build(string $operation, array $options): ChainOperationInterface
     {
         return $this->create(
-            $options['singleElement'] ?? true,
-            $options['keys'],
-            $options['keepKeys'] ?? false,
-            $options['keyName'] ?? null,
-            $options['duplicateKeys'] ?? []
+            new SplitItemConfig(
+                $options['keys'],
+                $options['singleElement'] ?? true,
+                $options['keepKeys'] ?? false,
+                $options['keyName'] ?? null,
+                $options['duplicateKeys'] ?? []
+            )
         );
     }
 
