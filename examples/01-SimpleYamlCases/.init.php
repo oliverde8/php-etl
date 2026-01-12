@@ -1,11 +1,13 @@
 <?php
 
 use Oliverde8\Component\PhpEtl\Builder\Factories\Loader\CsvFileWriterFactory;
+use Oliverde8\Component\PhpEtl\Builder\Factories\Transformer\FilterDataFactory;
 use Oliverde8\Component\PhpEtl\Builder\Factories\Transformer\LogFactory;
 use Oliverde8\Component\PhpEtl\Builder\Factories\Transformer\RuleTransformFactory;
 use Oliverde8\Component\PhpEtl\Builder\Factories\Transformer\SplitItemFactory;
 use Oliverde8\Component\PhpEtl\ChainBuilder;
 use Oliverde8\Component\PhpEtl\ChainOperation\Loader\FileWriterOperation;
+use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\FilterDataOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\LogOperation;
 use Oliverde8\Component\PhpEtl\Builder\Factories\Transformer\SimpleHttpOperationFactory;
 use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\RuleTransformOperation;
@@ -63,3 +65,4 @@ $chainBuilder->registerFactory(new SimpleHttpOperationFactory('http', SimpleHttp
 $chainBuilder->registerFactory(new SplitItemFactory('split-item', SplitItemOperation::class));
 $chainBuilder->registerFactory(new CsvFileWriterFactory('csv-write', FileWriterOperation::class));
 $chainBuilder->registerFactory(new RuleTransformFactory('rule-engine-transformer', RuleTransformOperation::class, $ruleApplier));
+$chainBuilder->registerFactory(new FilterDataFactory('filter', FilterDataOperation::class, $ruleApplier));
