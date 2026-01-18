@@ -1,33 +1,31 @@
 #### Creating an ETL chain
 
-To create an ETL chain in Symfony, you need to create a service that implements `ChainDescriptionInterface`.
+To create an ETL chain in Symfony, you need to create a service that implements `ChainDefinitionInterface`.
 The chain is built using typed PHP configuration objects.
 
-**1. Create a chain description service:**
+**1. Create a chain definition service:**
 
 ```php
 <?php
 
-namespace App\Etl;
+namespace App\Etl\ChainDefinition;
 
 use Oliverde8\Component\PhpEtl\ChainConfig;
-use Oliverde8\Component\PhpEtl\ChainDescriptionInterface;
+use Oliverde8\PhpEtlBundle\Etl\ChainDefinitionInterface\ChainDefinitionInterface;
 use Oliverde8\Component\PhpEtl\OperationConfig\Extract\CsvExtractConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\RuleTransformConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Loader\CsvFileWriterConfig;
 
-class CustomerImportChain implements ChainDescriptionInterface
+class CustomerImportDefinition implements ChainDefinitionInterface
 {
-    public function getName(): string
+    public function getKey(): string
     {
         return 'customer-import';
     }
 
-    public function getChain(): ChainConfig
+    public function build(): ChainConfig
     {
-        $chainConfig = new ChainConfig();
-
-        return $chainConfig
+        return (new ChainConfig())
             ->addLink(new CsvExtractConfig())
             ->addLink((new RuleTransformConfig(false))
                 ->addColumn('customer_id', [['get' => ['field' => 'ID']]])
@@ -49,23 +47,25 @@ class CustomerImportChain implements ChainDescriptionInterface
 
 **2. Register the service** (if not using autoconfigure):
 
+The interface has the `#[AutoconfigureTag('etl.chain_definition')]` attribute, so services implementing it are automatically tagged when autoconfigure is enabled (default in Symfony).
+
 ```yaml
 services:
-    App\Etl\CustomerImportChain:
-        tags: ['php_etl.chain_description']
+    App\Etl\ChainDefinition\CustomerImportDefinition:
+        tags: ['etl.chain_definition']
 ```
 
-With Configure maxAsynchronousItems and other chain settings:**
+**3. Configure maxAsynchronousItems and other chain settings:**
 
 ```php
-class HighVolumeImportChain implements ChainDescriptionInterface
+class HighVolumeImportDefinition implements ChainDefinitionInterface
 {
-    public function getName(): string
+    public function getKey(): string
     {
         return 'high-volume-import';
     }
 
-    public function getChain(): ChainConfig
+    public function build(): ChainConfig
     {
         $chainConfig = new ChainConfig();
         $chainConfig->setMaxAsynchronousItems(100); // Process up to 100 items in parallel
@@ -80,25 +80,23 @@ class HighVolumeImportChain implements ChainDescriptionInterface
 }
 ```
 
-**4. You can also inject dependencies** into your chain:
+**4. You can also inject dependencies** into your chain definition:
 
 ```php
-class ApiImportChain implements ChainDescriptionInterface
+class ApiImportDefinition implements ChainDefinitionInterface
 {
     public function __construct(
         private string $apiUrl,
     ) {}
 
-    public function getName(): string
+    public function getKey(): string
     {
         return 'api-import';
     }
 
-    public function getChain(): ChainConfig
+    public function build(): ChainConfig
     {
-        $chainConfig = new ChainConfig();
-
-        return $chainConfig
+        return (new ChainConfig())
             ->addLink(new SimpleHttpConfig(
                 url: $this->apiUrl,
                 method: 'GET',
@@ -113,13 +111,135 @@ class ApiImportChain implements ChainDescriptionInterface
 }
 ```
 
+#### Creating custom operations
+
+Custom operations are automatically registered when they implement `ConfigurableChainOperationInterface`. The bundle's compiler pass discovers them and sets up dependency injection automatically.
+
+**1. Create a config class:**
+
+```php
+<?php
+
+namespace App\Etl\Config;
+
+use Oliverde8\Component\PhpEtl\OperationConfig\OperationConfigInterface;
+
+class CustomTransformConfig implements OperationConfigInterface
+{
+    public function __construct(
+        public readonly string $targetField,
+        public readonly string $transformation,
+    ) {}
+}
+```
+
+**2. Create the operation:**
+
+```php
+<?php
+
+namespace App\Etl\Operation;
+
+use App\Etl\Config\CustomTransformConfig;
+use Oliverde8\Component\PhpEtl\ChainOperation\ConfigurableChainOperationInterface;
+use Oliverde8\Component\PhpEtl\ChainBuilderV2;
+use Psr\Log\LoggerInterface;
+
+class CustomTransformOperation implements ConfigurableChainOperationInterface
+{
+    public function __construct(
+        private CustomTransformConfig $config,
+        private ChainBuilderV2 $chainBuilder,
+        private string $flavor,
+        private LoggerInterface $logger, // Auto-injected by Symfony
+    ) {}
+
+    public function process(mixed $item, ?array &$output = null, mixed $context = null): void
+    {
+        $this->logger->info('Processing item', ['field' => $this->config->targetField]);
+        
+        // Your transformation logic here
+        $item[$this->config->targetField] = strtoupper($item[$this->config->targetField] ?? '');
+        
+        $output[] = $item;
+    }
+}
+```
+
+The operation is automatically registered and all dependencies (except `$config`, `$chainBuilder`, and `$flavor`) are auto-injected using Symfony's autowiring.
+
+**3. Use it in your chain:**
+
+```php
+class MyChainDefinition implements ChainDefinitionInterface
+{
+    public function getKey(): string
+    {
+        return 'my-custom-chain';
+    }
+
+    public function build(): ChainConfig
+    {
+        return (new ChainConfig())
+            ->addLink(new CsvExtractConfig())
+            ->addLink(new CustomTransformConfig('email', 'uppercase'))
+            ->addLink(new CsvFileWriterConfig('output/transformed.csv'));
+    }
+}
+```
+
+**How automatic dependency injection works:**
+
+The `ChainBuilderV2Compiler` compiler pass:
+- Discovers all services implementing `ConfigurableChainOperationInterface`
+- Identifies the config class from the constructor (must implement `OperationConfigInterface`)
+- Resolves all constructor dependencies at compile time using Symfony's dependency injection
+- Creates a `GenericChainFactory` for each operation with resolved dependencies
+- Automatically skips injection for `$config`, `$chainBuilder`, and `$flavor` (handled by the factory)
+
+**Manual dependency injection:**
+
+If you need more control over dependency injection, you can configure arguments manually:
+
+```yaml
+services:
+    App\Etl\Operation\CustomTransformOperation:
+        arguments:
+            $logger: '@monolog.logger.etl'
+```
+
+Or use the `#[Autowire]` attribute in PHP 8.1+:
+
+```php
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+
+class CustomTransformOperation implements ConfigurableChainOperationInterface
+{
+    public function __construct(
+        private CustomTransformConfig $config,
+        private ChainBuilderV2 $chainBuilder,
+        private string $flavor,
+        #[Autowire(service: 'monolog.logger.etl')]
+        private LoggerInterface $logger,
+        #[Autowire('%app.etl.batch_size%')]
+        private int $batchSize,
+    ) {}
+}
+```
+
+The compiler pass respects:
+- Manually configured service arguments
+- `#[Autowire]` attributes on constructor parameters
+- Default parameter values
+- Nullable parameters
+
 #### Executing a chain
 
 ```sh
 ./bin/console etl:execute customer-import '[["test1"],["test2"]]' '{"opt1": "val1"}'
 ```
 
-The first argument is the chain name (returned by `getName()`).
+The first argument is the chain key (returned by `getKey()`).
 The second argument is the input data, depending on your chain it can be empty or a JSON array.
 The third argument contains parameters that will be available in the execution context.
 
