@@ -16,8 +16,8 @@
 title: Oliverde's PHP-ETL
 email: your-email@example.com
 description: >-
-  PHP-ETL is the go-to library for executing complex data import, export, and transformation tasks within PHP applications. 
-  It offers seamless integrations with Symfony and Sylius, and can easily be extended to other CMS and frameworks, 
+  PHP-ETL is the go-to library for executing complex data import, export, and transformation tasks within PHP applications.
+  It offers seamless integrations with Symfony and Sylius, and can easily be extended to other CMS and frameworks,
   making it ideal for handling intricate data workflows with ease
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "" # the base hostname & protocol for your site, e.g. http://example.com
@@ -28,7 +28,12 @@ github_username:  oliverde8
 markdown: kramdown
 highlighter: rouge
 input: GFM
+theme: null
 plugins: []
 
-# exclude:
-#   - node_modules
+# Exclude theme to use custom layouts
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor
