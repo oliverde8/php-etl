@@ -4,6 +4,7 @@ namespace Oliverde8\Component\PhpEtl\ChainOperation\Transformer;
 
 use oliverde8\AssociativeArraySimplified\AssociativeArray;
 use Oliverde8\Component\PhpEtl\ChainOperation\AbstractChainOperation;
+use Oliverde8\Component\PhpEtl\ChainOperation\ConfigurableChainOperationInterface;
 use Oliverde8\Component\PhpEtl\ChainOperation\DataChainOperationInterface;
 use Oliverde8\Component\PhpEtl\Exception\ChainOperationException;
 use Oliverde8\Component\PhpEtl\Item\ChainBreakItem;
@@ -12,35 +13,22 @@ use Oliverde8\Component\PhpEtl\Item\DataItemInterface;
 use Oliverde8\Component\PhpEtl\Item\ItemInterface;
 use Oliverde8\Component\PhpEtl\Item\MixItem;
 use Oliverde8\Component\PhpEtl\Model\ExecutionContext;
+use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\SplitItemConfig;
 
-class SplitItemOperation extends AbstractChainOperation implements DataChainOperationInterface
+class SplitItemOperation extends AbstractChainOperation implements DataChainOperationInterface, ConfigurableChainOperationInterface
 {
-    protected bool $singleElement;
-
-    protected bool $keepKeys;
-
-    protected array $keys;
-
-    protected ?string $keyName;
-
-    protected array $duplicateKeys;
-
-    public function __construct(bool $singleElement, array $keys, bool $keepKeys, string $keyName = null, array $duplicatekeys = [])
+    public function __construct(protected readonly SplitItemConfig $config)
     {
-        $this->singleElement = $singleElement;
-        $this->keepKeys = $keepKeys;
-        $this->keys = $keys;
-        $this->keyName = $keyName;
-        $this->duplicateKeys = $duplicatekeys;
     }
 
     /**
      * @throws ChainOperationException
      */
+    #[\Override]
     public function processData(DataItemInterface $item, ExecutionContext $context): ItemInterface
     {
-        if ($this->singleElement) {
-            $data = AssociativeArray::getFromKey($item->getData(), $this->keys[0], new ChainBreakItem());
+        if ($this->config->singleElement) {
+            $data = AssociativeArray::getFromKey($item->getData(), $this->config->keys[0], new ChainBreakItem());
             if ($data instanceof ItemInterface) {
                 return $data;
             }
@@ -49,14 +37,14 @@ class SplitItemOperation extends AbstractChainOperation implements DataChainOper
         }
 
         $newItemData = [];
-        foreach ($this->keys as $key) {
+        foreach ($this->config->keys as $key) {
             $newItemData[] = AssociativeArray::getFromKey($item->getData(), $key, []);
         }
 
         return $this->createItem($newItemData);
     }
 
-    protected function createItem($itemData, $fullData): ItemInterface
+    protected function createItem($itemData, $fullData = []): ItemInterface
     {
         if (!is_array($itemData)) {
             throw new ChainOperationException(sprintf('Split operation expects an array to split; "%s', gettype($itemData)));
@@ -68,17 +56,17 @@ class SplitItemOperation extends AbstractChainOperation implements DataChainOper
                 $items[] = $datum;
             } else {
                 $dataItem = [];
-                if ($this->keyName) {
-                    AssociativeArray::setFromKey($dataItem, $this->keyName, $datum);
+                if ($this->config->keyName) {
+                    AssociativeArray::setFromKey($dataItem, $this->config->keyName, $datum);
                 } else {
                     $dataItem = $datum;
                 }
 
-                foreach ($this->duplicateKeys as $keyStore => $keyFetch) {
+                foreach ($this->config->duplicateKeys as $keyStore => $keyFetch) {
                     AssociativeArray::setFromKey($dataItem, $keyStore, AssociativeArray::getFromKey($fullData, $keyFetch));
                 }
 
-                if ($this->keepKeys) {
+                if ($this->config->keepKeys) {
                     $dataItem = ['key' => $datumKey, 'value' => $dataItem];
                 }
                 $items[] = new DataItem($dataItem);

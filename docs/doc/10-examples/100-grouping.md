@@ -12,16 +12,18 @@ We will write this in json as its more suited to understand what we are doing.
 Let's start by reading our csv file
 {% endcapture %}
 {% capture code %}
-```yaml
-  read-file:
-    operation: csv-read
-    options: [] # The default delimeter
+
+```php
+use Oliverde8\Component\PhpEtl\OperationConfig\Extract\CsvExtractConfig;
+
+$chainConfig->addLink(new CsvExtractConfig());
 ```
+
 {% endcapture %}
 {% include block/etl-step.html code=code description=description %}
 
 {% capture description %}
-We will use the `simple-grouping` operation for this. **This operation needs to put all the data in memory
+We will use the `SimpleGroupingConfig` operation for this. **This operation needs to put all the data in memory
 and should therefore be used with caution.**
 
 We have a single **grouping-key**, we can make more complex grouping operations, by grouping by subscription status and
@@ -31,48 +33,62 @@ Grouping identifier allows us to remove duplicates, if we had customer emails we
 that information for example.
 {% endcapture %}
 {% capture code %}
-```yaml
-group-per-subscription:
-  operation: simple-grouping
-  options:
-    grouping-key: ['IsSubscribed']
-    group-identifier: []
+
+```php
+use Oliverde8\Component\PhpEtl\OperationConfig\Grouping\SimpleGroupingConfig;
+
+$chainConfig->addLink(new SimpleGroupingConfig(
+    groupingKey: ['IsSubscribed'],
+    groupIdentifier: []
+));
 ```
+
 {% endcapture %}
 {% include block/etl-step.html code=code description=description %}
 
 {% capture description %}
-We will also use json write operation.
+We will also use the JSON file writer operation.
 
 This works like the csv file, but is more suited for complex multi level datas as we have after the grouping.
 {% endcapture %}
 {% capture code %}
-```yaml
-write-new-file:
-  operation: json-write
-  options:
-    file: "output.json"
+
+```php
+use Oliverde8\Component\PhpEtl\OperationConfig\Loader\CsvFileWriterConfig;
+
+$chainConfig->addLink(new CsvFileWriterConfig(
+    file: 'output.json',
+    fileFormat: 'json'
+));
 ```
+
 {% endcapture %}
 {% include block/etl-step.html code=code description=description %}
 
-### Complete yaml
+## Complete Configuration
 
-```yaml
-chain:
-  read-file:
-    operation: csv-read
-    options: [] # The default delimeter
+```php
+use Oliverde8\Component\PhpEtl\ChainConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\Extract\CsvExtractConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\Grouping\SimpleGroupingConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\Loader\CsvFileWriterConfig;
 
-  group-per-subscription:
-    operation: simple-grouping
-    options:
-      grouping-key: ['IsSubscribed']
-      group-identifier: []
+$chainConfig = new ChainConfig();
+$chainConfig
+    ->addLink(new CsvExtractConfig())
+    ->addLink(new SimpleGroupingConfig(
+        groupingKey: ['IsSubscribed'],
+        groupIdentifier: []
+    ))
+    ->addLink(new CsvFileWriterConfig(
+        file: 'output.json',
+        fileFormat: 'json'
+    ));
 
-  write-new-file:
-    operation: json-write
-    options:
-      file: "output.json"
-
+// Create and execute the chain
+$chainProcessor = $chainBuilder->createChain($chainConfig);
+$chainProcessor->process(
+    new ArrayIterator([new DataItem(['file' => 'customers.csv'])]),
+    []
+);
 ```

@@ -21,6 +21,7 @@ class SimpleGroupingFactory extends AbstractFactory
     /**
      * @inheritdoc
      */
+    #[\Override]
     public function build(string $operation, array $options): ChainOperationInterface
     {
         return $this->create($options['grouping-key'], $options['group-identifier']);
@@ -29,6 +30,7 @@ class SimpleGroupingFactory extends AbstractFactory
     /**
      * @inheritdoc
      */
+    #[\Override]
     protected function configureValidator(): Constraint
     {
         return new Assert\Collection([

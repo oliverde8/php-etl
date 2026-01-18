@@ -17,18 +17,17 @@ The `http` operation makes HTTP requests to external services using the [Symfony
 
 ## Example
 
-Here's an example of how to use the `http` operation to fetch data from a JSON API and store the response in the `api_response` key:
+Here's an example of how to use the HTTP operation to fetch data from a JSON API and store the response in the `api_response` key:
 
-```yaml
-chain:
-  - operation: http
-    options:
-      method: GET
-      url: "@'https://api.example.com/users/' ~ data.user_id"
-      response_is_json: true
-      response_key: api_response
+```php
+use Oliverde8\Component\PhpEtl\ChainConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\SimpleHttpConfig;
 
-  - operation: rule-transformer
-    options:
-      # Rules to transform the data, including the api_response.
+$chainConfig = new ChainConfig();
+$chainConfig->addLink(new SimpleHttpConfig(
+    method: 'GET',
+    url: '@"https://api.example.com/users/"~data["user_id"]',
+    responseIsJson: true,
+    responseKey: 'api_response'
+));
 ```

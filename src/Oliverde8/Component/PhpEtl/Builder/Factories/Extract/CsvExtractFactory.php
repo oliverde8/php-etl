@@ -9,6 +9,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 class CsvExtractFactory extends AbstractFactory
 {
+    #[\Override]
     protected function build(string $operation, array $options): ChainOperationInterface
     {
         return $this->create(

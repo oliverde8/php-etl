@@ -7,26 +7,21 @@ use Oliverde8\Component\PhpEtl\Item\ItemInterface;
 
 class TestAsyncItem implements AsyncItemInterface
 {
-    private ItemInterface $item;
+    private readonly int $startTime;
 
-    private int $runTime;
-
-    private int $startTime;
-
-    public function __construct(ItemInterface $item, int $runTime)
+    public function __construct(private readonly ItemInterface $item, private readonly int $runTime)
     {
-        $this->item = $item;
-        $this->runTime = $runTime;
-
         $this->startTime = time();
     }
 
 
+    #[\Override]
     public function isRunning(): bool
     {
         return $this->startTime + $this->runTime > time();
     }
 
+    #[\Override]
     public function getItem(): ItemInterface
     {
         return $this->item;

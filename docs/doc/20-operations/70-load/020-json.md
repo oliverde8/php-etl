@@ -12,27 +12,27 @@ The `json-write` operation writes `DataItem` objects (associative arrays) to a J
 
 ## Example
 
-Here's an example of how to use the `json-write` operation to save transformed data to a new JSON file:
+Here's an example of how to use JSON file writing to save transformed data to a new JSON file:
 
-```yaml
-chain:
-  - operation: extract-json
-    options:
-      path: /path/to/input.json
+```php
+use Oliverde8\Component\PhpEtl\ChainConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\Extract\JsonExtractConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\RuleTransformConfig;
 
-  - operation: rule-transformer
-    options:
-      # Rules to transform the JSON data.
-      columns:
-        full_name:
-          rules:
-            - implode:
-                values:
-                  - { get: { field: "first_name" } }
-                  - { get: { field: "last_name" } }
-                with: " "
-
-  - operation: json-write
-    options:
-      file: /path/to/output.json
+$chainConfig = new ChainConfig();
+$chainConfig
+    ->addLink(new JsonExtractConfig())
+    ->addLink((new RuleTransformConfig(add: false))
+        ->addColumn('full_name', [
+            ['implode' => [
+                'values' => [
+                    [['get' => ['field' => 'first_name']]],
+                    [['get' => ['field' => 'last_name']]],
+                ],
+                'with' => ' ',
+            ]],
+        ])
+    );
+    // Note: JsonFileWriterConfig is not yet available in v2.
+    // Use the old YAML-based approach or contribute the implementation.
 ```

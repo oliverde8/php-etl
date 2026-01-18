@@ -8,6 +8,9 @@
 
 namespace Oliverde8\Component\PhpEtl\Tests;
 
+use Oliverde8\Component\PhpEtl\ChainBuilderV2;
+use Oliverde8\Component\PhpEtl\ChainConfig;
+use Oliverde8\Component\PhpEtl\GenericChainFactory;
 use Oliverde8\Component\PhpEtl\Model\ExecutionContext;
 use Oliverde8\Component\PhpEtl\Model\File\LocalFileSystem;
 use Oliverde8\Component\PhpEtl\ChainOperation\ChainSplitOperation;
@@ -23,6 +26,9 @@ use Oliverde8\Component\PhpEtl\Item\DataItem;
 use Oliverde8\Component\PhpEtl\Item\GroupedItem;
 use Oliverde8\Component\PhpEtl\Item\ItemInterface;
 use Oliverde8\Component\PhpEtl\Item\MixItem;
+use Oliverde8\Component\PhpEtl\OperationConfig\ChainSplitConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\Grouping\SimpleGroupingConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\CallBackTransformerConfig;
 use PHPUnit\Framework\TestCase;
 
 class ChainProcessorTest extends TestCase
@@ -33,16 +39,16 @@ class ChainProcessorTest extends TestCase
         $count1 = 0;
         $count2 = 0;
 
-        $mock1 = new CallbackTransformerOperation(function (ItemInterface $item) use (&$count1) {
+        $mock1 = new CallbackTransformerOperation(new CallBackTransformerConfig(function (ItemInterface $item) use (&$count1) {
             $count1++;
 
             return $item;
-        });
-        $mock2 = new CallbackTransformerOperation(function (ItemInterface $item) use (&$count2) {
+        }));
+        $mock2 = new CallbackTransformerOperation(new CallBackTransformerConfig(function (ItemInterface $item) use (&$count2) {
             $count2++;
 
             return $item;
-        });
+        }));
 
         $chainProcessor = new ChainProcessor([$mock1, $mock2], new ExecutionContextFactory());
         $chainProcessor->process(new \ArrayIterator([1,2]), ['toto']);
@@ -56,16 +62,16 @@ class ChainProcessorTest extends TestCase
         $count1 = 0;
         $count2 = 0;
 
-        $mock1 = new CallbackTransformerOperation(function (ItemInterface $item) use (&$count1) {
+        $mock1 = new CallbackTransformerOperation(new CallBackTransformerConfig(function (ItemInterface $item) use (&$count1) {
             $count1++;
 
             return new ChainBreakItem();
-        });
-        $mock2 = new CallbackTransformerOperation(function (ItemInterface $item) use (&$count2) {
+        }));
+        $mock2 = new CallbackTransformerOperation(new CallBackTransformerConfig(function (ItemInterface $item) use (&$count2) {
             $count2++;
 
             return $item;
-        });
+        }));
 
         $chainProcessor = new ChainProcessor([$mock1, $mock2], new ExecutionContextFactory());
         $chainProcessor->process(new \ArrayIterator([1,2]), ['toto']);
@@ -79,12 +85,12 @@ class ChainProcessorTest extends TestCase
         $count1 = 0;
         $count2 = 0;
 
-        $mock1 = new CallbackTransformerOperation(function (ItemInterface $item) use (&$count1) {
+        $mock1 = new CallbackTransformerOperation(new CallBackTransformerConfig(function (ItemInterface $item) use (&$count1) {
             $count1++;
 
             return $item;
-        });
-        $mock2 = new CallbackTransformerOperation(function (ItemInterface $item) use (&$count2) {
+        }));
+        $mock2 = new CallbackTransformerOperation(new CallBackTransformerConfig(function (ItemInterface $item) use (&$count2) {
             $count2++;
 
             $data = $item->getData();
@@ -100,7 +106,7 @@ class ChainProcessorTest extends TestCase
             }
 
             return $item;
-        });
+        }));
 
         $data = [
             ['group' => 100, 'id' => 200, 'value' => 'test01'],
@@ -109,7 +115,7 @@ class ChainProcessorTest extends TestCase
             ['group' => 101, 'id' => 201, 'value' => 'test12'],
         ];
 
-        $chainProcessor = new ChainProcessor([$mock1, new SimpleGroupingOperation(['group'], ['id']), $mock2], new ExecutionContextFactory());
+        $chainProcessor = new ChainProcessor([$mock1, new SimpleGroupingOperation(new SimpleGroupingConfig(['group'], ['id'])), $mock2], new ExecutionContextFactory());
         $chainProcessor->process(new \ArrayIterator($data), ['toto']);
 
         $this->assertEquals(4, $count1);
@@ -122,23 +128,23 @@ class ChainProcessorTest extends TestCase
         $count2 = 0;
         $count3 = 0;
 
-        $mock1 = new CallbackTransformerOperation(function (ItemInterface $item) use (&$count1) {
+        $mock1 = new CallbackTransformerOperation(new CallBackTransformerConfig(function (ItemInterface $item) use (&$count1) {
             $count1++;
 
             return $item;
-        });
-        $mock2 = new CallbackTransformerOperation(function (ItemInterface $item) use (&$count2) {
+        }));
+        $mock2 = new CallbackTransformerOperation(new CallBackTransformerConfig(function (ItemInterface $item) use (&$count2) {
             $count2++;
 
             $data = ['value' => 0];
 
             return new DataItem($data);
-        });
-        $mock3 = new CallbackTransformerOperation(function (ItemInterface $item) use (&$count3) {
+        }));
+        $mock3 = new CallbackTransformerOperation(new CallBackTransformerConfig(function (ItemInterface $item) use (&$count3) {
             $count3++;
 
             return $item;
-        });
+        }));
 
         $data = [
             ['group' => 100, 'id' => 200, 'value' => 'test01'],
@@ -150,9 +156,9 @@ class ChainProcessorTest extends TestCase
         $chainProcessor = new ChainProcessor(
             [
                 $mock1,
-                new SimpleGroupingOperation(['group'], ['id']),
+                new SimpleGroupingOperation(new SimpleGroupingConfig(['group'], ['id'])),
                 $mock2,
-                new SimpleGroupingOperation(['value']),
+                new SimpleGroupingOperation(new SimpleGroupingConfig(['value'])),
                 $mock3,
             ],
             new ExecutionContextFactory()
@@ -169,14 +175,14 @@ class ChainProcessorTest extends TestCase
         $values1 = [];
         $values2 = [];
 
-        $mock1 = new CallbackTransformerOperation(function (ItemInterface $item) use (&$values1) {
+        $mock1 = new CallbackTransformerOperation(new CallBackTransformerConfig(function (ItemInterface $item) use (&$values1) {
             $values1[] = $item->getData();
             return new MixItem([$item, new GroupedItem(new \ArrayIterator([3, 4])), new DataItem(5)]);
-        });
-        $mock2 = new CallbackTransformerOperation(function (ItemInterface $item) use (&$values2) {
+        }));
+        $mock2 = new CallbackTransformerOperation(new CallBackTransformerConfig(function (ItemInterface $item) use (&$values2) {
             $values2[] = $item->getData();
             return $item;
-        });
+        }));
 
         $chainProcessor = new ChainProcessor([$mock1, $mock2], new ExecutionContextFactory());
         $chainProcessor->process(new \ArrayIterator([1,2]), ['toto']);
@@ -190,18 +196,18 @@ class ChainProcessorTest extends TestCase
         $results = [];
         $callNum = 0;
 
-        $mock = new CallbackTransformerOperation(function (ItemInterface $item) use (&$callNum) {
+        $mock = new CallbackTransformerOperation(new CallBackTransformerConfig(function (ItemInterface $item) use (&$callNum) {
             $callNum++;
             if ($callNum == 1) {
                 return new TestAsyncItem(new DataItem('I am slow'), 2);
             } else {
                 return new TestAsyncItem(new DataItem('I am fast'), 1);
             }
-        });
-        $mockEnd = new CallbackTransformerOperation(function (ItemInterface $item) use (&$results) {
+        }));
+        $mockEnd = new CallbackTransformerOperation(new CallBackTransformerConfig(function (ItemInterface $item) use (&$results) {
             $results[] = $item->getData();
             return $item;
-        });
+        }));
 
         $chainProcessor = new ChainProcessor(['mock' => $mock, 'mocked_end' => $mockEnd], new ExecutionContextFactory());
         $chainProcessor->process(new \ArrayIterator([1, 2]), ['toto']);
@@ -214,17 +220,15 @@ class ChainProcessorTest extends TestCase
     {
         $callNum = 0;
 
-        $mock = new CallbackTransformerOperation(function (ItemInterface $item) use (&$callNum) {
+        $mock = new CallbackTransformerOperation(new CallBackTransformerConfig(function (ItemInterface $item) use (&$callNum) {
             $callNum++;
             if ($callNum == 1) {
                 return new TestAsyncItem(new DataItem('I am slow'), 2);
             } else {
                 return new TestAsyncItem(new DataItem('I am fast'), 1);
             }
-        });
-        $mockEnd = new CallbackTransformerOperation(function (ItemInterface $item) use (&$results) {
-            return $item;
-        });
+        }));
+        $mockEnd = new CallbackTransformerOperation(new CallBackTransformerConfig(fn(ItemInterface $item) => $item));
 
         $chainProcessor = new ChainProcessor(['mock' => $mock, 'mocked_end' => $mockEnd], new ExecutionContextFactory());
         foreach ($chainProcessor->processGenerator(new \ArrayIterator([1, 2]), new ExecutionContext([], new LocalFileSystem())) as $item) {
@@ -242,7 +246,7 @@ class ChainProcessorTest extends TestCase
         $results = [];
         $callNum = 0;
 
-        $mock = new CallbackTransformerOperation(function (ItemInterface $item) use (&$callNum) {
+        $mock = new CallbackTransformerOperation(new CallBackTransformerConfig(function (ItemInterface $item) use (&$callNum) {
             $callNum++;
             if ($callNum == 1) {
                 return new TestAsyncItem(new DataItem('I am slow1'), 2);
@@ -251,11 +255,11 @@ class ChainProcessorTest extends TestCase
             } else {
                 return new TestAsyncItem(new DataItem('I am speed'), 1);
             }
-        });
-        $mockEnd = new CallbackTransformerOperation(function (ItemInterface $item) use (&$results) {
+        }));
+        $mockEnd = new CallbackTransformerOperation(new CallBackTransformerConfig(function (ItemInterface $item) use (&$results) {
             $results[] = $item->getData();
             return $item;
-        });
+        }));
 
         $chainProcessor = new ChainProcessor(
             ['mock' => $mock, 'mocked_end' => $mockEnd],
@@ -272,16 +276,14 @@ class ChainProcessorTest extends TestCase
     {
         $results = [];
 
-        $mock = new CallbackTransformerOperation(function (ItemInterface $item) use (&$callNum) {
-            return new MixItem([
-                new TestAsyncItem(new DataItem('I am slow'), 2),
-                new TestAsyncItem(new DataItem('I am fast'), 1),
-            ]);
-        });
-        $mockEnd = new CallbackTransformerOperation(function (ItemInterface $item) use (&$results) {
+        $mock = new CallbackTransformerOperation(new CallBackTransformerConfig(fn(ItemInterface $item) => new MixItem([
+            new TestAsyncItem(new DataItem('I am slow'), 2),
+            new TestAsyncItem(new DataItem('I am fast'), 1),
+        ])));
+        $mockEnd = new CallbackTransformerOperation(new CallBackTransformerConfig(function (ItemInterface $item) use (&$results) {
             $results[] = $item->getData();
             return $item;
-        });
+        }));
 
         $chainProcessor = new ChainProcessor(
             ['mock' => $mock, 'mocked_end' => $mockEnd],
@@ -296,25 +298,41 @@ class ChainProcessorTest extends TestCase
     public function testAsyncDisabledWithSplit()
     {
         $results = [];
-        $mockBranch1 = new CallbackTransformerOperation(function (ItemInterface $item) use (&$callNum) {
-            return new TestAsyncItem(new DataItem('I am slow'), 2);
-        });
-        $mockBranch2 = new CallbackTransformerOperation(function (ItemInterface $item) use (&$callNum) {
-            return new TestAsyncItem(new DataItem('I am fast'), 1);
-        });
-        $mockEnd = new CallbackTransformerOperation(function (ItemInterface $item) use (&$results) {
+        $mockBranch1 = new CallbackTransformerOperation(new CallBackTransformerConfig(fn(ItemInterface $item) => new TestAsyncItem(new DataItem('I am slow'), 2)));
+        $mockBranch2 = new CallbackTransformerOperation(new CallBackTransformerConfig(fn(ItemInterface $item) => new TestAsyncItem(new DataItem('I am fast'), 1)));
+        $mockEnd = new CallbackTransformerOperation(new CallBackTransformerConfig(function (ItemInterface $item) use (&$results) {
             $results[] = $item->getData();
             return $item;
-        });
-
+        }));
 
         $executionContext = new ExecutionContextFactory();
+
+        // Extract configs from operations using reflection
+        $reflection = new \ReflectionClass(CallbackTransformerOperation::class);
+        $configProperty = $reflection->getProperty('config');
+        $configProperty->setAccessible(true);
+
+        // Create chain configs for each split branch
+        $branch1Config = new ChainConfig();
+        $branch1Config->addLink($configProperty->getValue($mockBranch1))
+                      ->addLink($configProperty->getValue($mockEnd));
+
+        $branch2Config = new ChainConfig();
+        $branch2Config->addLink($configProperty->getValue($mockBranch2))
+                      ->addLink($configProperty->getValue($mockEnd));
+
+        $splitConfig = new ChainSplitConfig();
+        $splitConfig->addSplit($branch1Config)->addSplit($branch2Config);
+
+        // Create ChainBuilderV2 with CallbackTransformer factory
+        $chainBuilder = new ChainBuilderV2(
+            $executionContext,
+            [new GenericChainFactory(CallbackTransformerOperation::class, CallBackTransformerConfig::class)]
+        );
+
         $chainProcessor = new ChainProcessor(
             [
-                'split' => new ChainSplitOperation([
-                    new ChainProcessor(["mock1" => $mockBranch1, 'mockEnd' => $mockEnd], $executionContext, 0),
-                    new ChainProcessor(["mock2" => $mockBranch2, 'mockEnd' => $mockEnd], $executionContext, 0),
-                ])
+                'split' => new ChainSplitOperation($chainBuilder, $splitConfig)
             ],
             $executionContext
         );
@@ -326,9 +344,9 @@ class ChainProcessorTest extends TestCase
 
     public function testException()
     {
-        $mock1 = new CallbackTransformerOperation(function (ItemInterface $item) use (&$count1) {
+        $mock1 = new CallbackTransformerOperation(new CallBackTransformerConfig(function (ItemInterface $item) use (&$count1): void {
             throw new \Exception('Test exception');
-        });
+        }));
 
         try {
             $chainProcessor = new ChainProcessor(["op1" => $mock1], new ExecutionContextFactory());

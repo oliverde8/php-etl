@@ -33,6 +33,7 @@ class GetTest extends AbstractRule
     /**
      * @inheritdoc
      */
+    #[\Override]
     protected function getRule()
     {
         return new Get(new NullLogger());

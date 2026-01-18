@@ -5,3 +5,5 @@ build
 ./composer.lock
 var
 /docs/_site/
+/examples/**.csv
+/examples/00-SimpleCases/*.csv

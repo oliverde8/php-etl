@@ -9,95 +9,138 @@ width: large
 You are able to configure through the input the names of the files that are being read.
 {% endcapture %}
 {% capture code %}
+
 ```php
+use Oliverde8\Component\PhpEtl\Item\DataItem;
+
 $chainProcessor->process(
-    new ArrayIterator([__DIR__ . "/customers.csv"]),
+    new ArrayIterator([new DataItem(['file' => __DIR__ . "/customers.csv"])]),
     []
 );
 ```
+
 {% endcapture %}
 {% include block/etl-step.html code=code description=description %}
 
 {% capture description %}
 But we might need to configure some operations independently from the input. For example the name of the csv output file.
 {% endcapture %}
+
 {% capture code %}
-```yaml
-write-new-file:
-  operation: csv-write
-  options:
-    file: "output.csv"
+
+```php
+use Oliverde8\Component\PhpEtl\OperationConfig\Loader\CsvFileWriterConfig;
+
+$chainConfig->addLink(new CsvFileWriterConfig('output.csv'));
 ```
+
 {% endcapture %}
 {% include block/etl-step.html code=code description=description %}
 
 {% capture description %}
 
-The name "output.csv" is hardcoded here. But we can make this dynamic with symfony expression language. We will need
-to start our line with the `!` character.
+The name "output.csv" is hardcoded here. But we can make this dynamic with PHP variables. Simply define your
+configuration parameters and use them when creating the operation configs.
 {% endcapture %}
+
 {% capture code %}
-```yaml
-write-new-file:
-  operation: csv-write
-  options:
-    file: "!filewriter['outputfile']['name']"
+
+```php
+// Define configuration
+$outputFileName = 'configured-output.csv';
+
+// Use in configuration
+$chainConfig->addLink(new CsvFileWriterConfig($outputFileName));
 ```
+
 {% endcapture %}
 {% include block/etl-step.html code=code description=description %}
 
-We will also need to give this informaton when the chain is being created:
+You can pass configuration values from external sources (environment variables, config files, etc.) and use them when building your chain:
 
 {% capture column1 %}
-#### 🐘 Standalone
+
+## 🐘 Standalone
+
 ```php
-$inputOptions = ['filewriter' =>
-    ['outputfile' =>
-        ['name' => 'configured-output.csv']
-    ]
+use Oliverde8\Component\PhpEtl\ChainConfig;
+use Oliverde8\Component\PhpEtl\Item\DataItem;
+
+// Get configuration from your source
+$config = [
+    'outputFileName' => 'configured-output.csv'
 ];
 
-$chainProcessor = $builder->buildChainProcessor(
-    Yaml::parse(file_get_contents($fileName))['chain'],
-    $inputOptions
+// Build the chain with configuration
+$chainConfig = new ChainConfig();
+// ... add operations using $config values
+$chainConfig->addLink(
+    new CsvFileWriterConfig($config['outputFileName'])
+);
+
+$chainProcessor = $chainBuilder->createChain($chainConfig);
+$chainProcessor->process(
+    new ArrayIterator([new DataItem(['file' => './customers.csv'])]),
+    []
 );
 ```
+
 {% endcapture %}
+
 {% capture column2 %}
-#### 🎵 Symfony
+
+## 🎵 Symfony
+
 ```sh
 ./bin/console etl:execute myetl "['./customers.csv']" "{'outputfile': {'name': 'configured-output.csv'}}"
 ```
+
 {% endcapture %}
 {% include block/2column.html column1=column1 column2=column2 %}
 
 ### Complete Code
 
-```yaml
-chain:
-  read-file:
-    operation: csv-read
-    options: [] # The default delimeter,&
+```php
+use Oliverde8\Component\PhpEtl\ChainConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\Extract\CsvExtractConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\RuleTransformConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\Loader\CsvFileWriterConfig;
 
-  keep-only-name-and-subscription:
-    operation: rule-engine-transformer
-    options:
-      add: false # We want to replace all existing columns with our new columns.
-      columns:
-        Name:
-          rules:
-            - implode: # Concat both firstname & lastname
-                values:
-                  - [{get : {field: 'FirstName'}}]
-                  - [{get : {field: "LastName"}}]
-                with: " "
-        SubscriptionStatus:
-          rules:
-            - get: {field: 'IsSubscribed'}
+// Configuration from your source (env, config file, etc.)
+$config = [
+    'outputFileName' => 'configured-output.csv'
+];
 
-  write-new-file:
-    operation: csv-write
-    options:
-      file: "!filewriter['outputfile']['name']"
+$chainConfig = new ChainConfig();
+$chainConfig
+    ->addLink(new CsvExtractConfig())
+    ->addLink(new RuleTransformConfig(
+        columns: [
+            'Name' => [
+                'rules' => [
+                    ['implode' => [
+                        'values' => [
+                            [['get' => ['field' => 'FirstName']]],
+                            [['get' => ['field' => 'LastName']]]
+                        ],
+                        'with' => ' '
+                    ]]
+                ]
+            ],
+            'SubscriptionStatus' => [
+                'rules' => [
+                    ['get' => ['field' => 'IsSubscribed']]
+                ]
+            ]
+        ],
+        add: false
+    ))
+    ->addLink(new CsvFileWriterConfig($config['outputFileName']));
 
+// Create and execute the chain
+$chainProcessor = $chainBuilder->createChain($chainConfig);
+$chainProcessor->process(
+    new ArrayIterator([new DataItem(['file' => 'customers.csv'])]),
+    []
+);
 ```

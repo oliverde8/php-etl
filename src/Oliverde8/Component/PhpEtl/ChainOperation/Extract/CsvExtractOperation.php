@@ -4,6 +4,7 @@ namespace Oliverde8\Component\PhpEtl\ChainOperation\Extract;
 
 use oliverde8\AssociativeArraySimplified\AssociativeArray;
 use Oliverde8\Component\PhpEtl\ChainOperation\AbstractChainOperation;
+use Oliverde8\Component\PhpEtl\ChainOperation\ConfigurableChainOperationInterface;
 use Oliverde8\Component\PhpEtl\ChainOperation\DataChainOperationInterface;
 use Oliverde8\Component\PhpEtl\Extract\File\Csv;
 use Oliverde8\Component\PhpEtl\Item\DataItemInterface;
@@ -11,39 +12,30 @@ use Oliverde8\Component\PhpEtl\Item\FileExtractedItem;
 use Oliverde8\Component\PhpEtl\Item\GroupedItem;
 use Oliverde8\Component\PhpEtl\Item\ItemInterface;
 use Oliverde8\Component\PhpEtl\Item\MixItem;
+use Oliverde8\Component\PhpEtl\OperationConfig\Extract\CsvExtractConfig;
 use Oliverde8\Component\PhpEtl\Model\ExecutionContext;
 
-class CsvExtractOperation extends AbstractChainOperation implements DataChainOperationInterface
+class CsvExtractOperation extends AbstractChainOperation implements DataChainOperationInterface, ConfigurableChainOperationInterface
 {
-    protected string $delimiter;
 
-    protected string $enclosure;
+    public function __construct(protected readonly CsvExtractConfig $config)
+    {}
 
-    protected string $escape;
-
-    protected string $fileKey;
-
-    protected bool $scoped;
-
-    public function __construct(string $delimiter, string $enclosure, string $escape, string $fileKey, bool $scoped)
-    {
-        $this->delimiter = $delimiter;
-        $this->enclosure = $enclosure;
-        $this->escape = $escape;
-        $this->fileKey = $fileKey;
-        $this->scoped = $scoped;
-    }
-
-
+    #[\Override]
     public function processData(DataItemInterface $item, ExecutionContext $context): ItemInterface
     {
         $filename = $item->getData();
         if (is_array($filename)) {
-            $filename = AssociativeArray::getFromKey($filename, $this->fileKey);
+            $filename = AssociativeArray::getFromKey($filename, $this->config->fileKey);
         }
 
-        $fileIterator = new Csv($context->getFileSystem()->readStream($filename), $this->delimiter, $this->enclosure, $this->escape);
+        $fileIterator = new Csv($context->getFileSystem()->readStream($filename), $this->config->delimiter, $this->config->enclosure, $this->config->escape);
 
         return new MixItem([new GroupedItem($fileIterator), new FileExtractedItem($filename)]);
+    }
+
+    public function getConfigurationClass(): string
+    {
+        return CsvExtractConfig::class;
     }
 }

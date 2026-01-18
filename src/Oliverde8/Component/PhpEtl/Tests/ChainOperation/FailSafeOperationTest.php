@@ -3,14 +3,18 @@ declare(strict_types=1);
 
 namespace Oliverde8\Component\PhpEtl\Tests\ChainOperation;
 
-use Oliverde8\Component\PhpEtl\ChainOperation\ChainRepeatOperation;
+use Oliverde8\Component\PhpEtl\ChainBuilderV2;
+use Oliverde8\Component\PhpEtl\ChainConfig;
 use Oliverde8\Component\PhpEtl\ChainOperation\FailSafeOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\CallbackTransformerOperation;
 use Oliverde8\Component\PhpEtl\ChainProcessor;
 use Oliverde8\Component\PhpEtl\Exception\ChainOperationException;
 use Oliverde8\Component\PhpEtl\ExecutionContextFactory;
+use Oliverde8\Component\PhpEtl\GenericChainFactory;
 use Oliverde8\Component\PhpEtl\Item\DataItem;
 use Oliverde8\Component\PhpEtl\Item\ItemInterface;
+use Oliverde8\Component\PhpEtl\OperationConfig\FailSafeConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\CallBackTransformerConfig;
 use PHPUnit\Framework\TestCase;
 
 class FailSafeOperationTest extends TestCase
@@ -18,7 +22,7 @@ class FailSafeOperationTest extends TestCase
     public function testSingleFail()
     {
         $callNum = 0;
-        $failOperation = new CallbackTransformerOperation(function (ItemInterface $item) use (&$callNum) {
+        $failOperation = new CallbackTransformerOperation(new CallBackTransformerConfig(function (ItemInterface $item) use (&$callNum) {
             if ($callNum == 0 || $callNum == 2) {
                 return new DataItem(['val' => $callNum++]);
             }
@@ -26,11 +30,12 @@ class FailSafeOperationTest extends TestCase
                 $callNum++;
                 throw new \Exception("Exception at $callNum");
             }
-        });
-        $endOperation = new CallbackTransformerOperation(function (ItemInterface $item) use (&$results) {
+            return $item;
+        }));
+        $endOperation = new CallbackTransformerOperation(new CallBackTransformerConfig(function (ItemInterface $item) use (&$results) {
             $results[] = $item->getData();
             return $item;
-        });
+        }));
 
         $chain = $this->createChain([$failOperation], [$endOperation]);
         $chain->process(new \ArrayIterator([['var' => 1],['var' => 2]]), []);
@@ -41,15 +46,15 @@ class FailSafeOperationTest extends TestCase
     public function testToManyFail()
     {
         $callNum = 0;
-        $failOperation = new CallbackTransformerOperation(function (ItemInterface $item) use (&$callNum) {
+        $failOperation = new CallbackTransformerOperation(new CallBackTransformerConfig(function (ItemInterface $item) use (&$callNum): void {
             $callNum++;
             throw new \Exception("Exception at $callNum");
-        });
+        }));
         $results = [];
-        $endOperation = new CallbackTransformerOperation(function (ItemInterface $item) use (&$results) {
+        $endOperation = new CallbackTransformerOperation(new CallBackTransformerConfig(function (ItemInterface $item) use (&$results) {
             $results[] = $item->getData();
             return $item;
-        });
+        }));
 
         $chain = $this->createChain([$failOperation], [$endOperation]);
         $e = null;
@@ -66,10 +71,28 @@ class FailSafeOperationTest extends TestCase
     protected function createChain(array $failSafeOperation, array $afterOperations): ChainProcessor
     {
         $executionFactory = new ExecutionContextFactory();
+
+        $failSafeChainConfig = new ChainConfig();
+
+        $reflection = new \ReflectionClass(CallbackTransformerOperation::class);
+        $configProperty = $reflection->getProperty('config');
+        $configProperty->setAccessible(true);
+
+        foreach ($failSafeOperation as $operation) {
+            if ($operation instanceof CallbackTransformerOperation) {
+                $config = $configProperty->getValue($operation);
+                $failSafeChainConfig->addLink($config);
+            }
+        }
+
+        $chainBuilder = new ChainBuilderV2(
+            $executionFactory,
+            [new GenericChainFactory(CallbackTransformerOperation::class, CallBackTransformerConfig::class)]
+        );
+
         $repeatOperation = new FailSafeOperation(
-            new ChainProcessor($failSafeOperation, $executionFactory),
-            [\Exception::class],
-            2,
+            $chainBuilder,
+            new FailSafeConfig($failSafeChainConfig, [\Exception::class], 2)
         );
 
         array_unshift($afterOperations, $repeatOperation);

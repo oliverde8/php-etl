@@ -23,12 +23,13 @@ abstract class AbstractChainOperation implements ChainOperationInterface
     /**
      * @inheritdoc
      */
+    #[\Override]
     final public function process(ItemInterface $item, ExecutionContext $context): ItemInterface
     {
-        if (!isset($this->methodResolutionCache[get_class($item)])) {
-            $this->methodResolutionCache[get_class($item)] = $this->resolveMethodName($item);
+        if (!isset($this->methodResolutionCache[$item::class])) {
+            $this->methodResolutionCache[$item::class] = $this->resolveMethodName($item);
         }
-        $method = $this->methodResolutionCache[get_class($item)];
+        $method = $this->methodResolutionCache[$item::class];
 
         if (!is_null($method)) {
             return $this->$method($item, $context);
@@ -53,7 +54,7 @@ abstract class AbstractChainOperation implements ChainOperationInterface
                     continue;
                 }
 
-                if ($this->checkIsA(get_class($item), $expecting)) {
+                if ($this->checkIsA($item::class, $expecting)) {
                     return $method->getName();
                 }
             };
@@ -85,7 +86,7 @@ abstract class AbstractChainOperation implements ChainOperationInterface
         if (in_array($method->getName(), ['process', 'resolveMethodName'])) {
             return false;
         }
-        if (strpos($method->getName(), "process") !== 0) {
+        if (!str_starts_with($method->getName(), "process")) {
             return false;
         }
 

@@ -5,7 +5,8 @@ subTitle: Split/Fork the chain
 width: large
 ---
 
-In our next example 
+In our next example
+
 - One file containing all the customers
 - A second file containing unsubscribed customers
 - A third file with subscribed customers.
@@ -20,80 +21,90 @@ first example. But before writing the files we will add a split operation to cre
 filter to get subscribed customers and write them. The second branch will filter to get un subscribed customers and
 write them.
 {% endcapture %}
+
 {% capture code %}
-```yaml
-  branch-out:
-    operation: split
-    options:
-      branches:
-        -
-          filter-unsubscribed:
-            operation: filter
-            options:
-              rule: [{get : {field: 'IsSubscribed'}}]
-              negate: false
 
-          write-new-file:
-            operation: csv-write
-            options:
-              file: "subscribed.csv"
-        -
-          filter-subscribed:
-            operation: filter
-            options:
-              rule: [{get : {field: 'IsSubscribed'}}]
-              negate: true
+```php
+use Oliverde8\Component\PhpEtl\ChainConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\ChainSplitConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\FilterDataConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\Loader\CsvFileWriterConfig;
 
-          write-new-file:
-            operation: csv-write
-            options:
-              file: "unsubscribed.csv"
+// First branch: subscribed customers
+$subscribedBranch = new ChainConfig();
+$subscribedBranch
+    ->addLink(new FilterDataConfig(
+        rules: [['get' => ['field' => 'IsSubscribed']]],
+        negate: false
+    ))
+    ->addLink(new CsvFileWriterConfig('subscribed.csv'));
+
+// Second branch: unsubscribed customers
+$unsubscribedBranch = new ChainConfig();
+$unsubscribedBranch
+    ->addLink(new FilterDataConfig(
+        rules: [['get' => ['field' => 'IsSubscribed']]],
+        negate: true
+    ))
+    ->addLink(new CsvFileWriterConfig('unsubscribed.csv'));
+
+// Add split operation with both branches
+$chainConfig->addLink(new ChainSplitConfig(
+    branches: [$subscribedBranch, $unsubscribedBranch]
+));
 ```
+
 {% endcapture %}
 {% include block/etl-step.html code=code description=description %}
 
 ### Complete Code
 
 {% capture column1 %}
-```yaml
-chain:
-  read-file:
-    operation: csv-read
-    options: [] # The default delimeter,&
 
-  branch-out:
-    operation: split
-    options:
-      branches:
-        -
-          filter-subscribed:
-            operation: filter
-            options:
-              rule: [{get : {field: 'IsSubscribed'}}]
-              negate: false
+```php
+use Oliverde8\Component\PhpEtl\ChainConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\Extract\CsvExtractConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\ChainSplitConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\FilterDataConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\Loader\CsvFileWriterConfig;
 
-          write-new-file:
-            operation: csv-write
-            options:
-              file: "subscribed.csv"
-        -
-          filter-unsubscribed:
-            operation: filter
-            options:
-              rule: [{get : {field: 'IsSubscribed'}}]
-              negate: true
+$chainConfig = new ChainConfig();
+$chainConfig->addLink(new CsvExtractConfig());
 
-          write-new-file:
-            operation: csv-write
-            options:
-              file: "unsubscribed.csv"
+// First branch: subscribed customers
+$subscribedBranch = new ChainConfig();
+$subscribedBranch
+    ->addLink(new FilterDataConfig(
+        rules: [['get' => ['field' => 'IsSubscribed']]],
+        negate: false
+    ))
+    ->addLink(new CsvFileWriterConfig('subscribed.csv'));
 
-  write-new-file:
-    operation: csv-write
-    options:
-      file: "output.csv"
+// Second branch: unsubscribed customers
+$unsubscribedBranch = new ChainConfig();
+$unsubscribedBranch
+    ->addLink(new FilterDataConfig(
+        rules: [['get' => ['field' => 'IsSubscribed']]],
+        negate: true
+    ))
+    ->addLink(new CsvFileWriterConfig('unsubscribed.csv'));
 
+// Add split operation
+$chainConfig->addLink(new ChainSplitConfig(
+    branches: [$subscribedBranch, $unsubscribedBranch]
+));
+
+// Write all customers to main output
+$chainConfig->addLink(new CsvFileWriterConfig('output.csv'));
+
+// Create and execute the chain
+$chainProcessor = $chainBuilder->createChain($chainConfig);
+$chainProcessor->process(
+    new ArrayIterator([new DataItem(['file' => 'customers.csv'])]),
+    []
+);
 ```
+
 {% endcapture %}
 {% capture mermaid %}
 flowchart TB
@@ -106,7 +117,6 @@ S2 -->|UnSubscribed| S2A1
 S2 -->|Susbscribed| S2B1(Filter UnSubscribed)
 S2 -->|UnSubscribed| S2B1
 
-
 subgraph SubFlow
 S2A1 -->|Susbscribed| S2A2(Write Subscribed)
 
@@ -116,6 +126,7 @@ end
 S2 --->|Susbscribed| S3(Write Both)
 S2 --->|UnSubscribed| S3
 {% endcapture %}
+
 {% capture column2 %}
 {% include block/mermaid.html mermaid=mermaid %}
 {% endcapture %}

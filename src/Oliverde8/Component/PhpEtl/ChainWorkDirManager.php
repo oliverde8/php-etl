@@ -8,13 +8,10 @@ use Oliverde8\Component\PhpEtl\Model\File\LocalFileSystem;
 
 class ChainWorkDirManager
 {
-    private string $baseDir;
+    private readonly LocalFileSystem $fileSystem;
 
-    private LocalFileSystem $fileSystem;
-
-    public function __construct(string $baseDir)
+    public function __construct(private readonly string $baseDir)
     {
-        $this->baseDir = $baseDir;
         $this->fileSystem = new LocalFileSystem('/');
     }
 

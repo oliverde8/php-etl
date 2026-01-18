@@ -33,6 +33,7 @@ class RuleApplierTest extends TestCase
     /**
      * @inheritdoc
      */
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

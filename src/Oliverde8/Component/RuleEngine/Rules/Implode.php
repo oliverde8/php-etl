@@ -16,6 +16,7 @@ class Implode extends AbstractRule
     /**
      * @inheritdoc
      */
+    #[\Override]
     public function apply(array $rowData, array &$transformedData, array $options = [])
     {
         $subOptions = $options;
@@ -63,6 +64,7 @@ class Implode extends AbstractRule
     /**
      * @inheritdoc
      */
+    #[\Override]
     public function validate(array $options): void
     {
         $this->requireOption('values', $options);
@@ -72,6 +74,7 @@ class Implode extends AbstractRule
     /**
      * @inheritdoc
      */
+    #[\Override]
     public function getRuleCode(): string
     {
         return 'implode';

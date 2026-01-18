@@ -7,35 +7,50 @@ width: large
 
 ### With Context - Api to CSV
 
+This example uses **execution contexts**, which isolate each ETL execution in its own directory. 
+If you're not familiar with execution contexts, please read [Execution Context - Why to have an execution context & what it does](/doc/01-understand-the-etl/execution-context.html).
+
 {% capture description %}
 The chain definition is identical to our previous [definition](/doc/10-examples/150-api-csv.html) one without a context. 
-It's the end results that changes, as now our file is created within the unique context.
+It's the end results that changes, as now our file is created within the unique context directory.
 {% endcapture %}
 {% capture code %}
-```yaml
-chain:
-  get-from-api:
-    operation: http
-    options:
-      url: https://63b687951907f863aaf90ab1.mockapi.io/test
-      method: GET
-      response_is_json: true
-      option_key: ~
-      response_key: ~
-      options:
-        headers: {'Accept': 'application/json'}
+```php
+use Oliverde8\Component\PhpEtl\ChainConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\SimpleHttpConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\SplitItemConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\Loader\CsvFileWriterConfig;
+use Oliverde8\Component\PhpEtl\Item\DataItem;
+use Oliverde8\Component\PhpEtl\Model\PockExecution;
 
-  split-item:
-    operation: split-item
-    options:
-      keys: ['content']
-      singleElement: true
+$chainConfig = new ChainConfig();
+$chainConfig
+    ->addLink(new SimpleHttpConfig(
+        url: 'https://63b687951907f863aaf90ab1.mockapi.io/test',
+        method: 'GET',
+        responseIsJson: true,
+        optionKey: null,
+        responseKey: null,
+        options: [
+            'headers' => ['Accept' => 'application/json']
+        ]
+    ))
+    ->addLink(new SplitItemConfig(
+        keys: ['content'],
+        singleElement: true
+    ))
+    ->addLink(new CsvFileWriterConfig('output.csv'));
 
-  write-new-file:
-    operation: csv-write
-    options:
-      file: "output.csv"
-
+// Create and execute the chain with execution context
+$chainProcessor = $chainBuilder->createChain($chainConfig);
+$chainProcessor->process(
+    new ArrayIterator([new DataItem([])]),
+    [
+        'etl' => [
+            'execution' => new PockExecution(new DateTime())
+        ]
+    ]
+);
 ```
 {% endcapture %}
 {% include block/etl-step.html code=code description=description %}

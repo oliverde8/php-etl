@@ -24,6 +24,7 @@ class ChainObserver extends OperationState implements ChainObserverInterface
     }
 
 
+    #[\Override]
     public function init(array $chainLinks, array $chainNames): void
     {
         foreach ($chainLinks as $id => $operation) {
@@ -33,6 +34,7 @@ class ChainObserver extends OperationState implements ChainObserverInterface
         $this->callback();
     }
 
+    #[\Override]
     public function onBeforeProcess($operationId, ChainOperationInterface $operation, ItemInterface $item): void
     {
         $this->ended = false;
@@ -42,6 +44,7 @@ class ChainObserver extends OperationState implements ChainObserverInterface
         $this->callback();
     }
 
+    #[\Override]
     public function onAfterProcess($operationId, ChainOperationInterface $operation, ItemInterface $item): void
     {
         $this->returnItem($operation, $item);
@@ -50,6 +53,7 @@ class ChainObserver extends OperationState implements ChainObserverInterface
         $this->callback();
     }
 
+    #[\Override]
     public function onFinish()
     {
         $this->ended = true;

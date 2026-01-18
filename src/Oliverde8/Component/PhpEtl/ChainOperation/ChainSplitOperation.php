@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace Oliverde8\Component\PhpEtl\ChainOperation;
 
+use Oliverde8\Component\PhpEtl\ChainBuilderV2;
 use Oliverde8\Component\PhpEtl\ChainProcessor;
 use Oliverde8\Component\PhpEtl\Item\DataItemInterface;
 use Oliverde8\Component\PhpEtl\Item\ItemInterface;
 use Oliverde8\Component\PhpEtl\Item\StopItem;
 use Oliverde8\Component\PhpEtl\Model\ExecutionContext;
 use Oliverde8\Component\PhpEtl\Model\State\OperationState;
+use Oliverde8\Component\PhpEtl\OperationConfig\ChainSplitConfig;
 
 /**
  * Class ChainSplitOperation
@@ -18,26 +20,25 @@ use Oliverde8\Component\PhpEtl\Model\State\OperationState;
  * @copyright 2018 Oliverde8
  * @package Oliverde8\Component\PhpEtl\ChainOperation
  */
-class ChainSplitOperation extends AbstractChainOperation implements DataChainOperationInterface, DetailedObservableOperation
+class ChainSplitOperation extends AbstractChainOperation implements DataChainOperationInterface, DetailedObservableOperation, ConfigurableChainOperationInterface
 {
     use SplittedChainOperationTrait;
 
     /**
      * @var ChainProcessor[]
      */
-    private array $chainProcessors;
+    private array $chainProcessors = [];
 
-    /**
-     * ChainSplitOperation constructor.
-     *
-     * @param ChainProcessor[] $chainProcessors
-     */
-    public function __construct(array $chainProcessors)
+
+    public function __construct(ChainBuilderV2 $chainProcessors, ChainSplitConfig $config)
     {
-        $this->chainProcessors = $chainProcessors;
-        $this->onSplittedChainOperationConstruct($chainProcessors);
+        foreach ($config->getChainConfigs() as $chainConfig) {
+            $this->chainProcessors[] = $chainProcessors->createChain($chainConfig);
+        }
+        $this->onSplittedChainOperationConstruct($this->chainProcessors);
     }
 
+    #[\Override]
     public function processData(DataItemInterface $item, ExecutionContext $context): ItemInterface
     {
         foreach ($this->chainProcessors as $chainProcessor) {

@@ -17,7 +17,7 @@ trait SplittedChainOperationTrait
         $lastObservedState = &$this->lastObservedState;
         foreach ($chainProcessors as $subChainPart => $chainProcessor) {
             if ($chainProcessor instanceof ChainProcessor) {
-                $observer = $chainProcessor->initObserver(function (array $operationStates) use (&$lastObservedState, $subChainPart) {
+                $observer = $chainProcessor->initObserver(function (array $operationStates) use (&$lastObservedState, $subChainPart): void {
                     $lastObservedState[$subChainPart] = $operationStates;
                 });
 

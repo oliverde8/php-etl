@@ -14,20 +14,13 @@ namespace Oliverde8\Component\PhpEtl\Item;
 class DataItem implements DataItemInterface
 {
     /**
-     * @var mixed
-     */
-    protected $data;
-
-    /**
      * DataItem constructor.
-     *
-     * @param mixed $data
      */
-    public function __construct($data)
+    public function __construct(protected mixed $data)
     {
-        $this->data = $data;
     }
 
+    #[\Override]
     public function getData()
     {
        return $this->data;

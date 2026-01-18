@@ -83,6 +83,7 @@ class Csv extends AbstractCsvFile implements \Iterator
      * @return mixed Can return any type.
      * @since 5.0.0
      */
+    #[\Override]
     public function current(): mixed
     {
         $this->init();
@@ -97,6 +98,7 @@ class Csv extends AbstractCsvFile implements \Iterator
      * @return void Any returned value is ignored.
      * @since 5.0.0
      */
+    #[\Override]
     public function next(): void
     {
         $this->init();
@@ -119,6 +121,7 @@ class Csv extends AbstractCsvFile implements \Iterator
      * @return mixed scalar on success, or null on failure.
      * @since 5.0.0
      */
+    #[\Override]
     public function key(): mixed
     {
         $this->init();
@@ -134,6 +137,7 @@ class Csv extends AbstractCsvFile implements \Iterator
      * Returns true on success or false on failure.
      * @since 5.0.0
      */
+    #[\Override]
     public function valid(): bool
     {
         $this->init();
@@ -148,6 +152,7 @@ class Csv extends AbstractCsvFile implements \Iterator
      * @return void Any returned value is ignored.
      * @since 5.0.0
      */
+    #[\Override]
     public function rewind(): void
     {
         if (!is_null($this->file)) {
