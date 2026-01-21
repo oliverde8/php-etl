@@ -1,5 +1,7 @@
 <?php
 
+use Oliverde8\Component\PhpEtl\Builder\Factories\ChainSplitFactory;
+use Oliverde8\Component\PhpEtl\Builder\Factories\Extract\JsonExtractFactory;
 use Oliverde8\Component\PhpEtl\Builder\Factories\Grouping\SimpleGroupingFactory;
 use Oliverde8\Component\PhpEtl\Builder\Factories\Loader\CsvFileWriterFactory;
 use Oliverde8\Component\PhpEtl\Builder\Factories\Loader\JsonFileWriterFactory;
@@ -8,6 +10,8 @@ use Oliverde8\Component\PhpEtl\Builder\Factories\Transformer\LogFactory;
 use Oliverde8\Component\PhpEtl\Builder\Factories\Transformer\RuleTransformFactory;
 use Oliverde8\Component\PhpEtl\Builder\Factories\Transformer\SplitItemFactory;
 use Oliverde8\Component\PhpEtl\ChainBuilder;
+use Oliverde8\Component\PhpEtl\ChainOperation\ChainSplitOperationV1;
+use Oliverde8\Component\PhpEtl\ChainOperation\Extract\JsonExtractOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Grouping\SimpleGroupingOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Loader\FileWriterOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\FilterDataOperation;
@@ -70,4 +74,6 @@ $chainBuilder->registerFactory(new RuleTransformFactory('rule-engine-transformer
 $chainBuilder->registerFactory(new FilterDataFactory('filter', FilterDataOperation::class, $ruleApplier));
 $chainBuilder->registerFactory(new SimpleGroupingFactory('simple-grouping', SimpleGroupingOperation::class));
 $chainBuilder->registerFactory(new JsonFileWriterFactory('json-write', FileWriterOperation::class));
+$chainBuilder->registerFactory(new ChainSplitFactory('split', ChainSplitOperationV1::class, $chainBuilder));
+$chainBuilder->registerFactory(new JsonExtractFactory('json-read', JsonExtractOperation::class, $chainBuilder));
 
