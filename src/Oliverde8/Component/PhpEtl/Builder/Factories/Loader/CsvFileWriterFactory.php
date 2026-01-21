@@ -38,8 +38,7 @@ class CsvFileWriterFactory extends AbstractFactory
     protected function build($operation, $options): ChainOperationInterface
     {
         return $this->create(
-            new CsvFileWriterConfig($options['file']),
-            $options['file']
+            new CsvFileWriterConfig($options['file'])
         );
     }
 }

@@ -6,7 +6,7 @@ namespace Oliverde8\Component\PhpEtl\Builder\Factories\Loader;
 
 use Oliverde8\Component\PhpEtl\Builder\Factories\AbstractFactory;
 use Oliverde8\Component\PhpEtl\ChainOperation\ChainOperationInterface;
-use Oliverde8\Component\PhpEtl\Load\File\Json;
+use Oliverde8\Component\PhpEtl\OperationConfig\Loader\JsonFileWriterConfig;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -36,7 +36,8 @@ class JsonFileWriterFactory extends AbstractFactory
     #[\Override]
     protected function build($operation, $options): ChainOperationInterface
     {
-        $tmp = tempnam(sys_get_temp_dir(), 'etl');
-        return $this->create(new Json($tmp), $options['file']);
+        return $this->create(
+            new JsonFileWriterConfig($options['file']),
+        );
     }
 }

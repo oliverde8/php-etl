@@ -6,6 +6,7 @@ namespace Oliverde8\Component\PhpEtl\Builder\Factories\Grouping;
 
 use Oliverde8\Component\PhpEtl\Builder\Factories\AbstractFactory;
 use Oliverde8\Component\PhpEtl\ChainOperation\ChainOperationInterface;
+use Oliverde8\Component\PhpEtl\OperationConfig\Grouping\SimpleGroupingConfig;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -24,7 +25,12 @@ class SimpleGroupingFactory extends AbstractFactory
     #[\Override]
     public function build(string $operation, array $options): ChainOperationInterface
     {
-        return $this->create($options['grouping-key'], $options['group-identifier']);
+        return $this->create(
+            new SimpleGroupingConfig(
+                $options['grouping-key'],
+                $options['group-identifier']
+            )
+        );
     }
 
     /**
