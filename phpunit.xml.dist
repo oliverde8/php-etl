@@ -24,17 +24,8 @@
         </testsuite>
     </testsuites>
 
-    <filter>
-        <whitelist>
-            <directory>src</directory>
-            <exclude>
-                <directory>src/*/*/*/Tests</directory>
-            </exclude>
-        </whitelist>
-    </filter>
-
     <logging>
-        <log type="coverage-html" target="build/logs/coverage" charset="UTF-8" yui="true" highlight="true"/>
-        <log type="coverage-clover" target="build/logs/clover.xml"/>
+        <testdoxHtml outputFile="build/logs/coverage"/>
+        <junit outputFile="build/logs/clover.xml"/>
     </logging>
 </phpunit>

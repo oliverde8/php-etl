@@ -27,7 +27,7 @@ class ChainSplitOperation extends AbstractChainOperation implements DataChainOpe
     /**
      * @var ChainProcessor[]
      */
-    private array $chainProcessors = [];
+    protected array $chainProcessors = [];
 
 
     public function __construct(ChainBuilderV2 $chainProcessors, ChainSplitConfig $config)

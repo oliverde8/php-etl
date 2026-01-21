@@ -1,0 +1,15 @@
+chain:
+  read-file:
+    operation: csv-read
+    options: [] # The default delimeter,&
+
+  filter-unsubscribed:
+    operation: filter
+    options:
+      rule: [{get : {field: 'IsSubscribed'}}]
+      negate: false
+
+  write-new-file:
+    operation: csv-write
+    options:
+      file: "data/customers-filtered.csv"

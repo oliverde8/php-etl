@@ -1,0 +1,19 @@
+chain:
+  start:
+    operation: log
+    options:
+      message: 'Starting CSV extraction'
+      level: 'info'
+      context: ~
+
+  csv-read:
+    operation: csv-read
+    options: []
+
+  log-customer:
+    operation: log
+    options:
+      level: debug
+      message: '@"Processing customer: " ~ data["FirstName"]'
+      context:
+        firstname: Firstname

@@ -19,16 +19,16 @@ class Json implements FileWriterInterface
     }
 
     #[\Override]
-    public function write($rowData)
-    {
-        $this->init();
-        fputs($this->file, json_encode($rowData) . "\n");
-    }
-
-    #[\Override]
     public function getResource()
     {
         $this->init();
         return $this->file;
+    }
+
+    #[\Override]
+    public function write($rowData)
+    {
+        $this->init();
+        fputs($this->file, json_encode($rowData) . "\n");
     }
 }

@@ -5,22 +5,22 @@ namespace Oliverde8\Component\PhpEtl\Builder\Factories\Transformer;
 
 use Oliverde8\Component\PhpEtl\Builder\Factories\AbstractFactory;
 use Oliverde8\Component\PhpEtl\ChainOperation\ChainOperationInterface;
-use Oliverde8\Component\PhpEtl\Load\File\Json;
-use Oliverde8\Component\RuleEngine\RuleApplier;
+use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\LogConfig;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints as Assert;
 
 class LogFactory  extends AbstractFactory
 {
-    public function __construct(string $operation, string $class)
-    {
-        parent::__construct($operation, $class);
-    }
-
     #[\Override]
     protected function build($operation, $options): ChainOperationInterface
     {
-        return $this->create($options['message'], $options['level'], $options['context'] ?? []);
+        return $this->create(
+            new LogConfig(
+                $options['message'],
+                $options['level'],
+                $options['context'] ?? []
+            )
+        );
     }
 
     #[\Override]

@@ -1,0 +1,13 @@
+chain:
+  csv-read:
+    operation: csv-read
+    options: []
+  log:
+    operation: log
+    options:
+      level: info
+      message: "@'Processing user ' ~ data['ID']"
+      context:
+        user_id: ID
+        firstname: Firstname
+        lastname: LastName

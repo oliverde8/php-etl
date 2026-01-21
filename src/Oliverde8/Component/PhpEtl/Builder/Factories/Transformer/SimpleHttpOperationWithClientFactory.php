@@ -5,16 +5,13 @@ namespace Oliverde8\Component\PhpEtl\Builder\Factories\Transformer;
 use Oliverde8\Component\PhpEtl\Builder\Factories\AbstractFactory;
 use Oliverde8\Component\PhpEtl\ChainOperation\ChainOperationInterface;
 use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\SimpleHttpOperation;
-use Symfony\Component\HttpClient\HttpClient;
+use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\SimpleHttpConfig;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class SimpleHttpOperationWithClientFactory extends AbstractFactory
 {
-    /**
-     * @param HttpClientInterface $httpClient
-     */
     public function __construct(string $operation, private readonly HttpClientInterface $httpClient)
     {
         parent::__construct($operation, SimpleHttpOperation::class);
@@ -23,13 +20,17 @@ class SimpleHttpOperationWithClientFactory extends AbstractFactory
     #[\Override]
     protected function build(string $operation, array $options): ChainOperationInterface
     {
-        return new SimpleHttpOperation(
-            $this->httpClient,
+        $httpConfig = new SimpleHttpConfig(
             $options['method'],
             $options['url'],
             $options['response_is_json'] ?? false,
             $options['option_key'] ?? null,
             $options['response_key'] ?? null,
+        );
+
+        return new SimpleHttpOperation(
+            $this->httpClient,
+            $httpConfig
         );
     }
 
