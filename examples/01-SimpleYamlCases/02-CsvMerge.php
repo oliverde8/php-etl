@@ -7,13 +7,11 @@ use Symfony\Component\Yaml\Yaml;
 require_once __DIR__ . '/.init.php';
 /** @var ChainBuilder $chainBuilder */
 
-$fileName = __DIR__ . '/config/00-csv-read.yml';
+$fileName = __DIR__ . '/config/02-csv-merge.yml';
 
 $chainProcessor = $chainBuilder->buildChainProcessor(Yaml::parse(file_get_contents($fileName)),[]);
 
 $chainProcessor->process(
-    new DataItem([
-        'file' => 'data/customers.csv',
-    ]),
+    new ArrayIterator([new DataItem(['file' => 'data/customers.csv',]), new DataItem(['file' => 'data/customers2.csv',])]),
     []
 );

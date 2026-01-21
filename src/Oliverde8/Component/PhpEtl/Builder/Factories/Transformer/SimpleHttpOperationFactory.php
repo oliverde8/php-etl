@@ -7,6 +7,7 @@ namespace Oliverde8\Component\PhpEtl\Builder\Factories\Transformer;
 use Oliverde8\Component\PhpEtl\Builder\Factories\AbstractFactory;
 use Oliverde8\Component\PhpEtl\ChainOperation\ChainOperationInterface;
 use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\SimpleHttpOperation;
+use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\SimpleHttpConfig;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -22,13 +23,17 @@ class SimpleHttpOperationFactory extends AbstractFactory
 
         $httpClient = HttpClient::create($options['options']);
 
-        return new SimpleHttpOperation(
-            $httpClient,
+        $httpConfig = new SimpleHttpConfig(
             $options['method'],
             $options['url'],
             $options['response_is_json'] ?? false,
             $options['option_key'] ?? null,
             $options['response_key'] ?? null,
+        );
+
+        return new SimpleHttpOperation(
+            $httpClient,
+            $httpConfig
         );
     }
 
@@ -37,7 +42,9 @@ class SimpleHttpOperationFactory extends AbstractFactory
     {
         return new Assert\Collection([
             'method' => [
-                new Assert\Choice(['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD']),
+                new Assert\Choice(
+                    choices: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD']
+                ),
                 new Assert\NotBlank(),
             ],
             'url' => [
