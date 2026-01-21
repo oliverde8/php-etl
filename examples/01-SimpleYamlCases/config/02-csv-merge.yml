@@ -22,4 +22,4 @@ chain:
   write-new-file:
     operation: csv-write
     options:
-      file: "data/output.csv"
+      file: "data/customers-transformed.csv"

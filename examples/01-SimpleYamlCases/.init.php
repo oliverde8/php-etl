@@ -28,7 +28,7 @@ use Oliverde8\Component\RuleEngine\Rules\StrToUpper;
 use Psr\Log\AbstractLogger;
 use Psr\Log\NullLogger;
 
-require __DIR__ . '/../../vendor/autoload.php';
+require_once __DIR__ . '/../../vendor/autoload.php';
 
 // Simple logger that outputs to console
 class ConsoleLogger extends AbstractLogger
@@ -41,13 +41,13 @@ class ConsoleLogger extends AbstractLogger
 }
 
 $ruleApplier = new RuleApplier(
-    new NullLogger(),
+    new ConsoleLogger(),
     [
         new Get(new ConsoleLogger()),
-        new Implode(new NullLogger()),
-        new StrToLower(new NullLogger()),
-        new StrToUpper(new NullLogger()),
-        new ExpressionLanguage(new NullLogger()),
+        new Implode(new ConsoleLogger()),
+        new StrToLower(new ConsoleLogger()),
+        new StrToUpper(new ConsoleLogger()),
+        new ExpressionLanguage(new ConsoleLogger()),
     ]
 );
 
@@ -66,3 +66,4 @@ $chainBuilder->registerFactory(new SplitItemFactory('split-item', SplitItemOpera
 $chainBuilder->registerFactory(new CsvFileWriterFactory('csv-write', FileWriterOperation::class));
 $chainBuilder->registerFactory(new RuleTransformFactory('rule-engine-transformer', RuleTransformOperation::class, $ruleApplier));
 $chainBuilder->registerFactory(new FilterDataFactory('filter', FilterDataOperation::class, $ruleApplier));
+

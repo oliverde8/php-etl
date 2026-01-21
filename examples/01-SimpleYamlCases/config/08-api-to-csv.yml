@@ -1,23 +1,22 @@
 chain:
-    get-from-api:
-        operation: http
-        options:
-            url: https://63b687951907f863aaf90ab1.mockapi.io/test
-            method: GET
-            response_is_json: true
-            option_key: ~
-            response_key: ~
-            options:
-                headers: {'Accept': 'application/json'}
+  get-from-api:
+    operation: http
+    options:
+      url: https://63b687951907f863aaf90ab1.mockapi.io/test
+      method: GET
+      response_is_json: true
+      option_key: ~
+      response_key: ~
+      options:
+        headers: {'Accept': 'application/json'}
 
-    split-item:
-        operation: split-item
-        options:
-            keys: ['content']
-            singleElement: true
+  split-item:
+    operation: split-item
+    options:
+      keys: ['content']
+      singleElement: true
 
-    write-new-file:
-        operation: csv-write
-        options:
-            file: "output.csv"
-
+  write-new-file:
+    operation: csv-write
+    options:
+      file: "data/output.csv"
