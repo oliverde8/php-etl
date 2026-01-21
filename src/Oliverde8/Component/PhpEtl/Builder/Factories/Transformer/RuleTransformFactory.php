@@ -20,8 +20,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class RuleTransformFactory extends AbstractFactory
 {
-    /** @var RuleApplier */
-    protected $ruleApplier;
+    protected RuleApplier $ruleApplier;
 
     /**
      * RuleTransformFactory constructor.

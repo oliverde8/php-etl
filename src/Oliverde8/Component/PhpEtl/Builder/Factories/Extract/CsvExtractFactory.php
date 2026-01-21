@@ -5,8 +5,6 @@ namespace Oliverde8\Component\PhpEtl\Builder\Factories\Extract;
 use Oliverde8\Component\PhpEtl\Builder\Factories\AbstractFactory;
 use Oliverde8\Component\PhpEtl\ChainOperation\ChainOperationInterface;
 use Oliverde8\Component\PhpEtl\OperationConfig\Extract\CsvExtractConfig;
-use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\Constraints as Assert;
 
 class CsvExtractFactory extends AbstractFactory
 {

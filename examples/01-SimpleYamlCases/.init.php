@@ -75,5 +75,5 @@ $chainBuilder->registerFactory(new FilterDataFactory('filter', FilterDataOperati
 $chainBuilder->registerFactory(new SimpleGroupingFactory('simple-grouping', SimpleGroupingOperation::class));
 $chainBuilder->registerFactory(new JsonFileWriterFactory('json-write', FileWriterOperation::class));
 $chainBuilder->registerFactory(new ChainSplitFactory('split', ChainSplitOperationV1::class, $chainBuilder));
-$chainBuilder->registerFactory(new JsonExtractFactory('json-read', JsonExtractOperation::class, $chainBuilder));
+$chainBuilder->registerFactory(new JsonExtractFactory('json-read', JsonExtractOperation::class));
 

@@ -73,6 +73,11 @@ $ruleApplier = new RuleApplier(
 
 $client = HttpClient::create(['headers' => ['Accept' => 'application/json']]);
 
+if (!function_exists('getEtlExecutionContextFactory')) {
+    function getEtlExecutionContextFactory() {
+        return new ExecutionContextFactory();
+    }
+}
 
 $chainBuilder = new ChainBuilderV2(
     getEtlExecutionContextFactory(),
@@ -95,9 +100,3 @@ $chainBuilder = new ChainBuilderV2(
         new GenericChainFactory(ExternalFileProcessorOperation::class, ExternalFileProcessorConfig::class),
     ],
 );
-
-if (!function_exists('getEtlExecutionContextFactory')) {
-    function getEtlExecutionContextFactory() {
-        return new ExecutionContextFactory();
-    }
-}
