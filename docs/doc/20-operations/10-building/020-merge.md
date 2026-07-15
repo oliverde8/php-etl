@@ -56,8 +56,16 @@ $chainConfig
             ->addMerge(
                 (new ChainConfig())
                     ->addLink((new RuleTransformConfig(false))
-                        ->addColumn('sku', [['get' => ['field' => 'sku']], ['append' => '-simple']])
-                        ->addColumn('type', [['const' => 'simple']])
+                        ->addColumn('sku', [
+                            ['implode' => [
+                                'values' => [
+                                    [['get' => ['field' => 'sku']]],
+                                    [['constant' => ['value' => '-simple']]],
+                                ],
+                                'with' => '',
+                            ]]
+                        ])
+                        ->addColumn('type', [['constant' => ['value' => 'simple']]])
                         ->addColumn('name', [['get' => ['field' => 'name']]])
                     )
             )
@@ -65,8 +73,16 @@ $chainConfig
             ->addMerge(
                 (new ChainConfig())
                     ->addLink((new RuleTransformConfig(false))
-                        ->addColumn('sku', [['get' => ['field' => 'sku']], ['append' => '-configurable']])
-                        ->addColumn('type', [['const' => 'configurable']])
+                        ->addColumn('sku', [
+                            ['implode' => [
+                                'values' => [
+                                    [['get' => ['field' => 'sku']]],
+                                    [['constant' => ['value' => '-configurable']]],
+                                ],
+                                'with' => '',
+                            ]]
+                        ])
+                        ->addColumn('type', [['constant' => ['value' => 'configurable']]])
                         ->addColumn('name', [['get' => ['field' => 'name']]])
                     )
             )
@@ -109,7 +125,7 @@ $chainConfig
                             ]]
                         ])
                         ->addColumn('email', [['get' => ['field' => 'Email']]])
-                        ->addColumn('data_type', [['const' => 'contact']])
+                        ->addColumn('data_type', [['constant' => ['value' => 'contact']]])
                     )
             )
             // Branch 2: Subscription status view
@@ -119,7 +135,7 @@ $chainConfig
                         ->addColumn('customer_id', [['get' => ['field' => 'ID']]])
                         ->addColumn('is_subscribed', [['get' => ['field' => 'IsSubscribed']]])
                         ->addColumn('subscription_date', [['get' => ['field' => 'CreatedAt']]])
-                        ->addColumn('data_type', [['const' => 'subscription']])
+                        ->addColumn('data_type', [['constant' => ['value' => 'subscription']]])
                     )
             )
     )
@@ -154,12 +170,12 @@ $chainConfig
                     ->addLink((new RuleTransformConfig(false))
                         ->addColumn('customer_id', [['get' => ['field' => 'customer_id']]])
                         ->addColumn('name', [['get' => ['field' => 'profile', 'name']]])
-                        ->addColumn('source', [['const' => 'profile_api']])
+                        ->addColumn('source', [['constant' => ['value' => 'profile_api']]])
                     )
             )
             // Branch 2: Get order history (with error handling)
             ->addMerge(
-                new FailSafeConfig(
+                (new ChainConfig())->addLink(new FailSafeConfig(
                     chainConfig: (new ChainConfig())
                         ->addLink(new SimpleHttpConfig(
                             url: '@"https://api.example.com/orders?customer="~data["customer_id"]',
@@ -170,11 +186,11 @@ $chainConfig
                         ->addLink((new RuleTransformConfig(false))
                             ->addColumn('customer_id', [['get' => ['field' => 'customer_id']]])
                             ->addColumn('total_orders', [['get' => ['field' => 'orders', 'total']]])
-                            ->addColumn('source', [['const' => 'orders_api']])
+                            ->addColumn('source', [['constant' => ['value' => 'orders_api']]])
                         ),
                     exceptionsToCatch: [\Exception::class],
                     nbAttempts: 3
-                )
+                ))
             )
     )
     ->addLink(new CsvFileWriterConfig('customer-enriched.csv'));
@@ -204,18 +220,18 @@ $chainConfig
                     ->addLink((new RuleTransformConfig(false))
                         ->addColumn('product_id', [['get' => ['field' => 'product_id']]])
                         ->addColumn('name', [['get' => ['field' => 'name']]])
-                        ->addColumn('type', [['const' => 'base']])
-                        ->addColumn('variant', [['const' => null]])
+                        ->addColumn('type', [['constant' => ['value' => 'base']]])
+                        ->addColumn('variant', [['constant' => ['value' => null]]])
                     )
             )
             // Branch 2: Each variant becomes a separate row
             ->addMerge(
                 (new ChainConfig())
-                    ->addLink(new SplitItemConfig(path: 'variants'))
+                    ->addLink(new SplitItemConfig(keys: ['variants']))
                     ->addLink((new RuleTransformConfig(false))
                         ->addColumn('product_id', [['get' => ['field' => 'product_id']]])
                         ->addColumn('name', [['get' => ['field' => 'name']]])
-                        ->addColumn('type', [['const' => 'variant']])
+                        ->addColumn('type', [['constant' => ['value' => 'variant']]])
                         ->addColumn('variant', [['get' => ['field' => 'data']]])
                     )
             )

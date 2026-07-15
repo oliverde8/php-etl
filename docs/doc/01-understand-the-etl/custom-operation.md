@@ -9,7 +9,7 @@ Creating custom operations involves three main components:
 
 1. A configuration class that holds the operation's parameters
 2. An operation class that implements the actual logic
-3. Registering the operation with the ChainBuilder
+3. Registering the operation with `ChainBuilderV2`
 
 ## Step 1: Create a Configuration Class
 

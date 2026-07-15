@@ -140,20 +140,24 @@ $chainConfig
     ->addLink((new ChainMergeConfig())
         // Branch 1: High-value customers (> $1000)
         ->addMerge((new ChainConfig())
-            ->addLink(new FilterDataConfig('@data["total_spent"] > 1000'))
+            ->addLink(new FilterDataConfig([
+                ['expression_language' => ['expression' => 'rowData.total_spent > 1000']]
+            ]))
             ->addLink((new RuleTransformConfig(false))
                 ->addColumn('customer_id', [['get' => ['field' => 'ID']]])
-                ->addColumn('segment', [['const' => 'premium']])
+                ->addColumn('segment', [['constant' => ['value' => 'premium']]])
                 ->addColumn('total_spent', [['get' => ['field' => 'total_spent']]])
             )
             ->addLink(new CsvFileWriterConfig('premium-customers.csv'))
         )
         // Branch 2: Regular customers
         ->addMerge((new ChainConfig())
-            ->addLink(new FilterDataConfig('@data["total_spent"] <= 1000'))
+            ->addLink(new FilterDataConfig([
+                ['expression_language' => ['expression' => 'rowData.total_spent <= 1000']]
+            ]))
             ->addLink((new RuleTransformConfig(false))
                 ->addColumn('customer_id', [['get' => ['field' => 'ID']]])
-                ->addColumn('segment', [['const' => 'regular']])
+                ->addColumn('segment', [['constant' => ['value' => 'regular']]])
                 ->addColumn('total_spent', [['get' => ['field' => 'total_spent']]])
             )
             ->addLink(new CsvFileWriterConfig('regular-customers.csv'))
@@ -196,17 +200,17 @@ $chainConfig
             ->addLink((new RuleTransformConfig(false))
                 ->addColumn('product_id', [['get' => ['field' => 'product_id']]])
                 ->addColumn('name', [['get' => ['field' => 'name']]])
-                ->addColumn('type', [['const' => 'base']])
+                ->addColumn('type', [['constant' => ['value' => 'base']]])
             )
         )
         // Branch 2: Create row for each variant
         ->addMerge((new ChainConfig())
-            ->addLink(new SplitItemConfig(path: 'variants'))
+            ->addLink(new SplitItemConfig(keys: ['variants']))
             ->addLink((new RuleTransformConfig(false))
                 ->addColumn('product_id', [['get' => ['field' => 'product_id']]])
                 ->addColumn('name', [['get' => ['field' => 'name']]])
                 ->addColumn('variant', [['get' => ['field' => 'data']]])  // Split item data
-                ->addColumn('type', [['const' => 'variant']])
+                ->addColumn('type', [['constant' => ['value' => 'variant']]])
             )
         )
     )
@@ -254,7 +258,7 @@ $chainConfig
             ->addLink((new RuleTransformConfig(false))
                 ->addColumn('customer_id', [['get' => ['field' => 'customer_id']]])
                 ->addColumn('credit_score', [['get' => ['field' => 'score']]])
-                ->addColumn('source', [['const' => 'credit_api']])
+                ->addColumn('source', [['constant' => ['value' => 'credit_api']]])
             )
         )
     )
@@ -290,7 +294,7 @@ $chainConfig
             ))
         )
         // Branch 2: Optional API (can fail gracefully)
-        ->addMerge((new FailSafeConfig(
+        ->addMerge((new ChainConfig())->addLink(new FailSafeConfig(
             chainConfig: (new ChainConfig())
                 ->addLink(new SimpleHttpConfig(
                     url: '@"https://api2.example.com/data/"~data["id"]',
@@ -302,7 +306,7 @@ $chainConfig
             nbAttempts: 2
         )))
         // Branch 3: Another optional API
-        ->addMerge((new FailSafeConfig(
+        ->addMerge((new ChainConfig())->addLink(new FailSafeConfig(
             chainConfig: (new ChainConfig())
                 ->addLink(new SimpleHttpConfig(
                     url: '@"https://api3.example.com/data/"~data["id"]',
@@ -357,12 +361,12 @@ $chainConfig->addLink((new ChainMergeConfig())
                 ]]
             ])
             ->addColumn('email', [['get' => ['field' => 'Email']]])
-            ->addColumn('data_source', [['const' => 'basic_info']])
+            ->addColumn('data_source', [['constant' => ['value' => 'basic_info']]])
         )
     )
     
     // Branch 2: Subscription status (with retry)
-    ->addMerge(new FailSafeConfig(
+    ->addMerge((new ChainConfig())->addLink(new FailSafeConfig(
         chainConfig: (new ChainConfig())
             ->addLink(new SimpleHttpConfig(
                 url: '@"https://api.example.com/subscriptions/"~data["ID"]',
@@ -373,14 +377,14 @@ $chainConfig->addLink((new ChainMergeConfig())
                 ->addColumn('customer_id', [['get' => ['field' => 'ID']]])
                 ->addColumn('subscription_tier', [['get' => ['field' => 'tier']]])
                 ->addColumn('subscription_status', [['get' => ['field' => 'status']]])
-                ->addColumn('data_source', [['const' => 'subscription_api']])
+                ->addColumn('data_source', [['constant' => ['value' => 'subscription_api']]])
             ),
         exceptionsToCatch: [\Exception::class],
         nbAttempts: 3
-    ))
+    )))
     
     // Branch 3: Purchase history (with retry)
-    ->addMerge(new FailSafeConfig(
+    ->addMerge((new ChainConfig())->addLink(new FailSafeConfig(
         chainConfig: (new ChainConfig())
             ->addLink(new SimpleHttpConfig(
                 url: '@"https://api.example.com/purchases/"~data["ID"]',
@@ -391,11 +395,11 @@ $chainConfig->addLink((new ChainMergeConfig())
                 ->addColumn('customer_id', [['get' => ['field' => 'ID']]])
                 ->addColumn('total_purchases', [['get' => ['field' => 'total']]])
                 ->addColumn('last_purchase_date', [['get' => ['field' => 'last_date']]])
-                ->addColumn('data_source', [['const' => 'purchase_api']])
+                ->addColumn('data_source', [['constant' => ['value' => 'purchase_api']]])
             ),
         exceptionsToCatch: [\Exception::class],
         nbAttempts: 3
-    ))
+    )))
     
     // Branch 4: Calculated metrics
     ->addMerge((new ChainConfig())

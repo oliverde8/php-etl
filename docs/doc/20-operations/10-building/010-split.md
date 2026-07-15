@@ -52,13 +52,13 @@ $chainConfig
             // Branch 1: Subscribed customers only
             ->addSplit(
                 (new ChainConfig())
-                    ->addLink(new FilterDataConfig('@data["IsSubscribed"]'))
+                    ->addLink(new FilterDataConfig([['get' => ['field' => 'IsSubscribed']]]))
                     ->addLink(new CsvFileWriterConfig('customers-subscribed.csv'))
             )
             // Branch 2: Non-subscribed customers only
             ->addSplit(
                 (new ChainConfig())
-                    ->addLink(new FilterDataConfig('@!data["IsSubscribed"]'))
+                    ->addLink(new FilterDataConfig(rules: [['get' => ['field' => 'IsSubscribed']]], negate: true))
                     ->addLink(new CsvFileWriterConfig('customers-not-subscribed.csv'))
             )
     )
@@ -142,7 +142,7 @@ $chainConfig
             // Branch 2: Export to Marketing (email only)
             ->addSplit(
                 (new ChainConfig())
-                    ->addLink(new FilterDataConfig('@data["IsSubscribed"]'))
+                    ->addLink(new FilterDataConfig([['get' => ['field' => 'IsSubscribed']]]))
                     ->addLink((new RuleTransformConfig(false))
                         ->addColumn('email', [['get' => ['field' => 'Email']]])
                         ->addColumn('first_name', [['get' => ['field' => 'FirstName']]])

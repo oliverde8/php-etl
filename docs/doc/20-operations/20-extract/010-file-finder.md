@@ -16,7 +16,7 @@ This operation works with any file system supported by [Flysystem](https://flysy
 ## How It Works
 
 The `ExternalFileFinder` searches a directory for files matching a provided regex pattern. For each file found, 
-it returns a `FileExtractedItem`. These items are typically passed down the chain to:
+it returns an `ExternalFileItem`. These items are typically passed down the chain to:
 
 - **Process the file** using `ExternalFileProcessorConfig` to copy it locally
 - **Read/process the file** content using format-specific operations (e.g., `CsvExtractConfig`, `JsonExtractConfig`, etc.)
@@ -39,7 +39,7 @@ $fileFinderConfig = new ExternalFileFinderConfig(
 
 **Parameters:**
 - `directory`: The directory path on the file system to search for files
-- `flavor`: (Optional) The flavor to use for multi-instance operations. With Symfony Flysystem integration, use `flysystem.{storage_name}`
+- `flavor`: (Optional) which registered factory to use — see [Flavor](/doc/01-understand-the-etl/flavor.html). With Symfony Flysystem integration, use `flysystem.{storage_name}`
 
 **Input Data:** The operation expects a DataItem containing a regex pattern string to match files against filenames (not full paths).
 
@@ -404,7 +404,7 @@ $chainProcessor->process(
 
 The typical flow when using `ExternalFileFinderConfig`:
 
-1. **Find**: `ExternalFileFinderConfig` searches directory and returns `FileExtractedItem` for each match
+1. **Find**: `ExternalFileFinderConfig` searches directory and returns `ExternalFileItem` for each match
 2. **Copy**: `ExternalFileProcessorConfig` copies the file to local execution context directory
 3. **Process**: Format-specific operations (`CsvExtractConfig`, `JsonExtractConfig`) read the local file
 4. **Transform**: Apply transformations to the data

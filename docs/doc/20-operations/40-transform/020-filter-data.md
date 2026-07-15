@@ -304,7 +304,7 @@ Use `ChainSplitConfig` with filters to split data into multiple output files:
 use Oliverde8\Component\PhpEtl\ChainConfig;
 use Oliverde8\Component\PhpEtl\Item\DataItem;
 use Oliverde8\Component\PhpEtl\OperationConfig\Extract\CsvExtractConfig;
-use Oliverde8\Component\PhpEtl\OperationConfig\Building\ChainSplitConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\ChainSplitConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\FilterDataConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Loader\CsvFileWriterConfig;
 

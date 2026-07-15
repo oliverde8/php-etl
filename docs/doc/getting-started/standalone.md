@@ -12,6 +12,10 @@ focuses on that aspect.
 
 That said, this does not mean the ETL can't be run standalone, it's just that the "init" part is not ideal. 
 
+> ##### TIP
+> Coming from the old YAML config? See [Migrating from YAML](/doc/01-understand-the-etl/migration-from-yaml.html).
+{: .block-tip }
+
 ## Writing some code
 
 - Start by installing the necessary dependencies

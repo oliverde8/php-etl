@@ -67,10 +67,8 @@ class HighVolumeImportDefinition implements ChainDefinitionInterface
 
     public function build(): ChainConfig
     {
-        $chainConfig = new ChainConfig();
-        $chainConfig->setMaxAsynchronousItems(100); // Process up to 100 items in parallel
-
-        return $chainConfig
+        // maxAsynchronousItems is set at construction: process up to 100 items in parallel
+        return (new ChainConfig(maxAsynchronousItems: 100))
             ->addLink(new CsvExtractConfig())
             ->addLink((new RuleTransformConfig(false))
                 ->addColumn('id', [['get' => ['field' => 'ID']]])

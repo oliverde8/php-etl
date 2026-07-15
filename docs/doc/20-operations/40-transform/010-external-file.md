@@ -8,7 +8,7 @@ The **External File Processor** operation moves and registers external files (e.
 
 ## Purpose
 
-When `ExternalFileFinderConfig` locates a remote file, it returns an `FileExtractedItem`. However, that file is not yet part of the ETL's working context.
+When `ExternalFileFinderConfig` locates a remote file, it returns an `ExternalFileItem`. However, that file is not yet part of the ETL's working context.
 
 The `ExternalFileProcessorConfig` operation:
 
@@ -37,7 +37,7 @@ The operation follows a structured file management flow across multiple runs:
 
 ## Filesystem Agnostic
 
-The operation does **not require manual configuration of the filesystem**. It uses the File system instance already embedded in the `FileExtractedItem` provided by the `ExternalFileFinderConfig`.
+The operation does **not require manual configuration of the filesystem**. It uses the File system instance already embedded in the `ExternalFileItem` provided by the `ExternalFileFinderConfig`.
 
 ---
 
@@ -67,7 +67,7 @@ public function __construct(
 
 ## Input/Output
 
-- **Input**: Expects `FileExtractedItem` objects from `ExternalFileFinderConfig`
+- **Input**: Expects `ExternalFileItem` objects from `ExternalFileFinderConfig`
 - **Output**: Produces `DataItem` objects containing local file paths
 
 ---
@@ -111,12 +111,17 @@ $chainProcessor->process(
 
 Process files from an SFTP server with error handling:
 
+The filesystem is not a per-config option — it's injected into the `GenericChainFactory` that builds `ExternalFileFinderOperation`, with a distinct [flavor](/doc/01-understand-the-etl/flavor.html) per adapter:
+
 ```php
 use League\Flysystem\Ftp\FtpAdapter;
 use League\Flysystem\Ftp\FtpConnectionOptions;
 use League\Flysystem\Filesystem;
+use Oliverde8\Component\PhpEtl\ChainBuilderV2;
 use Oliverde8\Component\PhpEtl\ChainConfig;
 use Oliverde8\Component\PhpEtl\Item\DataItem;
+use Oliverde8\Component\PhpEtl\GenericChainFactory;
+use Oliverde8\Component\PhpEtl\ChainOperation\Extract\ExternalFileFinderOperation;
 use Oliverde8\Component\PhpEtl\OperationConfig\Extract\ExternalFileFinderConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Extract\CsvExtractConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\ExternalFileProcessorConfig;
@@ -134,18 +139,25 @@ $adapter = new FtpAdapter(
 );
 $filesystem = new Filesystem($adapter);
 
+// Register a factory for this adapter under its own flavor
+$chainBuilder = new ChainBuilderV2($executionContextFactory, [
+    // ... other factories
+    new GenericChainFactory(
+        ExternalFileFinderOperation::class,
+        ExternalFileFinderConfig::class,
+        flavor: 'sftp',
+        injections: ['fileSystem' => $filesystem]
+    ),
+]);
+
 $chainConfig = new ChainConfig();
 $chainConfig
-    ->addLink(new ExternalFileFinderConfig(
-        directory: '/uploads',
-        fileSystem: $filesystem
-    ))
+    ->addLink(new ExternalFileFinderConfig(directory: '/uploads', flavor: 'sftp'))
     ->addLink(new ExternalFileProcessorConfig())
     ->addLink(new CsvExtractConfig(delimiter: ';'))
-    ->addLink(new RuleTransformConfig([
-        'status' => '"processed"',
-        'processed_at' => 'now()'
-    ]))
+    ->addLink((new RuleTransformConfig(add: true))
+        ->addColumn('status', [['constant' => ['value' => 'processed']]])
+    )
     ->addLink(new CsvFileWriterConfig('processed_orders.csv'))
     ->addLink(new ExternalFileProcessorConfig());
 
@@ -160,23 +172,33 @@ $chainProcessor->process(
 
 Process different file types differently after initial file processor:
 
+`ChainSplitConfig` branches all receive the same item — there's no per-branch condition on `addSplit()`. To route by file type, filter each branch with a callback that breaks the chain for files it doesn't handle:
+
 ```php
 use Oliverde8\Component\PhpEtl\ChainConfig;
 use Oliverde8\Component\PhpEtl\Item\DataItem;
+use Oliverde8\Component\PhpEtl\Item\ChainBreakItem;
 use Oliverde8\Component\PhpEtl\OperationConfig\Extract\ExternalFileFinderConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\ExternalFileProcessorConfig;
-use Oliverde8\Component\PhpEtl\OperationConfig\Building\ChainSplitConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\CallBackTransformerConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\ChainSplitConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Extract\CsvExtractConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Extract\JsonExtractConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Loader\CsvFileWriterConfig;
 
 $csvChain = new ChainConfig();
 $csvChain
+    ->addLink(new CallBackTransformerConfig(function (DataItem $item) {
+        return str_ends_with($item->getData(), '.csv') ? $item : new ChainBreakItem();
+    }))
     ->addLink(new CsvExtractConfig())
     ->addLink(new CsvFileWriterConfig('csv_output.csv'));
 
 $jsonChain = new ChainConfig();
 $jsonChain
+    ->addLink(new CallBackTransformerConfig(function (DataItem $item) {
+        return str_ends_with($item->getData(), '.json') ? $item : new ChainBreakItem();
+    }))
     ->addLink(new JsonExtractConfig())
     ->addLink(new CsvFileWriterConfig('json_output.csv'));
 
@@ -184,9 +206,9 @@ $mainChain = new ChainConfig();
 $mainChain
     ->addLink(new ExternalFileFinderConfig(directory: '/data/mixed'))
     ->addLink(new ExternalFileProcessorConfig())
-    ->addLink(new ChainSplitConfig()
-        ->addSplit('preg_match("/\.csv$/", item.data)', $csvChain)
-        ->addSplit('preg_match("/\.json$/", item.data)', $jsonChain)
+    ->addLink((new ChainSplitConfig())
+        ->addSplit($csvChain)
+        ->addSplit($jsonChain)
     )
     ->addLink(new ExternalFileProcessorConfig());
 
@@ -248,7 +270,7 @@ use Oliverde8\Component\PhpEtl\Item\DataItem;
 use Oliverde8\Component\PhpEtl\OperationConfig\Extract\ExternalFileFinderConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\ExternalFileProcessorConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Extract\CsvExtractConfig;
-use Oliverde8\Component\PhpEtl\OperationConfig\Building\FailSafeConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\FailSafeConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Loader\CsvFileWriterConfig;
 
 // Create chain with error handling
@@ -259,15 +281,13 @@ $processingChain
 
 $mainChain = new ChainConfig();
 $mainChain
-    // Look in both incoming and processing directories (for retry)
-    ->addLink(new ExternalFileFinderConfig(
-        directory: '/data/incoming',
-        additionalDirectories: ['/data/processing']
-    ))
+    // Files stuck in processing/ from a previously failed run need their own finder pass
+    ->addLink(new ExternalFileFinderConfig(directory: '/data/incoming'))
     ->addLink(new ExternalFileProcessorConfig())
     ->addLink(new FailSafeConfig(
-        chain: $processingChain,
-        retries: 3
+        chainConfig: $processingChain,
+        exceptionsToCatch: [\Exception::class],
+        nbAttempts: 3
     ))
     ->addLink(new ExternalFileProcessorConfig());
 
@@ -278,7 +298,7 @@ $chainProcessor->process(
 );
 ```
 
-**Note**: Files that failed previously will be in the `processing/` directory. The `ExternalFileFinderConfig` can be configured to look in multiple directories.
+**Note**: `ExternalFileFinderConfig` only searches one `directory`. To retry files stuck in `processing/` from a failed previous run, add a second `ExternalFileFinderConfig` link (or a separate chain run) pointed at that path.
 
 ---
 
