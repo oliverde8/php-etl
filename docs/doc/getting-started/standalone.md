@@ -40,6 +40,7 @@ $executionContextFactory = new ExecutionContextFactory();
 use Oliverde8\Component\PhpEtl\ChainBuilderV2;
 use Oliverde8\Component\PhpEtl\GenericChainFactory;
 use Oliverde8\Component\RuleEngine\RuleApplier;
+use Oliverde8\Component\RuleEngine\Rules\Constant;
 use Oliverde8\Component\RuleEngine\Rules\Get;
 use Oliverde8\Component\RuleEngine\Rules\Implode;
 use Oliverde8\Component\RuleEngine\Rules\StrToLower;
@@ -57,6 +58,7 @@ $ruleApplier = new RuleApplier(
         new StrToLower(new NullLogger()),
         new StrToUpper(new NullLogger()),
         new ExpressionLanguage(new NullLogger()),
+        new Constant(new NullLogger()),
     ]
 );
 
