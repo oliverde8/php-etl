@@ -1,6 +1,6 @@
 # 🌟 2.0.0 🌟
 
-- :star2: - **NEW PARADIGM** - use php for configurations instead of yaml (**Breaking Change**)
+- :star2: - **NEW PARADIGM** - use php for configurations instead of yaml
 - :star2: - Complete rewrite of the ChainProcessor
 - :star2: - Optimized chain processor not to send as many stop items when multiple chains are involved
 - :star2: - Allows ChainProcessor to output through generators the items at the end. This is great to remove all limitations of the current sub chains.
@@ -14,6 +14,7 @@
     has evolved and some complex cases the ETL didn't handle well could be easily fixed by using the new features of
     the language (mostly using Generators).
 - :exclamation: **Deprecation** Support for symfony 4 and 5 was dropped.
+- :exclamation: **Deprecation** The yaml/array configuration (`ChainBuilder`) is deprecated in favor of the new php configuration (`ChainBuilderV2`), but remains fully supported.
 
 # 1.2.1
 - :wrench: Fix - Temporary files not being deleted when using file load operations.
