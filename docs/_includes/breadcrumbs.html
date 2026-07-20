@@ -1,0 +1,26 @@
+{% if page.url != '/' %}
+<nav class="pe-breadcrumbs" aria-label="Breadcrumb">
+    <a href="/">Home</a>
+    {% if page.url == '/changelog.html' %}
+        <span class="pe-breadcrumbs__sep">/</span>
+        <span class="pe-breadcrumbs__current">Changelog</span>
+    {% elsif page.url contains '/doc/' %}
+        {% assign section = nil %}
+        {% for s in site.data.sections %}
+            {% if section == nil and page.url contains s.prefix %}
+                {% assign section = s %}
+            {% endif %}
+        {% endfor %}
+        <span class="pe-breadcrumbs__sep">/</span>
+        <a href="/doc/getting-started.html">Docs</a>
+        {% if section %}
+            <span class="pe-breadcrumbs__sep">/</span>
+            <a href="{{ section.url }}">{{ section.name }}</a>
+        {% endif %}
+        {% if page.subTitle and page.subTitle != "" %}
+            <span class="pe-breadcrumbs__sep">/</span>
+            <span class="pe-breadcrumbs__current">{{ page.subTitle }}</span>
+        {% endif %}
+    {% endif %}
+</nav>
+{% endif %}

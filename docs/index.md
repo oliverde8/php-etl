@@ -1,112 +1,137 @@
 ---
 layout: base
-title: Welcome to the PHP-ETL Doc page
-subTitle: 
+title: PHP-ETL - Extract, Transform, Load for PHP
+subTitle:
 ---
 
-## What is PHP-ETL
+<div class="pe-home-hero">
+    <h1 class="pe-home-hero__title">Extract, Transform, Load.</h1>
+    <p class="pe-home-hero__subtitle">
+        PHP-ETL is the go-to library for executing complex data import, export, and transformation tasks
+        within PHP applications, with seamless Symfony and Sylius integrations.
+    </p>
+    <div class="pe-home-hero__install">
+        <code>$ composer require oliverde8/php-etl</code>
+    </div>
+    <div class="pe-home-hero__ctas">
+        <a href="/doc/getting-started.html" class="pe-btn pe-btn--primary">Get Started</a>
+        <a href="https://github.com/oliverde8/php-etl" class="pe-btn pe-btn--outline">GitHub</a>
+    </div>
+    <div class="pe-home-hero__badges">
+        <a href="https://github.com/oliverde8/php-etl/stargazers" class="pe-home-hero__badge">⭐ Star on GitHub</a>
+        <a href="https://github.com/sponsors/oliverde8" class="pe-home-hero__badge">💜 Sponsor</a>
+    </div>
+</div>
 
-PHP-ETL is the go-to library for executing complex data import, export, and transformation tasks within PHP applications. 
-It offers seamless integrations with the [🎵 Symfony Framework](https://symfony.com/), [🦢 Sylius](https://sylius.com/fr/) , and can easily be integrated to 
-other CMS and &frameworks, making it ideal for handling intricate data workflows with ease.
+## Why PHP-ETL?
 
-## Why PHP-ETL
+<p class="pe-home-section__subtitle">A standardized approach for handling complex data tasks, without locking you into a rigid framework.</p>
 
-PHP-ETL was built to address a common challenge in real-world applications: while complex data transformations should 
-ideally be handled by enterprise ETL tools or ESBs, the reality is that many CMS platforms require intricate 
-transformations within the application itself. This often leads to complex, hard-to-maintain code with limited
-flexibility, usually confined to specific execution methods like command-line scripts.
+<div class="pe-feature-grid">
+    <div class="pe-feature-card">
+        <div class="pe-feature-card__icon">🔗</div>
+        <h3>Composable Chains</h3>
+        <p>Split, Merge, Repeat, and FailSafe operations let you build complex pipelines out of small, reusable pieces.</p>
+    </div>
+    <div class="pe-feature-card">
+        <div class="pe-feature-card__icon">⚡</div>
+        <h3>Asynchronous Operations</h3>
+        <p>API calls and other long-running tasks can run in parallel without blocking the rest of the chain.</p>
+    </div>
+    <div class="pe-feature-card">
+        <div class="pe-feature-card__icon">📁</div>
+        <h3>Multi-Source I/O</h3>
+        <p>Read and write CSV and JSON, or reach remote files over SFTP, S3, and more via Flysystem.</p>
+    </div>
+    <div class="pe-feature-card">
+        <div class="pe-feature-card__icon">🧩</div>
+        <h3>Rule Engine</h3>
+        <p>Shape and transform data declaratively with a flexible rule engine, no custom transformer code required.</p>
+    </div>
+    <div class="pe-feature-card">
+        <div class="pe-feature-card__icon">🎯</div>
+        <h3>Framework-Agnostic</h3>
+        <p>Use it standalone, or drop into Symfony and Sylius with bundle integrations.</p>
+    </div>
+    <div class="pe-feature-card">
+        <div class="pe-feature-card__icon">📊</div>
+        <h3>Auto-Generated Diagrams</h3>
+        <p>Visualize any chain as a Mermaid flowchart, generated straight from your configuration.</p>
+    </div>
+    <div class="pe-feature-card">
+        <div class="pe-feature-card__icon">🛡️</div>
+        <h3>Fail-Safe by Design</h3>
+        <p>Wrap operations in retryable, exception-catching sub-chains without extra plumbing.</p>
+    </div>
+    <div class="pe-feature-card">
+        <div class="pe-feature-card__icon">🗂️</div>
+        <h3>Traceable Executions</h3>
+        <p>Keep a clear history of processed files, so nothing important gets silently lost.</p>
+    </div>
+</div>
 
-I wanted a more flexible solution—one that allowed easy splitting of code, reusable operations,
-consistent logging, and a clear history of processed files. PHP-ETL offers a standardized approach for handling 
-complex tasks, such as reading remote files and performing advanced operations like data aggregation,
-all while promoting efficient memory usage. 
-It provides an abstraction layer for common tasks, simplifying operations across various file systems 
-(via [Flysystem](https://flysystem.thephpleague.com/docs/)) and ensuring backup and accessibility of processed files.
+## Works With Your Stack
 
-Additionally, while PHP isn't naturally suited for asynchronous tasks, 
-PHP-ETL handles asynchronous operations—such as API calls—natively, allowing certain tasks to run in parallel, 
-like loading data into the database while making API calls. The library also supports visualizing data flows
-through auto-generated diagrams, making complex workflows easier to understand and manage.
+<div class="pe-integrations-grid">
+    <a href="/doc/getting-started/standalone.html" class="pe-integration-card">
+        <span class="pe-integration-card__icon">🐘</span> Standalone
+    </a>
+    <a href="/doc/getting-started/symfony.html" class="pe-integration-card">
+        <span class="pe-integration-card__icon">🎵</span> Symfony
+    </a>
+    <a href="/doc/getting-started/sylius.html" class="pe-integration-card">
+        <span class="pe-integration-card__icon">🦢</span> Sylius
+    </a>
+    <a href="https://flysystem.thephpleague.com/docs/" class="pe-integration-card" target="_blank">
+        <span class="pe-integration-card__icon">📁</span> Flysystem
+    </a>
+</div>
 
-## A execution tree
+## See It In Action
 
-{% capture mermaid %}
-flowchart TD
+Define a chain in PHP, get a flowchart for free — generated automatically from your configuration. Here's a chain
+that splits subscribed customers into their own file while still writing everyone to the main export:
 
-subgraph Execution
-%% Nodes
-0B(Extract Get Article API Params Data<br/><br/>2<i class="sign in alternate icon"></i> / 2<i class="sign out alternate icon"></i><br/>00:00.064<i class="hourglass half icon"></i>)
-style 0B fill:#EEE;
-1B(Get products/articles until api stop's<br/><br/>2<i class="sign in alternate icon"></i> / 2<i class="sign out alternate icon"></i><br/>00:00.000<i class="hourglass half icon"></i>)@{ shape: hex}
-subgraph 1S[Get articles until api stop's]
-100B(Make get Article API call<br/><br/>4<i class="sign in alternate icon"></i> / 1<i class="clock icon"></i> / 0<i class="sign out alternate icon"></i><br/>00:05.243<i class="hourglass half icon"></i>)
-style 100B fill:#ffe294;
-end
-style 1B fill:#EEE;
-2B(Write api response to file to keep history<br/><br/>4<i class="sign in alternate icon"></i> / 4<i class="sign out alternate icon"></i><br/>00:00.057<i class="hourglass half icon"></i>)
-style 2B fill:#EEE;
-3B(Split response<br/><br/>5<i class="sign in alternate icon"></i> / 5<i class="sign out alternate icon"></i><br/>00:00.008<i class="hourglass half icon"></i>)
-style 3B fill:#EEE;
-4B(Map Api fields with Sylius attributes code<br/><br/>2085<i class="sign in alternate icon"></i> / 2085<i class="sign out alternate icon"></i><br/>00:01.482<i class="hourglass half icon"></i>)
-style 4B fill:#EEE;
-5B(Branch to handle attribute option values & product imports<br/><br/>2085<i class="sign in alternate icon"></i> / 2085<i class="sign out alternate icon"></i><br/>04:28.817<i class="hourglass half icon"></i>)@{ shape: hex}
-subgraph 5S[Branch to handle attribute option values & product imports]
-500B(Split each attribute items<br/><br/>2085<i class="sign in alternate icon"></i> / 2085<i class="sign out alternate icon"></i><br/>00:00.248<i class="hourglass half icon"></i>)
-style 500B fill:#EEE;
-501B(Load Attribute from database<br/><br/>89571<i class="sign in alternate icon"></i> / 89571<i class="sign out alternate icon"></i><br/>00:46.995<i class="hourglass half icon"></i>)
-style 501B fill:#EEE;
-502B(Add new choices to select attributes<br/><br/>89571<i class="sign in alternate icon"></i> / 2<i class="sign out alternate icon"></i><br/>00:09.363<i class="hourglass half icon"></i>)
-style 502B fill:#EEE;
-503B(Persist attribute<br/><br/>2<i class="sign in alternate icon"></i> / 2<i class="sign out alternate icon"></i><br/>00:00.001<i class="hourglass half icon"></i>)
-style 503B fill:#EEE;
-510B(Flush Doctrine before importing products<br/><br/>2085<i class="sign in alternate icon"></i> / 2085<i class="sign out alternate icon"></i><br/>00:00.961<i class="hourglass half icon"></i>)
-style 510B fill:#EEE;
-511B(Load Product from database<br/><br/>2085<i class="sign in alternate icon"></i> / 2085<i class="sign out alternate icon"></i><br/>00:00.904<i class="hourglass half icon"></i>)
-style 511B fill:#EEE;
-512B(Create or Update product<br/><br/>2085<i class="sign in alternate icon"></i> / 2085<i class="sign out alternate icon"></i><br/>00:27.247<i class="hourglass half icon"></i>)
-style 512B fill:#EEE;
-513B(Add price to product<br/><br/>2085<i class="sign in alternate icon"></i> / 2085<i class="sign out alternate icon"></i><br/>00:01.651<i class="hourglass half icon"></i>)
-style 513B fill:#EEE;
-514B(Persist entities<br/><br/>2085<i class="sign in alternate icon"></i> / 2085<i class="sign out alternate icon"></i><br/>00:00.338<i class="hourglass half icon"></i>)
-style 514B fill:#EEE;
-515B(Flush entities<br/><br/>2085<i class="sign in alternate icon"></i> / 2085<i class="sign out alternate icon"></i><br/>00:02.117<i class="hourglass half icon"></i>)
-style 515B fill:#EEE;
-516B(Clear doctrine<br/><br/>2085<i class="sign in alternate icon"></i> / 2085<i class="sign out alternate icon"></i><br/>00:00.213<i class="hourglass half icon"></i>)
-style 516B fill:#EEE;
-517B(Prepare data for Set association product API<br/><br/>2085<i class="sign in alternate icon"></i> / 2085<i class="sign out alternate icon"></i><br/>00:00.201<i class="hourglass half icon"></i>)
-style 517B fill:#EEE;
-518B(Set Sylius Product ID association - API call<br/><br/>2085<i class="sign in alternate icon"></i> / 2<i class="sign out alternate icon"></i><br/>00:00.687<i class="hourglass half icon"></i>)
-style 518B fill:#EEE;
-519B(Log association response<br/><br/>2085<i class="sign in alternate icon"></i> / 4168<i class="sign out alternate icon"></i><br/>00:00.012<i class="hourglass half icon"></i>)
-style 519B fill:#EEE;
-end
-style 5B fill:#EEE;
-%% Links
-0B --> 1B
-1B --> 100B
-1B --> 2B
-1S ~~~ 2B
-2B --> 3B
-3B --> 4B
-4B --> 5B
-5B --> 500B
-500B --> 501B
-501B --> 502B
-502B --> 503B
-5B --> 510B
-510B --> 511B
-511B --> 512B
-512B --> 513B
-513B --> 514B
-514B --> 515B
-515B --> 516B
-516B --> 517B
-517B --> 518B
-518B --> 519B
-end
+{% capture code_col %}
+```php
+$chainConfig = (new ChainConfig())
+    ->addLink(new CsvExtractConfig())
+    ->addLink((new ChainSplitConfig())
+        ->addSplit((new ChainConfig())
+            ->addLink(new FilterDataConfig([
+                ['get' => ['field' => 'IsSubscribed']]
+            ]))
+            ->addLink(new CsvFileWriterConfig('subscribed.csv'))
+        )
+    )
+    ->addLink(new CsvFileWriterConfig('all-customers.csv'));
+
+$chainProcessor = $chainBuilder->createChain($chainConfig);
+$chainProcessor->process($input, []);
+```
 {% endcapture %}
 
-{% include block/mermaid.html mermaid=mermaid %}
+{% capture mermaid_source %}
+flowchart TD
+    A[Extract CSV] --> B{Split}
+    B --> C[Filter: Subscribed]
+    C --> D[Write subscribed.csv]
+    B --> E[Write all-customers.csv]
+{% endcapture %}
 
+{% capture diagram_col %}
+{% include block/mermaid.html mermaid=mermaid_source %}
+{% endcapture %}
 
+{% include block/2column.html column1=code_col column2=diagram_col %}
+
+<p class="pe-home-section__subtitle">Real chains can get a lot more involved — see the <a href="/doc/10-examples/180-api-pagination.html">cookbook</a> for real-world examples like API pagination and nested sub-chains.</p>
+
+<div class="pe-home-cta">
+    <h2>Ready to get started?</h2>
+    <p>Install PHP-ETL and have your first chain running in a few minutes.</p>
+    <div class="pe-home-cta__buttons">
+        <a href="/doc/getting-started.html" class="pe-btn pe-btn--primary">Read the Docs</a>
+        <a href="https://github.com/oliverde8/php-etl" class="pe-btn pe-btn--outline">Star on GitHub</a>
+    </div>
+</div>

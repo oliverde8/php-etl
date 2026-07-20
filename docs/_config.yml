@@ -20,7 +20,7 @@ description: >-
   It offers seamless integrations with Symfony and Sylius, and can easily be extended to other CMS and frameworks,
   making it ideal for handling intricate data workflows with ease
 baseurl: "" # the subpath of your site, e.g. /blog
-url: "" # the base hostname & protocol for your site, e.g. http://example.com
+url: "https://php-etl.oliver-decramer.com" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: oliverde8
 github_username:  oliverde8
 

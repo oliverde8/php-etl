@@ -1,16 +1,9 @@
-<div class="ui masthead vertical segment">
-    <div class="ui container">
-        <div class="ui right floated main menu">
-            <a class="github popup icon item" data-content="View project on GitHub" href="https://github.com/oliverde8/php-etl">
-                <i class="alternate github icon"></i>
-            </a>
-        </div>
-        <h1 class="ui header">
-            {{ page.title }}
-
-            <div class="sub header">
-                {{ page.subTitle }}
-            </div>
-        </h1>
+<div class="pe-hero">
+    <div class="pe-hero__inner">
+        {% include breadcrumbs.html %}
+        <h1 class="pe-hero__title">{{ page.title }}</h1>
+        {% if page.subTitle %}
+        <p class="pe-hero__subtitle">{{ page.subTitle }}</p>
+        {% endif %}
     </div>
 </div>

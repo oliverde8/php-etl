@@ -42,7 +42,7 @@
 - :wrench: Fix - Usage of the AbstractFactory for operation without overriding configureValidator causing errors.
 
 # 1.1.1
-- -:exclamation: **Deprecation - Dropped support for php 7.4 and 8.0.** Both are in end of life.
+- :exclamation: **Deprecation - Dropped support for php 7.4 and 8.0.** Both are in end of life.
 - :wrench: Fix - Deprecation issues with the Csv extractor.
 - :wrench: Fix - Add missing tests to Csv extractor. 
 - :wrench: Fix - Unit test not running for ChainSplitOperation.
@@ -76,7 +76,7 @@
 - :star2: Improve method resolution for chain operations to use types instead of arbitrary names. processData can be names anything now as long as it typed properly
 - :wrench: Improve the global quality of the code by having typed methods.
 
--:exclamation: This will break any of your existing chain declarations: 
+- :exclamation: This will break any of your existing chain declarations: 
  - If you are using the symfony bundle only your custom operations will break (not factories). The context is now an object. 
  - If not the definition of chains remains un changed but both the `ChainBuilder` and `ChainProcessor` has changed.
 
@@ -90,7 +90,7 @@
 
 - :star2: Added a chainBuilder this allow building chanins from descriptions (such as yaml files)
 - :star2: Added the [Symfony Expression Langauge](https://symfony.com/doc/3.4/components/expression_language.html) to the RuleEngine
--:exclamation: The condition rule was deprecated in favor of the Symfony Expression Language.
+- :exclamation: The condition rule was deprecated in favor of the Symfony Expression Language.
 
 # 0.1.0
 

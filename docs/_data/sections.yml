@@ -1,0 +1,12 @@
+- name: Getting Started
+  prefix: /doc/getting-started
+  url: /doc/getting-started/standalone.html
+- name: Core Concepts
+  prefix: /doc/01-understand-the-etl
+  url: /doc/01-understand-the-etl/the-concept.html
+- name: Operations
+  prefix: /doc/20-operations
+  url: /doc/20-operations/10-building/010-split.html
+- name: Cookbook
+  prefix: /doc/10-examples
+  url: /doc/10-examples/100-grouping.html

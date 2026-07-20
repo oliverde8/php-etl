@@ -1,0 +1,73 @@
+:root {
+    --header-height: 64px;
+
+    --color-bg: #ffffff;
+    --color-surface: #f5f5f7;
+    --color-surface-hover: #ebebef;
+    --color-text: #1c1c1e;
+    --color-text-muted: #68686f;
+    --color-border: #e3e3e6;
+
+    --color-primary: #6a48d7;
+    --color-primary-hover: #5636b5;
+    --color-primary-surface: #f1ecfd;
+    --color-primary-contrast: #ffffff;
+
+    --color-code-bg: #282c34;
+    --color-code-text: #abb2bf;
+
+    --color-tip-bg: #e6f7ff;
+    --color-tip-border: #91d5ff;
+    --color-tip-text: #0050b3;
+
+    --color-warning-bg: #fffbe6;
+    --color-warning-border: #ffe58f;
+    --color-warning-text: #ad8b00;
+
+    --color-error-bg: #fff1f0;
+    --color-error-border: #ffa39e;
+    --color-error-text: #cf1322;
+}
+
+// Single source of truth for the dark palette, reused both for the
+// OS-preference media query (default behavior) and the explicit
+// [data-theme="dark"] override (set by the toggle button in header.html).
+@mixin dark-theme-vars {
+    --color-bg: #121212;
+    --color-surface: #1c1c1e;
+    --color-surface-hover: #262628;
+    --color-text: #e4e4e6;
+    --color-text-muted: #8b8b92;
+    --color-border: #303033;
+
+    --color-primary: #a58bf0;
+    --color-primary-hover: #b9a3f5;
+    --color-primary-surface: #241e38;
+    --color-primary-contrast: #121212;
+
+    --color-tip-bg: #112a3d;
+    --color-tip-border: #1f6ea8;
+    --color-tip-text: #7ec2ff;
+
+    --color-warning-bg: #332c10;
+    --color-warning-border: #a6862c;
+    --color-warning-text: #f0cf5a;
+
+    --color-error-bg: #3a1616;
+    --color-error-border: #a34640;
+    --color-error-text: #ff8a83;
+}
+
+// Auto (OS preference) — skipped when the toggle has explicitly forced light.
+@media (prefers-color-scheme: dark) {
+    html:not([data-theme="light"]) {
+        @include dark-theme-vars;
+    }
+}
+
+// Explicit override, set by the toggle button regardless of OS preference.
+// (Targets `html` rather than `:root` — jekyll-sass-converter's pipeline was
+// mangling a bare `:root[attr]` selector into invalid `::root[attr]`.)
+html[data-theme="dark"] {
+    @include dark-theme-vars;
+}

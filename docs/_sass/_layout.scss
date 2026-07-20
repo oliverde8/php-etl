@@ -1,0 +1,255 @@
+.pe-topbar {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    height: var(--header-height);
+    background-color: var(--color-bg);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.pe-topbar__inner {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    padding: 0 24px;
+}
+
+.pe-topbar__brand {
+    display: flex;
+    align-items: center;
+    flex: 0 0 auto;
+}
+
+.pe-topbar__nav {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex: 0 0 auto;
+}
+
+.pe-topbar__actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-left: auto;
+}
+
+.pe-shell {
+    display: flex;
+    align-items: stretch;
+    min-height: calc(100vh - var(--header-height));
+}
+
+.pe-sidebar {
+    flex: 0 0 280px;
+    width: 280px;
+    position: sticky;
+    top: var(--header-height);
+    align-self: flex-start;
+    height: calc(100vh - var(--header-height));
+    overflow-y: auto;
+    background-color: var(--color-bg);
+    border-right: 1px solid var(--color-border);
+}
+
+.pe-sidebar__toggle {
+    display: none;
+}
+
+.pe-sidebar__nav-wrapper {
+    display: block;
+    padding: 8px 0;
+}
+
+.pe-content {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.pe-content__container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 48px 32px;
+    width: 100%;
+    overflow-x: hidden;
+
+    &--large {
+        max-width: 100%;
+        padding: 48px 5%;
+    }
+}
+
+.pe-footer {
+    margin-top: auto;
+    border-top: 1px solid var(--color-border);
+    background-color: var(--color-surface);
+    color: var(--color-text);
+    padding: 48px 5% 24px;
+}
+
+.pe-footer__inner {
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.pe-footer__grid {
+    display: flex;
+    justify-content: center;
+    gap: 56px;
+    text-align: left;
+    margin-bottom: 32px;
+}
+
+.pe-footer__col {
+    h4 {
+        color: var(--color-text);
+        font-size: 1.1em;
+        margin-bottom: 12px;
+    }
+
+    p {
+        color: var(--color-text-muted);
+        max-width: 220px;
+    }
+}
+
+.pe-footer__links {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    a {
+        color: var(--color-text-muted);
+        text-decoration: none;
+
+        &:hover {
+            color: var(--color-primary);
+        }
+    }
+}
+
+.pe-footer__divider {
+    border: none;
+    border-top: 1px solid var(--color-border);
+    margin: 0 0 24px;
+}
+
+.pe-footer__bottom {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.pe-footer__logo {
+    height: 28px;
+    width: auto;
+}
+
+.pe-footer__legal {
+    color: var(--color-text-muted);
+    font-size: 0.9em;
+    margin: 0;
+
+    a {
+        color: var(--color-text-muted);
+        text-decoration: underline;
+
+        &:hover {
+            color: var(--color-primary);
+        }
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .pe-sidebar {
+        flex: 0 0 220px;
+        width: 220px;
+    }
+}
+
+@media (max-width: 768px) {
+    .pe-topbar__nav {
+        gap: 12px;
+    }
+
+    .pe-topbar__inner {
+        gap: 8px;
+        padding: 0 12px;
+    }
+
+    .pe-topbar__nav {
+        display: none;
+    }
+
+    .pe-topbar__actions {
+        gap: 10px;
+    }
+
+    .pe-shell {
+        flex-direction: column;
+    }
+
+    .pe-sidebar {
+        flex-basis: auto;
+        width: 100%;
+        position: relative;
+        top: 0;
+        height: auto;
+        overflow-y: visible;
+    }
+
+    .pe-sidebar__toggle {
+        display: inline-flex;
+    }
+
+    .pe-sidebar__nav-wrapper {
+        display: none;
+    }
+
+    .pe-sidebar.open .pe-sidebar__nav-wrapper {
+        display: block;
+    }
+
+    .pe-content__container,
+    .pe-content__container--large {
+        padding: 16px;
+
+        h1 { font-size: 1.6em; }
+        h2 { font-size: 1.3em; }
+        h3 { font-size: 1.1em; }
+
+        table {
+            font-size: 0.8em;
+            display: block;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        th, td {
+            padding: 5px 7px;
+        }
+    }
+
+    .pe-footer__grid {
+        flex-direction: column;
+        align-items: center;
+        gap: 32px;
+        text-align: center;
+    }
+
+    .pe-footer__links {
+        align-items: center;
+    }
+
+    .pe-footer__col p {
+        max-width: none;
+    }
+}

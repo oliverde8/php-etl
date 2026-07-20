@@ -1,136 +1,106 @@
+{% assign chevron = '<svg class="pe-nav-group__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"></polyline></svg>' %}
+<nav id="main-menu" class="pe-sidebar">
+    <div class="pe-sidebar__nav-wrapper">
 
-<div id="main-menu">
-    <div class="ui vertical menu">
-        <div class="item">
-            <button id="mobile-menu-toggle" class="ui icon button mobile-only menu-toggle">
-                <i class="bars icon"></i>
-            </button>
-            <a href="/" class="logo" >
-                <img class="logo" src="/assets/images/logo.png" alt="Logo of php-etl">
-            </a>
-        </div>
+        <details class="pe-nav-group"{% if page.url contains '/doc/getting-started' %} open{% endif %}>
+            <summary class="pe-nav-group__title">
+                <a href="/doc/getting-started.html">Getting Started</a>
+                {{ chevron }}
+            </summary>
+            <ul class="pe-nav">
+                <li><a class="pe-nav__item{% if page.url == '/doc/getting-started/standalone.html' %} active{% endif %}" href="/doc/getting-started/standalone.html">🐘 Standalone</a></li>
+                <li><a class="pe-nav__item{% if page.url == '/doc/getting-started/symfony.html' %} active{% endif %}" href="/doc/getting-started/symfony.html">🎵 Symfony</a></li>
+                <li><a class="pe-nav__item{% if page.url == '/doc/getting-started/sylius.html' %} active{% endif %}" href="/doc/getting-started/sylius.html">🦢 Sylius</a></li>
+            </ul>
+        </details>
 
-        <div id="mobile-menu-content">
-            <div class="item search-box">
-                <div class="ui transparent icon input">
-                    <input type="text" id="search-input" placeholder="Search docs...">
-                    <i class="search icon"></i>
-                </div>
-                <div id="menu-search-results"></div>
-            </div>
+        <details class="pe-nav-group"{% if page.url contains '/doc/01-understand-the-etl' %} open{% endif %}>
+            <summary class="pe-nav-group__title">
+                Core Concepts
+                {{ chevron }}
+            </summary>
+            <ul class="pe-nav">
+                <li><a class="pe-nav__item{% if page.url == '/doc/01-understand-the-etl/the-concept.html' %} active{% endif %}" href="/doc/01-understand-the-etl/the-concept.html">The Concept</a></li>
+                <li><a class="pe-nav__item{% if page.url == '/doc/01-understand-the-etl/migration-from-yaml.html' %} active{% endif %}" href="/doc/01-understand-the-etl/migration-from-yaml.html">Migrating from YAML</a></li>
+                <li><a class="pe-nav__item{% if page.url == '/doc/01-understand-the-etl/flavor.html' %} active{% endif %}" href="/doc/01-understand-the-etl/flavor.html">Flavor</a></li>
+                <li><a class="pe-nav__item{% if page.url == '/doc/01-understand-the-etl/execution-context.html' %} active{% endif %}" href="/doc/01-understand-the-etl/execution-context.html">Execution Context</a></li>
+                <li><a class="pe-nav__item{% if page.url == '/doc/01-understand-the-etl/item-types.html' %} active{% endif %}" href="/doc/01-understand-the-etl/item-types.html">Item Types</a></li>
+                <li><a class="pe-nav__item{% if page.url == '/doc/01-understand-the-etl/custom-operation.html' %} active{% endif %}" href="/doc/01-understand-the-etl/custom-operation.html">Custom Operations</a></li>
+                <li><a class="pe-nav__item{% if page.url == '/doc/01-understand-the-etl/glossary.html' %} active{% endif %}" href="/doc/01-understand-the-etl/glossary.html">Glossary</a></li>
+                <li><a class="pe-nav__item{% if page.url == '/doc/01-understand-the-etl/faq.html' %} active{% endif %}" href="/doc/01-understand-the-etl/faq.html">FAQ</a></li>
+            </ul>
+        </details>
 
-            <div class="item">
-                <div class="header header-big">
-                    <a href="/doc/getting-started.html">Getting Started</a>
-                </div>
-                <div class="menu">
-                    <a class="item" href="/doc/getting-started/standalone.html">🐘 Standalone</a>
-                    <a class="item" href="/doc/getting-started/symfony.html">🎵 Symfony</a>
-                    <a class="item" href="/doc/getting-started/sylius.html">🦢 Sylius</a>
-                </div>
-            </div>
+        <details class="pe-nav-group"{% if page.url contains '/doc/20-operations' %} open{% endif %}>
+            <summary class="pe-nav-group__title">
+                ⛓️ Operations
+                {{ chevron }}
+            </summary>
 
-            <div class="item">
-                <div class="header header-big">
-                    Core Concepts
-                </div>
-                <div class="menu">
-                    <a class="item" href="/doc/01-understand-the-etl/the-concept.html">The Concept</a>
-                    <a class="item" href="/doc/01-understand-the-etl/migration-from-yaml.html">Migrating from YAML</a>
-                    <a class="item" href="/doc/01-understand-the-etl/flavor.html">Flavor</a>
-                    <a class="item" href="/doc/01-understand-the-etl/execution-context.html">Execution Context</a>
-                    <a class="item" href="/doc/01-understand-the-etl/item-types.html">Item Types</a>
-                    <a class="item" href="/doc/01-understand-the-etl/custom-operation.html">Custom Operations</a>
-                    <a class="item" href="/doc/01-understand-the-etl/glossary.html">Glossary</a>
-                    <a class="item" href="/doc/01-understand-the-etl/faq.html">FAQ</a>
-                </div>
-            </div>
+            <div class="pe-nav-group__subtitle">Building Blocks</div>
+            <ul class="pe-nav pe-nav--nested">
+                <li><a class="pe-nav__item{% if page.url == '/doc/20-operations/10-building/010-split.html' %} active{% endif %}" href="/doc/20-operations/10-building/010-split.html">Split</a></li>
+                <li><a class="pe-nav__item{% if page.url == '/doc/20-operations/10-building/020-merge.html' %} active{% endif %}" href="/doc/20-operations/10-building/020-merge.html">Merge</a></li>
+                <li><a class="pe-nav__item{% if page.url == '/doc/20-operations/10-building/030-repeat.html' %} active{% endif %}" href="/doc/20-operations/10-building/030-repeat.html">Repeat</a></li>
+                <li><a class="pe-nav__item{% if page.url == '/doc/20-operations/10-building/040-safe.html' %} active{% endif %}" href="/doc/20-operations/10-building/040-safe.html">Safe</a></li>
+            </ul>
 
-            <div class="item">
-                <div class="header header-big">
-                    ⛓️ Operations
-                </div>
-                <div class="sub-menu">
-                    <div class="header">
-                        Building Blocks
-                    </div>
-                    <div class="menu">
-                        <a class="item" href="/doc/20-operations/10-building/010-split.html">Split</a>
-                        <a class="item" href="/doc/20-operations/10-building/020-merge.html">Merge</a>
-                        <a class="item" href="/doc/20-operations/10-building/030-repeat.html">Repeat</a>
-                        <a class="item" href="/doc/20-operations/10-building/040-safe.html">Safe</a>
-                    </div>
-                    <div class="header">
-                        Extract
-                    </div>
-                    <div class="menu">
-                        <a class="item" href="/doc/20-operations/20-extract/010-file-finder.html">File Finder</a>
-                        <a class="item" href="/doc/20-operations/20-extract/020-csv.html">CSV</a>
-                        <a class="item" href="/doc/20-operations/20-extract/030-json.html">JSON</a>
-                    </div>
-                    <div class="header">
-                        Transform
-                    </div>
-                    <div class="menu">
-                        <a class="item" href="/doc/20-operations/40-transform/010-external-file.html">External File Processor</a>
-                        <a class="item" href="/doc/20-operations/40-transform/020-filter-data.html">Filter Data</a>
-                        <a class="item" href="/doc/20-operations/40-transform/030-rule-transformer.html">Rule Transformer</a>
-                        <a class="item" href="/doc/20-operations/40-transform/040-split-item.html">Split Item</a>
-                        <a class="item" href="/doc/20-operations/40-transform/050-http.html">HTTP Client</a>
-                        <a class="item" href="/doc/20-operations/40-transform/060-log.html">Log</a>
-                        <a class="item" href="/doc/20-operations/40-transform/070-callback.html">Callback</a>
-                    </div>
-                    <div class="header">
-                        Aggregation
-                    </div>
-                    <div class="menu">
-                        <a class="item" href="/doc/20-operations/60-aggregation/010-grouping.html">Simple Grouping</a>
-                    </div>
-                    <div class="header">
-                        Load
-                    </div>
-                    <div class="menu">
-                        <a class="item" href="/doc/20-operations/70-load/010-csv.html">CSV</a>
-                        <a class="item" href="/doc/20-operations/70-load/020-json.html">JSON</a>
-                    </div>
-                </div>
-            </div>
+            <div class="pe-nav-group__subtitle">Extract</div>
+            <ul class="pe-nav pe-nav--nested">
+                <li><a class="pe-nav__item{% if page.url == '/doc/20-operations/20-extract/010-file-finder.html' %} active{% endif %}" href="/doc/20-operations/20-extract/010-file-finder.html">File Finder</a></li>
+                <li><a class="pe-nav__item{% if page.url == '/doc/20-operations/20-extract/020-csv.html' %} active{% endif %}" href="/doc/20-operations/20-extract/020-csv.html">CSV</a></li>
+                <li><a class="pe-nav__item{% if page.url == '/doc/20-operations/20-extract/030-json.html' %} active{% endif %}" href="/doc/20-operations/20-extract/030-json.html">JSON</a></li>
+            </ul>
 
-            <div class="item">
-                <div class="header header-big">
-                    🧑‍🍳 Cookbook
-                </div>
-                <div class="sub-menu">
-                    <div class="header">
-                        Without Context
-                    </div>
-                    <div class="menu">
-                        <a class="item" href="/doc/10-examples/100-grouping.html">Grouping / Aggregation</a>
-                        <a class="item" href="/doc/10-examples/110-filtering.html">Filtering</a>
-                        <a class="item" href="/doc/10-examples/120-split-the-chain.html">Splitting/Forking</a>
-                        <a class="item" href="/doc/10-examples/130-configuration.html">Making your chains configurable</a>
-                        <a class="item" href="/doc/10-examples/140-complex-data.html">Complex data to csv / Flatten Data</a>
-                        <a class="item" href="/doc/10-examples/150-api-csv.html">Api to CSV N°1</a>
-                        <a class="item" href="/doc/10-examples/160-api-csv.html">Api to CSV N°2</a>
-                        <a class="item" href="/doc/10-examples/170-sub-chains.html">Sub chains</a>
-                        <a class="item" href="/doc/10-examples/180-api-pagination.html">Api with Pagination</a>
-                        <a class="item" href="/doc/10-examples/190-error-handling.md">Error handling</a>
-                        <a class="item" href="/doc/10-examples/200-chain-merge.md">Merge multiple source of data</a>
-                    </div>
+            <div class="pe-nav-group__subtitle">Transform</div>
+            <ul class="pe-nav pe-nav--nested">
+                <li><a class="pe-nav__item{% if page.url == '/doc/20-operations/40-transform/010-external-file.html' %} active{% endif %}" href="/doc/20-operations/40-transform/010-external-file.html">External File Processor</a></li>
+                <li><a class="pe-nav__item{% if page.url == '/doc/20-operations/40-transform/020-filter-data.html' %} active{% endif %}" href="/doc/20-operations/40-transform/020-filter-data.html">Filter Data</a></li>
+                <li><a class="pe-nav__item{% if page.url == '/doc/20-operations/40-transform/030-rule-transformer.html' %} active{% endif %}" href="/doc/20-operations/40-transform/030-rule-transformer.html">Rule Transformer</a></li>
+                <li><a class="pe-nav__item{% if page.url == '/doc/20-operations/40-transform/040-split-item.html' %} active{% endif %}" href="/doc/20-operations/40-transform/040-split-item.html">Split Item</a></li>
+                <li><a class="pe-nav__item{% if page.url == '/doc/20-operations/40-transform/050-http.html' %} active{% endif %}" href="/doc/20-operations/40-transform/050-http.html">HTTP Client</a></li>
+                <li><a class="pe-nav__item{% if page.url == '/doc/20-operations/40-transform/060-log.html' %} active{% endif %}" href="/doc/20-operations/40-transform/060-log.html">Log</a></li>
+                <li><a class="pe-nav__item{% if page.url == '/doc/20-operations/40-transform/070-callback.html' %} active{% endif %}" href="/doc/20-operations/40-transform/070-callback.html">Callback</a></li>
+            </ul>
 
-                    <div class="header">
-                        With Context
-                    </div>
-                    <div class="menu">
-                        <a class="item" href="/doc/10-examples/500-api-csv.html">Api to CSV</a>
-                        <a class="item" href="/doc/10-examples/510-import-file.html">Import external file</a>
-                    </div>
+            <div class="pe-nav-group__subtitle">Aggregation</div>
+            <ul class="pe-nav pe-nav--nested">
+                <li><a class="pe-nav__item{% if page.url == '/doc/20-operations/60-aggregation/010-grouping.html' %} active{% endif %}" href="/doc/20-operations/60-aggregation/010-grouping.html">Simple Grouping</a></li>
+            </ul>
 
-                    <div class="header">
-                        Custom Operations
-                    </div>
-                </div>
-            </div>
-        </div>
+            <div class="pe-nav-group__subtitle">Load</div>
+            <ul class="pe-nav pe-nav--nested">
+                <li><a class="pe-nav__item{% if page.url == '/doc/20-operations/70-load/010-csv.html' %} active{% endif %}" href="/doc/20-operations/70-load/010-csv.html">CSV</a></li>
+                <li><a class="pe-nav__item{% if page.url == '/doc/20-operations/70-load/020-json.html' %} active{% endif %}" href="/doc/20-operations/70-load/020-json.html">JSON</a></li>
+            </ul>
+        </details>
+
+        <details class="pe-nav-group"{% if page.url contains '/doc/10-examples' %} open{% endif %}>
+            <summary class="pe-nav-group__title">
+                🧑‍🍳 Cookbook
+                {{ chevron }}
+            </summary>
+
+            <div class="pe-nav-group__subtitle">Without Context</div>
+            <ul class="pe-nav pe-nav--nested">
+                <li><a class="pe-nav__item{% if page.url == '/doc/10-examples/100-grouping.html' %} active{% endif %}" href="/doc/10-examples/100-grouping.html">Grouping / Aggregation</a></li>
+                <li><a class="pe-nav__item{% if page.url == '/doc/10-examples/110-filtering.html' %} active{% endif %}" href="/doc/10-examples/110-filtering.html">Filtering</a></li>
+                <li><a class="pe-nav__item{% if page.url == '/doc/10-examples/120-split-the-chain.html' %} active{% endif %}" href="/doc/10-examples/120-split-the-chain.html">Splitting/Forking</a></li>
+                <li><a class="pe-nav__item{% if page.url == '/doc/10-examples/130-configuration.html' %} active{% endif %}" href="/doc/10-examples/130-configuration.html">Making your chains configurable</a></li>
+                <li><a class="pe-nav__item{% if page.url == '/doc/10-examples/140-complex-data.html' %} active{% endif %}" href="/doc/10-examples/140-complex-data.html">Complex data to csv / Flatten Data</a></li>
+                <li><a class="pe-nav__item{% if page.url == '/doc/10-examples/150-api-csv.html' %} active{% endif %}" href="/doc/10-examples/150-api-csv.html">Api to CSV N°1</a></li>
+                <li><a class="pe-nav__item{% if page.url == '/doc/10-examples/160-api-csv.html' %} active{% endif %}" href="/doc/10-examples/160-api-csv.html">Api to CSV N°2</a></li>
+                <li><a class="pe-nav__item{% if page.url == '/doc/10-examples/170-sub-chains.html' %} active{% endif %}" href="/doc/10-examples/170-sub-chains.html">Sub chains</a></li>
+                <li><a class="pe-nav__item{% if page.url == '/doc/10-examples/180-api-pagination.html' %} active{% endif %}" href="/doc/10-examples/180-api-pagination.html">Api with Pagination</a></li>
+                <li><a class="pe-nav__item{% if page.url == '/doc/10-examples/190-error-handling.md' %} active{% endif %}" href="/doc/10-examples/190-error-handling.md">Error handling</a></li>
+                <li><a class="pe-nav__item{% if page.url == '/doc/10-examples/200-chain-merge.md' %} active{% endif %}" href="/doc/10-examples/200-chain-merge.md">Merge multiple source of data</a></li>
+            </ul>
+
+            <div class="pe-nav-group__subtitle">With Context</div>
+            <ul class="pe-nav pe-nav--nested">
+                <li><a class="pe-nav__item{% if page.url == '/doc/10-examples/500-api-csv.html' %} active{% endif %}" href="/doc/10-examples/500-api-csv.html">Api to CSV</a></li>
+                <li><a class="pe-nav__item{% if page.url == '/doc/10-examples/510-import-file.html' %} active{% endif %}" href="/doc/10-examples/510-import-file.html">Import external file</a></li>
+            </ul>
+        </details>
     </div>
-</div>
+</nav>

@@ -1,0 +1,40 @@
+// Rouge syntax-highlighting theme, tuned for the permanently-dark code block
+// background (var(--color-code-bg)) set by `pre` in _base.scss. This file only
+// owns token colors — box model (background/padding/overflow) is owned by the
+// generic `pre` rule so the two can't drift out of sync again.
+
+.highlight {
+    margin-bottom: 1.5em;
+
+    .lineno { padding-right: 24px; color: var(--color-text-muted); }
+    .hll { background-color: rgba(255, 255, 255, 0.08); }
+
+    .c, .cm, .c1, .cp, .cs { color: #5c6370; font-style: italic; }
+
+    .err { color: #e06c75; background-color: rgba(224, 108, 117, 0.15); }
+
+    .k, .o, .kc, .kd, .kn, .kp, .kr, .ow { color: #c678dd; }
+
+    .gd { color: #e06c75; background-color: rgba(224, 108, 117, 0.15); }
+    .ge { color: var(--color-code-text); font-style: italic; }
+    .gr, .gt { color: #e06c75; }
+    .gh, .gu { color: #56b6c2; }
+    .gi { color: #98c379; background-color: rgba(152, 195, 121, 0.15); }
+    .go { color: var(--color-text-muted); }
+    .gs { font-weight: bold; }
+
+    .kt, .nc { color: #e5c07b; }
+
+    .m, .mf, .mh, .mi, .mo, .il { color: #d19a66; }
+
+    .s, .sb, .sc, .sd, .s2, .se, .sh, .si, .sx, .s1, .ss { color: #98c379; }
+    .sr { color: #56b6c2; }
+
+    .na, .nv { color: #e5c07b; }
+    .nb, .bp, .no, .vc, .vg, .vi, .ni { color: #56b6c2; }
+    .nd, .ne, .nf, .nl, .gp { color: #61afef; }
+    .nn { color: var(--color-code-text); }
+    .nt { color: #e06c75; }
+
+    .w { color: var(--color-text-muted); }
+}

@@ -43,6 +43,7 @@
     "scripts": {
         "auto-scripts": {
 
-        }
+        },
+        "sync-changelog": "php bin/sync-changelog.php"
     }
 }

@@ -1,13 +1,88 @@
 <meta charset="utf-8">
+<script>
+    // Must run before the stylesheet loads to avoid a flash of the wrong theme.
+    (function () {
+        try {
+            var stored = localStorage.getItem('pe-theme');
+            if (stored === 'light' || stored === 'dark') {
+                document.documentElement.setAttribute('data-theme', stored);
+            }
+        } catch (e) {}
+    })();
+</script>
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{% if page.title %}{{ page.title }} | {% endif %}{{ site.title }}</title>
 <meta name="description" content="{{ page.excerpt | default: site.description | strip_html | normalize_whitespace | truncate: 160 | escape }}">
 
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.5.0/dist/semantic.min.css">
-<script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.5.0/dist/semantic.min.js"></script>
+<meta property="og:type" content="website">
+<meta property="og:title" content="{% if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %}">
+<meta property="og:description" content="{{ page.excerpt | default: site.description | strip_html | normalize_whitespace | truncate: 160 | escape }}">
+<meta property="og:url" content="{{ page.url | absolute_url }}">
+<meta property="og:image" content="{{ '/assets/images/og-image.png' | absolute_url }}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:site_name" content="{{ site.title }}">
 
-<link rel="stylesheet" href='{{ "/assets/css/custom.css" | absolute_url }}' />
-<script src='{{ "/assets/js/custom.js" | absolute_url }}'></script>
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{% if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %}">
+<meta name="twitter:description" content="{{ page.excerpt | default: site.description | strip_html | normalize_whitespace | truncate: 160 | escape }}">
+<meta name="twitter:image" content="{{ '/assets/images/og-image.png' | absolute_url }}">
+{% if site.twitter_username %}<meta name="twitter:site" content="@{{ site.twitter_username }}">{% endif %}
+
+<link rel="icon" type="image/png" sizes="32x32" href='{{ "/assets/images/favicon-32.png" | relative_url }}'>
+<link rel="icon" type="image/png" sizes="16x16" href='{{ "/assets/images/favicon-16.png" | relative_url }}'>
+<link rel="apple-touch-icon" sizes="180x180" href='{{ "/assets/images/apple-touch-icon.png" | relative_url }}'>
+
+<link rel="stylesheet" href='{{ "/assets/css/custom.css" | relative_url }}' />
+<script src='{{ "/assets/js/custom.js" | relative_url }}'></script>
 
 <script src="https://cdn.jsdelivr.net/npm/mermaid@11.8.1/dist/mermaid.min.js"></script>
+<script>
+    function peEffectiveTheme() {
+        try {
+            var stored = localStorage.getItem('pe-theme');
+            if (stored === 'light' || stored === 'dark') return stored;
+        } catch (e) {}
+        return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+    }
+
+    function initMermaid() {
+        var isDark = peEffectiveTheme() === 'dark';
+        var themeVariables = isDark ? {
+            primaryColor: '#241e38',
+            primaryTextColor: '#e4e4e6',
+            primaryBorderColor: '#a58bf0',
+            lineColor: '#a58bf0',
+            background: '#121212',
+            mainBkg: '#241e38',
+            secondaryColor: '#1c1c1e',
+            tertiaryColor: '#1c1c1e',
+            clusterBkg: '#1c1c1e',
+            clusterBorder: '#a58bf0',
+            edgeLabelBackground: '#121212',
+            textColor: '#e4e4e6'
+        } : {
+            primaryColor: '#f1ecfd',
+            primaryTextColor: '#1c1c1e',
+            primaryBorderColor: '#6a48d7',
+            lineColor: '#6a48d7',
+            background: '#ffffff',
+            mainBkg: '#f1ecfd',
+            secondaryColor: '#f5f5f7',
+            tertiaryColor: '#f5f5f7',
+            clusterBkg: '#f5f5f7',
+            clusterBorder: '#6a48d7',
+            edgeLabelBackground: '#ffffff',
+            textColor: '#1c1c1e'
+        };
+        // Always use the 'base' theme so themeVariables fully control the palette —
+        // Mermaid's built-in 'dark' theme uses its own greys that clash with the site.
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'base',
+            themeVariables: themeVariables
+        });
+    }
+    initMermaid();
+</script>

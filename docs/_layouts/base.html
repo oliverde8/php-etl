@@ -4,58 +4,57 @@
     {% include head.html %}
 </head>
 <body>
-    <div id="main-div" class="main ui container">
-        {% include menu.html %}
+    {% include header.html %}
 
-        <div id="main-content">
-            {% include title-block.html %}
+    <div id="main-div" class="pe-shell">
+        {% if page.url contains '/doc/' %}{% include menu.html %}{% endif %}
 
-            <div class="ui container width-{{page.width}}">
-                <div class="ui hidden divider"></div>
+        <div id="main-content" class="pe-content">
+            {% unless page.url == '/' %}{% include title-block.html %}{% endunless %}
+
+            <div class="pe-content__container{% if page.width == 'large' %} pe-content__container--large{% endif %}{% if page.url == '/' %} pe-content__container--home{% endif %}">
                 {{ content }}
-                <div id="search-results"></div>
             </div>
 
-            <div class="ui hidden divider"></div>
-            <div class="ui hidden divider"></div>
-            <div class="ui  vertical footer segment main-footer">
-                <div class="ui center aligned container">
-                    <div class="ui stackable grid">
-                        <div class="three wide column">
-                            <h4 class="ui header">Network</h4>
-                            <div class="ui link list">
-                                <a class="item" href="https://github.com/oliverde8/php-etl/" target="_blank">GitHub Repo</a>
-                                <a class="item" href="https://github.com/oliverde8/php-etl/issues" target="_blank">Issues</a>
-                                <a class="item" href="https://github.com/oliverde8/php-etl/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22" target="_blank">Good First Issues</a>
-                            </div>
+            <footer class="pe-footer">
+                <div class="pe-footer__inner">
+                    <div class="pe-footer__grid">
+                        <div class="pe-footer__col">
+                            <h4>Docs</h4>
+                            <ul class="pe-footer__links">
+                                <li><a href="/doc/getting-started.html">Getting Started</a></li>
+                                <li><a href="/doc/01-understand-the-etl/the-concept.html">Core Concepts</a></li>
+                                <li><a href="/doc/20-operations/10-building/010-split.html">Operations</a></li>
+                                <li><a href="/doc/10-examples/100-grouping.html">Cookbook</a></li>
+                            </ul>
                         </div>
-                        <div class="seven wide right floated column">
-                            <h4 class="ui header">Help Preserve This Project</h4>
-                            <p> Support for the continued development of php ETL. I maintain this project in my free time.</p>
-                            <a href="https://github.com/sponsors/oliverde8" class="ui primary button">Support</a>
+                        <div class="pe-footer__col">
+                            <h4>Community</h4>
+                            <ul class="pe-footer__links">
+                                <li><a href="https://github.com/oliverde8/php-etl/" target="_blank">GitHub Repo</a></li>
+                                <li><a href="https://github.com/oliverde8/php-etl/issues" target="_blank">Issues</a></li>
+                                <li><a href="https://github.com/oliverde8/php-etl/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22" target="_blank">Good First Issues</a></li>
+                                <li><a href="/changelog.html">Changelog</a></li>
+                            </ul>
+                        </div>
+                        <div class="pe-footer__col">
+                            <h4>Help Preserve This Project</h4>
+                            <p>Support for the continued development of php ETL. I maintain this project in my free time.</p>
+                            <a href="https://github.com/sponsors/oliverde8" class="pe-btn pe-btn--primary">Support</a>
                         </div>
                     </div>
-                    <div class="ui section divider"></div>
-                    <div class="ui horizontal small divided link list">
-                        <a class="item" href="https://github.com/oliverde8/php-etl/?tab=MIT-1-ov-file#readme" target="_blank">Free &amp; Open Source (MIT)</a>
+                    <hr class="pe-footer__divider">
+                    <div class="pe-footer__bottom">
+                        <a href="/" class="pe-footer__brand">
+                            <img src='{{ "/assets/images/logo.png" | relative_url }}' alt="PHP-ETL" class="pe-footer__logo">
+                        </a>
+                        <p class="pe-footer__legal">Free &amp; Open Source (<a href="https://github.com/oliverde8/php-etl/?tab=MIT-1-ov-file#readme" target="_blank">MIT</a>) &middot; &copy; {{ 'now' | date: '%Y' }} PHP-ETL</p>
                     </div>
                 </div>
-            </div>
+            </footer>
         </div>
     </div>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const toggleButton = document.getElementById('mobile-menu-toggle');
-            const mainMenu = document.getElementById('main-menu');
-
-            if (toggleButton && mainMenu) {
-                toggleButton.addEventListener('click', function() {
-                    mainMenu.classList.toggle('open');
-                });
-            }
-        });
-    </script>
-    <script src="https://unpkg.com/lunr/lunr.js"></script>
-    <script src="/assets/js/search.js"></script>
+    <script src="https://unpkg.com/lunr@2.3.9/lunr.js"></script>
+    <script src='{{ "/assets/js/search.js" | relative_url }}'></script>
 </body>
 </html>

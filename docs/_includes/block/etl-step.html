@@ -1,11 +1,11 @@
-<div class="ui grid etl-step-block">
-    <div class="ten wide column  description">
+<div class="pe-step">
+    <div class="pe-step__description">
         {{ include.description| markdownify }}
     </div>
 
-    <div class="six wide column code">
-        <div class="ui card">
-            <div class="content">
+    <div class="pe-step__code">
+        <div class="pe-card">
+            <div class="pe-card__body">
                 {{ include.code| markdownify }}
             </div>
         </div>
