@@ -118,7 +118,6 @@ class ChainRepeatOperationTest extends TestCase
         // Extract configs from the operations using reflection
         $reflection = new \ReflectionClass(CallbackTransformerOperation::class);
         $configProperty = $reflection->getProperty('config');
-        $configProperty->setAccessible(true);
 
         foreach ($repeatedOperations as $operation) {
             if ($operation instanceof CallbackTransformerOperation) {

@@ -76,7 +76,6 @@ class FailSafeOperationTest extends TestCase
 
         $reflection = new \ReflectionClass(CallbackTransformerOperation::class);
         $configProperty = $reflection->getProperty('config');
-        $configProperty->setAccessible(true);
 
         foreach ($failSafeOperation as $operation) {
             if ($operation instanceof CallbackTransformerOperation) {

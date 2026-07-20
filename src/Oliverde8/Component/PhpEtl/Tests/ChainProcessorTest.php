@@ -310,7 +310,6 @@ class ChainProcessorTest extends TestCase
         // Extract configs from operations using reflection
         $reflection = new \ReflectionClass(CallbackTransformerOperation::class);
         $configProperty = $reflection->getProperty('config');
-        $configProperty->setAccessible(true);
 
         // Create chain configs for each split branch
         $branch1Config = new ChainConfig();
