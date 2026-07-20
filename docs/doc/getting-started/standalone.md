@@ -19,12 +19,14 @@ That said, this does not mean the ETL can't be run standalone, it's just that th
 ## Writing some code
 
 - Start by installing the necessary dependencies
+
 ```sh
 composer require oliverde8/php-etl
 ```
 
 - We will also need a factory to create execution contexts, you can read more about what an execution context is
 [here](/doc/01-understand-the-etl/execution-context.html). 
+
 ```php
 use Oliverde8\Component\PhpEtl\ExecutionContextFactory;
 
@@ -36,6 +38,7 @@ $executionContextFactory = new ExecutionContextFactory();
 {: .block-tip }
 
 - You will need to initialize the rule applier and all your operation factories.
+
 ```php
 use Oliverde8\Component\PhpEtl\ChainBuilderV2;
 use Oliverde8\Component\PhpEtl\GenericChainFactory;
@@ -149,6 +152,7 @@ $chainBuilder = new ChainBuilderV2(
 
 
 - Now we can describe our ETL using typed PHP configuration objects instead of YAML. Let's create a simple chain that transforms and outputs data.
+
 ```php
 use Oliverde8\Component\PhpEtl\ChainConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Extract\CsvExtractConfig;
@@ -176,11 +180,13 @@ $chainConfig
 ```
 
 - Build the chain processor from the configuration
+
 ```php
 $chainProcessor = $chainBuilder->createChain($chainConfig);
 ```
 
 - Prepare your input data. For a CSV file, wrap it in a DataItem:
+
 ```php
 $inputData = new ArrayIterator([
     new DataItem(['file' => 'customers.csv'])
@@ -188,6 +194,7 @@ $inputData = new ArrayIterator([
 ```
 
 - Execute the ETL chain
+
 ```php
 $chainProcessor->process($inputData, []);
 ```

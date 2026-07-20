@@ -143,6 +143,7 @@ When creating your `ChainBuilderV2`, pass your custom `RuleApplier` to the `Gene
 
 {% capture column1 %}
 #### 🐘 Standalone
+
 ```php
 <?php
 

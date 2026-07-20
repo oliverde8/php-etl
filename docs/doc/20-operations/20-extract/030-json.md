@@ -61,6 +61,7 @@ $chainProcessor->process(
 ```
 
 **Input JSON file (data/customers.json):**
+
 ```json
 [
   {"id": 1, "name": "John Doe", "email": "john@example.com"},
@@ -117,6 +118,7 @@ $chainProcessor->process(
 ```
 
 **Input JSON with nested structure:**
+
 ```json
 [
   {
@@ -194,6 +196,7 @@ $chainProcessor->process(
 ```
 
 **Input JSON:**
+
 ```json
 [
   {
@@ -208,6 +211,7 @@ $chainProcessor->process(
 ```
 
 **Output CSV:**
+
 ```csv
 productId,sku,name-fr_FR,name-en_US
 1,PROD-001,Produit Un,Product One
@@ -241,6 +245,7 @@ $chainProcessor->process(
 ```
 
 **Input JSON:**
+
 ```json
 [
   {

@@ -43,13 +43,16 @@ $chainConfig->addLink(new SimpleGroupingConfig(['city']));
 The next operation in the chain will receive an iterator with two groups:
 
 - **Group 1 (New York):**
+
   ```json
   [
     { "name": "John Doe", "city": "New York" },
     { "name": "Jane Doe", "city": "New York" }
   ]
   ```
+
 - **Group 2 (London):**
+
   ```json
   [
     { "name": "Peter Jones", "city": "London" }

@@ -39,6 +39,7 @@ $chainConfig
 
 {% capture column1 %}
 #### 🐘 Standalone
+
 ```php
 use Oliverde8\Component\PhpEtl\Item\DataItem;
 use Oliverde8\Component\PhpEtl\Model\PockExecution;
@@ -108,11 +109,13 @@ class ImportFilesDefinition implements ChainDefinitionInterface
 ```
 
 Execute:
+
 ```sh
 ./bin/console etl:execute etl:import-files '["/^file[0-9]\.csv$/"]' -p
 ```
 
 **Manual (with context):**
+
 ```sh
 ./bin/console etl:execute myetl "['/^file[0-9]\.csv$/']" "{'dir': '/var/import'}"
 ```

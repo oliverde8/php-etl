@@ -74,6 +74,7 @@ $chainBuilder = new ChainBuilderV2(
 ```
 
 **Using SFTP:**
+
 ```php
 use League\Flysystem\PhpseclibV3\SftpAdapter;
 use League\Flysystem\PhpseclibV3\SftpConnectionProvider;
@@ -96,6 +97,7 @@ new GenericChainFactory(
 ```
 
 **Using AWS S3:**
+
 ```php
 use Aws\S3\S3Client;
 use League\Flysystem\AwsS3V3\AwsS3V3Adapter;
@@ -424,6 +426,7 @@ $chainConfig
 ## Best Practices
 
 **1. Use Specific Patterns**
+
 ```php
 // Good: Specific pattern
 new DataItem('/^customer_export_[0-9]{8}\.csv$/')
@@ -433,6 +436,7 @@ new DataItem('/customer\.csv/')
 ```
 
 **2. Always Clean Up**
+
 ```php
 // Copy file locally
 ->addLink(new ExternalFileProcessorConfig())
@@ -442,6 +446,7 @@ new DataItem('/customer\.csv/')
 ```
 
 **3. Add Error Handling**
+
 ```php
 // Wrap in FailSafe for network issues
 $chainConfig->addLink(new FailSafeConfig(
@@ -452,6 +457,7 @@ $chainConfig->addLink(new FailSafeConfig(
 ```
 
 **4. Log File Processing**
+
 ```php
 ->addLink(new LogConfig(
     message: 'Processing file: @data["file"], size: @data["size"] bytes',
@@ -460,6 +466,7 @@ $chainConfig->addLink(new FailSafeConfig(
 ```
 
 **5. Validate Files Before Processing**
+
 ```php
 ->addLink(new CallBackTransformerConfig(function(DataItem $item) {
     $data = $item->getData();

@@ -15,6 +15,7 @@ The [symfony bundle](https://github.com/oliverde8/phpEtlBundle) will allow you t
 ### Is there a validation of the chain configuration ?
 
 Yes there is. you will get an error like this :
+
 ```
 There was an error building the operation 'simple-grouping' : 
  - "grouping-key" : This field is missing.

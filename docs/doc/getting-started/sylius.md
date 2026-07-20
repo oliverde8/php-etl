@@ -18,6 +18,7 @@ It adds the required "commands" as well as "services" to make the etl easy to us
 **Now let's install the sylius bundle**
 
 1. Install the additional dependency
+
 ```sh
 composer require oliverde8/php-etl-sylius-admin-bundle
 ```
@@ -25,6 +26,7 @@ composer require oliverde8/php-etl-sylius-admin-bundle
 2. Create EtlExecution table via migrations
 
 3. Import configs
+
 ```yaml
 # config/packages/etl.yaml
 imports:
@@ -32,6 +34,7 @@ imports:
 ```
 
 4. Import routes
+
 ```yaml
 # config/routes/etl.yaml
 oliverde8_etl:
@@ -39,6 +42,7 @@ oliverde8_etl:
 ```
 
 5. **Optional:** Configure EtlExecution Message:
+
 ```yaml
 # config/packages/messenger.yaml
 framework:

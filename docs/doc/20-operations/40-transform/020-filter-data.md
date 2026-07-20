@@ -54,12 +54,14 @@ public function __construct(
 The `rules` parameter uses the rule engine syntax. The rule engine has the following operations:
 
 ### Get Field Value
+
 ```php
 // Keep items where field exists and is truthy
 ["get" => ["field" => "fieldName"]]
 ```
 
 ### Expression Language (for complex conditions)
+
 ```php
 // Keep items where status equals "published" using Symfony Expression Language
 ["expression_language" => [
@@ -78,6 +80,7 @@ The `rules` parameter uses the rule engine syntax. The rule engine has the follo
 ```
 
 ### Constant Value
+
 ```php
 // Always keep all items (returns true constant)
 ["constant" => ["value" => true]]
