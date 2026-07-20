@@ -32,6 +32,8 @@ class AsyncHttpClientResponseItem implements AsyncItemInterface
                     return false;
                 }
             }
+
+            return false;
         } catch (TimeoutException) {
             // This is normal, we have used a very low stream timeout because we wish to continue processing
             // other items while this item is being downloaded.
