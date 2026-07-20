@@ -213,10 +213,6 @@ final class ChainProcessor extends LoggerContext implements ChainProcessorInterf
                 $chainNumber = $item['chain_number'];
                 $newItem = $item['item']->getItem();
 
-                // We consider that the process finished only once the async operation is done.
-                if (isset($this->chainLinks[$chainNumber])) {
-                    $this->chainObserver->onAfterProcess($chainNumber, $this->chainLinks[$chainNumber], $newItem);
-                }
                 unset($this->asyncItems[$id]);
                 $toProcess[] = [$newItem, $item['context'], $chainNumber];
             }
