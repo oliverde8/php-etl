@@ -40,7 +40,7 @@ class ExternalFileFinderOperation extends AbstractChainOperation implements Data
         }
 
         // Ensure pattern has delimiters for preg_match
-        if (!preg_match('/^[\/~#!]/', $pattern)) {
+        if (!preg_match('/^[\/~#!]/', (string) $pattern)) {
             $pattern = '/' . $pattern . '/';
         }
 

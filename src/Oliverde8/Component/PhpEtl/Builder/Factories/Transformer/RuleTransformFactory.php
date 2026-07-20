@@ -20,8 +20,6 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class RuleTransformFactory extends AbstractFactory
 {
-    protected RuleApplier $ruleApplier;
-
     /**
      * RuleTransformFactory constructor.
      *
@@ -29,10 +27,9 @@ class RuleTransformFactory extends AbstractFactory
      * @param string $class
      * @param RuleApplier $ruleApplier
      */
-    public function __construct(string $operation, string $class, RuleApplier $ruleApplier)
+    public function __construct(string $operation, string $class, protected RuleApplier $ruleApplier)
     {
         parent::__construct($operation, $class);
-        $this->ruleApplier = $ruleApplier;
     }
 
     /**

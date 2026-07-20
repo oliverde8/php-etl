@@ -75,7 +75,7 @@ class FlySystemFileSystem implements FileSystemInterface
     public function listContents(string $path): array
     {
         $listing = $this->filesystem->listContents($path);
-        return array_map(fn($item) => basename($item->path()), $listing->toArray());
+        return array_map(fn($item) => basename((string) $item->path()), $listing->toArray());
     }
 
     #[\Override]
