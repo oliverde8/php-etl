@@ -32,7 +32,6 @@
     },
     "autoload": {
         "psr-4": {
-            "App\\": "src/App/",
             "Oliverde8\\": "src/Oliverde8/"
         }
     },
