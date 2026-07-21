@@ -1,11 +1,6 @@
 parameters:
 	ignoreErrors:
 		-
-			message: "#^Parameter \\#2 \\$violations of class Oliverde8\\\\Component\\\\PhpEtl\\\\Exception\\\\ChainBuilderValidationException constructor expects array\\<Symfony\\\\Component\\\\Validator\\\\ConstraintViolation\\>, array\\<int, Symfony\\\\Component\\\\Validator\\\\ConstraintViolationInterface\\> given\\.$#"
-			count: 1
-			path: src/Oliverde8/Component/PhpEtl/Builder/Factories/AbstractFactory.php
-
-		-
 			message: "#^Parameter \\#1 \\$type of class Symfony\\\\Component\\\\Validator\\\\Constraints\\\\Type constructor expects array\\<int, string\\>\\|string\\|null, array\\<string, string\\> given\\.$#"
 			count: 3
 			path: src/Oliverde8/Component/PhpEtl/Builder/Factories/ChainRepeatFactory.php
@@ -61,34 +56,9 @@ parameters:
 			path: src/Oliverde8/Component/PhpEtl/ChainConfig.php
 
 		-
-			message: "#^Call to an undefined method ReflectionType\\:\\:getName\\(\\)\\.$#"
-			count: 1
-			path: src/Oliverde8/Component/PhpEtl/ChainOperation/AbstractChainOperation.php
-
-		-
-			message: "#^Property Oliverde8\\\\Component\\\\PhpEtl\\\\ChainOperation\\\\ChainMergeOperation\\:\\:\\$chainProcessors \\(array\\<Oliverde8\\\\Component\\\\PhpEtl\\\\ChainProcessor\\>\\) does not accept array\\<Oliverde8\\\\Component\\\\PhpEtl\\\\ChainProcessorInterface\\>\\.$#"
-			count: 1
-			path: src/Oliverde8/Component/PhpEtl/ChainOperation/ChainMergeOperation.php
-
-		-
 			message: "#^PHPDoc tag @param for parameter \\$context with type array is incompatible with native type Oliverde8\\\\Component\\\\PhpEtl\\\\Model\\\\ExecutionContext\\.$#"
 			count: 1
 			path: src/Oliverde8/Component/PhpEtl/ChainOperation/ChainOperationInterface.php
-
-		-
-			message: "#^Property Oliverde8\\\\Component\\\\PhpEtl\\\\ChainOperation\\\\ChainRepeatOperation\\:\\:\\$chainProcessor \\(Oliverde8\\\\Component\\\\PhpEtl\\\\ChainProcessor\\) does not accept Oliverde8\\\\Component\\\\PhpEtl\\\\ChainProcessorInterface\\.$#"
-			count: 1
-			path: src/Oliverde8/Component/PhpEtl/ChainOperation/ChainRepeatOperation.php
-
-		-
-			message: "#^Property Oliverde8\\\\Component\\\\PhpEtl\\\\ChainOperation\\\\ChainSplitOperation\\:\\:\\$chainProcessors \\(array\\<Oliverde8\\\\Component\\\\PhpEtl\\\\ChainProcessor\\>\\) does not accept array\\<Oliverde8\\\\Component\\\\PhpEtl\\\\ChainProcessorInterface\\>\\.$#"
-			count: 1
-			path: src/Oliverde8/Component/PhpEtl/ChainOperation/ChainSplitOperation.php
-
-		-
-			message: "#^Property Oliverde8\\\\Component\\\\PhpEtl\\\\ChainOperation\\\\FailSafeOperation\\:\\:\\$chainProcessor \\(Oliverde8\\\\Component\\\\PhpEtl\\\\ChainProcessor\\) does not accept Oliverde8\\\\Component\\\\PhpEtl\\\\ChainProcessorInterface\\.$#"
-			count: 1
-			path: src/Oliverde8/Component/PhpEtl/ChainOperation/FailSafeOperation.php
 
 		-
 			message: "#^Property Oliverde8\\\\Component\\\\PhpEtl\\\\ChainOperation\\\\Transformer\\\\ExternalFileProcessorOperation\\:\\:\\$config is never read, only written\\.$#"
@@ -99,21 +69,6 @@ parameters:
 			message: "#^Offset 'variables' on array\\{0\\: array\\<int, string\\>, variables\\: array\\<int, non\\-empty\\-string\\>, 1\\: array\\<int, non\\-empty\\-string\\>\\} in isset\\(\\) always exists and is not nullable\\.$#"
 			count: 1
 			path: src/Oliverde8/Component/PhpEtl/ChainOperation/Transformer/RuleTransformOperation.php
-
-		-
-			message: "#^Method Oliverde8\\\\Component\\\\PhpEtl\\\\ChainProcessor\\:\\:initObserver\\(\\) should return Oliverde8\\\\Component\\\\PhpEtl\\\\ChainObserver\\\\ChainObserver but returns Oliverde8\\\\Component\\\\PhpEtl\\\\ChainObserver\\\\ChainObserverInterface\\.$#"
-			count: 1
-			path: src/Oliverde8/Component/PhpEtl/ChainProcessor.php
-
-		-
-			message: "#^Parameter \\#1 \\$item of method Oliverde8\\\\Component\\\\PhpEtl\\\\ChainProcessor\\:\\:getItemsFromGroupItem\\(\\) expects Oliverde8\\\\Component\\\\PhpEtl\\\\Item\\\\GroupedItem, Oliverde8\\\\Component\\\\PhpEtl\\\\Item\\\\GroupedItemInterface given\\.$#"
-			count: 2
-			path: src/Oliverde8/Component/PhpEtl/ChainProcessor.php
-
-		-
-			message: "#^Deprecated in PHP 8\\.4\\: Parameter \\#4 \\$previous \\(Throwable\\) is implicitly nullable via default value null\\.$#"
-			count: 1
-			path: src/Oliverde8/Component/PhpEtl/Exception/ChainBuilderValidationException.php
 
 		-
 			message: "#^Call to function is_null\\(\\) with resource will always evaluate to false\\.$#"
@@ -146,19 +101,9 @@ parameters:
 			path: src/Oliverde8/Component/PhpEtl/Extract/File/Csv.php
 
 		-
-			message: "#^Call to an undefined method ReflectionType\\:\\:getName\\(\\)\\.$#"
-			count: 1
-			path: src/Oliverde8/Component/PhpEtl/GenericChainFactory.php
-
-		-
 			message: "#^Property Oliverde8\\\\Component\\\\PhpEtl\\\\Item\\\\AsyncHttpClientResponseItem\\:\\:\\$isRunning is never read, only written\\.$#"
 			count: 1
 			path: src/Oliverde8/Component/PhpEtl/Item/AsyncHttpClientResponseItem.php
-
-		-
-			message: "#^PHPDoc tag @return with type mixed is not subtype of native type Iterator\\.$#"
-			count: 1
-			path: src/Oliverde8/Component/PhpEtl/Item/GroupedItemInterface.php
 
 		-
 			message: "#^Call to function is_null\\(\\) with resource will always evaluate to false\\.$#"
@@ -169,71 +114,6 @@ parameters:
 			message: "#^Call to function is_null\\(\\) with resource will always evaluate to false\\.$#"
 			count: 1
 			path: src/Oliverde8/Component/PhpEtl/Load/File/Json.php
-
-		-
-			message: "#^Call to method copy\\(\\) on an unknown class League\\\\Flysystem\\\\Filesystem\\.$#"
-			count: 1
-			path: src/Oliverde8/Component/PhpEtl/Model/File/FlySystemFileSystem.php
-
-		-
-			message: "#^Call to method createDirectory\\(\\) on an unknown class League\\\\Flysystem\\\\Filesystem\\.$#"
-			count: 1
-			path: src/Oliverde8/Component/PhpEtl/Model/File/FlySystemFileSystem.php
-
-		-
-			message: "#^Call to method delete\\(\\) on an unknown class League\\\\Flysystem\\\\Filesystem\\.$#"
-			count: 1
-			path: src/Oliverde8/Component/PhpEtl/Model/File/FlySystemFileSystem.php
-
-		-
-			message: "#^Call to method deleteDirectory\\(\\) on an unknown class League\\\\Flysystem\\\\Filesystem\\.$#"
-			count: 1
-			path: src/Oliverde8/Component/PhpEtl/Model/File/FlySystemFileSystem.php
-
-		-
-			message: "#^Call to method fileExists\\(\\) on an unknown class League\\\\Flysystem\\\\Filesystem\\.$#"
-			count: 1
-			path: src/Oliverde8/Component/PhpEtl/Model/File/FlySystemFileSystem.php
-
-		-
-			message: "#^Call to method listContents\\(\\) on an unknown class League\\\\Flysystem\\\\Filesystem\\.$#"
-			count: 1
-			path: src/Oliverde8/Component/PhpEtl/Model/File/FlySystemFileSystem.php
-
-		-
-			message: "#^Call to method move\\(\\) on an unknown class League\\\\Flysystem\\\\Filesystem\\.$#"
-			count: 1
-			path: src/Oliverde8/Component/PhpEtl/Model/File/FlySystemFileSystem.php
-
-		-
-			message: "#^Call to method read\\(\\) on an unknown class League\\\\Flysystem\\\\Filesystem\\.$#"
-			count: 1
-			path: src/Oliverde8/Component/PhpEtl/Model/File/FlySystemFileSystem.php
-
-		-
-			message: "#^Call to method readStream\\(\\) on an unknown class League\\\\Flysystem\\\\Filesystem\\.$#"
-			count: 1
-			path: src/Oliverde8/Component/PhpEtl/Model/File/FlySystemFileSystem.php
-
-		-
-			message: "#^Call to method write\\(\\) on an unknown class League\\\\Flysystem\\\\Filesystem\\.$#"
-			count: 1
-			path: src/Oliverde8/Component/PhpEtl/Model/File/FlySystemFileSystem.php
-
-		-
-			message: "#^Call to method writeStream\\(\\) on an unknown class League\\\\Flysystem\\\\Filesystem\\.$#"
-			count: 1
-			path: src/Oliverde8/Component/PhpEtl/Model/File/FlySystemFileSystem.php
-
-		-
-			message: "#^Parameter \\$filesystem of method Oliverde8\\\\Component\\\\PhpEtl\\\\Model\\\\File\\\\FlySystemFileSystem\\:\\:__construct\\(\\) has invalid type League\\\\Flysystem\\\\Filesystem\\.$#"
-			count: 2
-			path: src/Oliverde8/Component/PhpEtl/Model/File/FlySystemFileSystem.php
-
-		-
-			message: "#^Property Oliverde8\\\\Component\\\\PhpEtl\\\\Model\\\\File\\\\FlySystemFileSystem\\:\\:\\$filesystem has unknown class League\\\\Flysystem\\\\Filesystem as its type\\.$#"
-			count: 1
-			path: src/Oliverde8/Component/PhpEtl/Model/File/FlySystemFileSystem.php
 
 		-
 			message: "#^Property Oliverde8\\\\Component\\\\PhpEtl\\\\Model\\\\State\\\\OperationState\\:\\:\\$lastStartTime \\(int\\) does not accept float\\.$#"
@@ -254,11 +134,6 @@ parameters:
 			message: "#^Parameter \\#2 \\$hasHeader of class Oliverde8\\\\Component\\\\PhpEtl\\\\Load\\\\File\\\\Csv constructor expects bool, string given\\.$#"
 			count: 1
 			path: src/Oliverde8/Component/PhpEtl/OperationConfig/Loader/CsvFileWriterConfig.php
-
-		-
-			message: "#^Deprecated in PHP 8\\.4\\: Parameter \\#3 \\$previous \\(string\\) is implicitly nullable via default value null\\.$#"
-			count: 1
-			path: src/Oliverde8/Component/PhpEtl/Output/MermaidStaticOutput.php
 
 		-
 			message: "#^Call to an undefined method Symfony\\\\Component\\\\Console\\\\Output\\\\OutputInterface\\:\\:section\\(\\)\\.$#"
