@@ -3,6 +3,7 @@ includes:
 
 parameters:
     level: 5
+    phpVersion: 80300
     paths:
         - src
     excludePaths:

@@ -15,8 +15,6 @@ interface GroupedItemInterface extends ItemInterface
 {
     /**
      * Get iterator returning list of grouped data that needs to be processed individually.
-     *
-     * @return mixed
      */
     public function getIterator() : \Iterator;
 }

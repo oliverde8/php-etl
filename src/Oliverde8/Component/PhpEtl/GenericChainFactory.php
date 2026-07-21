@@ -37,7 +37,7 @@ class GenericChainFactory
                 $name = $param->getName();
                 if ($param->getType() !== null && $this->reflectionIsOfType($param->getType(), OperationConfigInterface::class)) {
                     $args[] = $linkConfig;
-                } elseif ($param->getType() !== null && $param->getType()->getName() === 'string' && $name === 'flavor') {
+                } elseif ($param->getType() instanceof ReflectionNamedType && $param->getType()->getName() === 'string' && $name === 'flavor') {
                     $args[] = $this->flavor;
                 } elseif ($param->getType() !== null && $this->reflectionIsOfType($param->getType(), ChainBuilderV2::class)) {
                     $args[] = $chainBuilder;

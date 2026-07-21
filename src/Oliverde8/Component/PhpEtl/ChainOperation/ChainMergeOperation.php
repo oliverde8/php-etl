@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Oliverde8\Component\PhpEtl\ChainOperation;
 
 use Oliverde8\Component\PhpEtl\ChainBuilderV2;
-use Oliverde8\Component\PhpEtl\ChainProcessor;
+use Oliverde8\Component\PhpEtl\ChainProcessorInterface;
 use Oliverde8\Component\PhpEtl\Item\DataItemInterface;
 use Oliverde8\Component\PhpEtl\Item\ItemInterface;
 use Oliverde8\Component\PhpEtl\Item\MixItem;
@@ -25,7 +25,7 @@ class ChainMergeOperation extends AbstractChainOperation implements DataChainOpe
     use SplittedChainOperationTrait;
 
     /**
-     * @var ChainProcessor[]
+     * @var ChainProcessorInterface[]
      */
     private array $chainProcessors = [];
 
@@ -61,7 +61,7 @@ class ChainMergeOperation extends AbstractChainOperation implements DataChainOpe
     }
 
     /**
-     * @return ChainProcessor[]
+     * @return ChainProcessorInterface[]
      */
     public function getChainProcessors(): array
     {

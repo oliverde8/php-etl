@@ -4,11 +4,11 @@ declare(strict_types=1);
 namespace Oliverde8\Component\PhpEtl\Output;
 
 use Oliverde8\Component\PhpEtl\ChainOperation\ChainSplitOperation;
-use Oliverde8\Component\PhpEtl\ChainProcessor;
+use Oliverde8\Component\PhpEtl\ChainProcessorInterface;
 
 class MermaidStaticOutput
 {
-    public function generateGrapText(ChainProcessor $chainProcessor)
+    public function generateGrapText(ChainProcessorInterface $chainProcessor)
     {
         $text = "flowchart TD\n";
 
@@ -21,7 +21,7 @@ class MermaidStaticOutput
         return $text;
     }
 
-    public function generateUrl(ChainProcessor $chainProcessor)
+    public function generateUrl(ChainProcessorInterface $chainProcessor)
     {
         $text = $this->generateGrapText($chainProcessor);
         $json = \json_encode([
@@ -35,7 +35,7 @@ class MermaidStaticOutput
     }
 
     /**
-     * @param ChainProcessor[] $chainProcessors
+     * @param ChainProcessorInterface[] $chainProcessors
      */
     protected function generateNodes(array $chainProcessors, string $prefix = ""): string
     {
@@ -58,9 +58,9 @@ class MermaidStaticOutput
     }
 
     /**
-     * @param ChainProcessor[] $chainProcessors
+     * @param ChainProcessorInterface[] $chainProcessors
      */
-    protected function generateLinks(array $chainProcessors, string $prefix = "", string $previous = null): string
+    protected function generateLinks(array $chainProcessors, string $prefix = "", ?string $previous = null): string
     {
         $text = '';
         $originalPrevious = $previous;

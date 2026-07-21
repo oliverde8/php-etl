@@ -44,7 +44,11 @@ abstract class AbstractChainOperation implements ChainOperationInterface
         foreach ($processReflection->getMethods() as $method) {
             if ($this->validateMethod($method)) {
                 $firstParameter = $method->getParameters()[0];
-                $expecting = $firstParameter->getType()->getName();
+                $type = $firstParameter->getType();
+                if (!$type instanceof \ReflectionNamedType) {
+                    continue;
+                }
+                $expecting = $type->getName();
 
                 if (interface_exists($expecting)) {
                     $itemReflection = new \ReflectionClass($item);

@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Oliverde8\Component\PhpEtl\ChainOperation;
 
 use Oliverde8\Component\PhpEtl\ChainBuilderV2;
-use Oliverde8\Component\PhpEtl\ChainProcessor;
+use Oliverde8\Component\PhpEtl\ChainProcessorInterface;
 use Oliverde8\Component\PhpEtl\Exception\ChainOperationException;
 use Oliverde8\Component\PhpEtl\Item\DataItemInterface;
 use Oliverde8\Component\PhpEtl\Item\GroupedItem;
@@ -17,7 +17,7 @@ class FailSafeOperation extends AbstractChainOperation implements DataChainOpera
 {
     use SplittedChainOperationTrait;
 
-    private ChainProcessor $chainProcessor;
+    private ChainProcessorInterface $chainProcessor;
     private array $exceptionsToCatch = [];
     private int $nbAttempts = 1;
 

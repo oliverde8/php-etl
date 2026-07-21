@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Oliverde8\Component\PhpEtl;
 
 use Oliverde8\Component\PhpEtl\ChainObserver\ChainObserver;
-use Oliverde8\Component\PhpEtl\ChainObserver\ChainObserverInterface;
 use Oliverde8\Component\PhpEtl\ChainOperation\ChainOperationInterface;
 use Oliverde8\Component\PhpEtl\Exception\ChainOperationException;
 use Oliverde8\Component\PhpEtl\Item\AsyncItemInterface;
@@ -31,7 +30,7 @@ final class ChainProcessor extends LoggerContext implements ChainProcessorInterf
 
     protected readonly int $chainEnd;
 
-    protected ?ChainObserverInterface $chainObserver = null;
+    protected ?ChainObserver $chainObserver = null;
 
     protected array $asyncItems = [];
 
@@ -171,7 +170,7 @@ final class ChainProcessor extends LoggerContext implements ChainProcessorInterf
         }
     }
 
-    protected function getItemsFromGroupItem(GroupedItem $item): \Generator
+    protected function getItemsFromGroupItem(GroupedItemInterface $item): \Generator
     {
         foreach ($item->getIterator() as $item) {
             if (!is_object($item)) {

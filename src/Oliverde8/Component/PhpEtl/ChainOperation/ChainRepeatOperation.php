@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Oliverde8\Component\PhpEtl\ChainOperation;
 
 use Oliverde8\Component\PhpEtl\ChainBuilderV2;
-use Oliverde8\Component\PhpEtl\ChainProcessor;
+use Oliverde8\Component\PhpEtl\ChainProcessorInterface;
 use Oliverde8\Component\PhpEtl\Item\DataItemInterface;
 use Oliverde8\Component\PhpEtl\Item\GroupedItem;
 use Oliverde8\Component\PhpEtl\Item\ItemInterface;
@@ -17,7 +17,7 @@ class ChainRepeatOperation extends AbstractChainOperation implements DetailedObs
     use SplittedChainOperationTrait;
 
     protected ExpressionLanguage $expressionLanguage;
-    protected ChainProcessor $chainProcessor;
+    protected ChainProcessorInterface $chainProcessor;
     protected bool $allowAsynchronous;
     protected string $validationExpression;
 
