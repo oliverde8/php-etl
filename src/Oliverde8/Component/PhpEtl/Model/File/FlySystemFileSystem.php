@@ -7,14 +7,8 @@ use League\Flysystem\Filesystem;
 
 class FlySystemFileSystem implements FileSystemInterface
 {
-    protected Filesystem $filesystem;
-
-    /**
-     * @param Filesystem $filesystem
-     */
-    public function __construct(Filesystem $filesystem)
+    public function __construct(protected Filesystem $filesystem)
     {
-        $this->filesystem = $filesystem;
     }
 
     #[\Override]
