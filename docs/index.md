@@ -23,6 +23,17 @@ subTitle:
     </div>
 </div>
 
+## What is ETL?
+
+<p class="pe-home-section__subtitle">
+    ETL stands for Extract, Transform, Load: read data from a source (a CSV, an API, a database),
+    reshape it into what you need, then write it to a destination. It's the pattern behind
+    imports, exports, migrations, and data syncs — done as small, reusable steps instead of one
+    tangled script.
+    <br><br>
+    <a href="/doc/01-understand-the-etl/what-is-etl.html">Learn more →</a>
+</p>
+
 ## Why PHP-ETL?
 
 <p class="pe-home-section__subtitle">A standardized approach for handling complex data tasks, without locking you into a rigid framework.</p>
