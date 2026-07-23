@@ -25,7 +25,8 @@ use Oliverde8\Component\PhpEtl\ChainConfig;
 $repeatConfig = new ChainRepeatConfig(
     chainConfig: $chainToRepeat,           // ChainConfig to execute repeatedly
     validationExpression: 'expression',     // Symfony expression - loop while true
-    allowAsynchronous: false                // Optional: allow async operations (default: false)
+    allowAsynchronous: false,               // Optional: allow async operations (default: false)
+    isolateContext: false                   // Optional: isolate the loop's context from the parent (default: false)
 );
 ```
 
@@ -33,6 +34,9 @@ $repeatConfig = new ChainRepeatConfig(
 - `chainConfig`: A `ChainConfig` containing operations to execute in each iteration
 - `validationExpression`: A Symfony Expression Language expression that must return boolean. Loop continues while `true`
 - `allowAsynchronous`: Whether operations within the loop can execute asynchronously
+- `isolateContext`: When `true`, the whole repeat loop runs against its own clone of the execution context instead of the parent's. Default `false`.
+
+{% include block/isolate-context-loop.md unit="repeat loop" var="repeatConfig" config="ChainRepeatConfig" persistNote='across iterations, so pagination patterns that stash a cursor or page number on the context (see "Using context" below) keep working exactly the same' %}
 
 ## Example: Basic API Pagination
 

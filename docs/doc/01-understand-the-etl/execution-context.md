@@ -114,3 +114,24 @@ $chainProcessor->process(
 Executing this will create a directory in `var/` with the output result. Everytime you execute the chain a new
 directory wil be created.
 
+### Isolating context in sub-chains
+
+The same `ExecutionContext` instance flows by reference through every operation in a run, including into the
+sub-chains wrapped by `Split`, `Merge`, `Repeat`, and `FailSafe`. This means a parameter set with
+`$context->setParameter()` inside a branch, a repeat iteration, or a retry attempt is visible everywhere else
+in that run — sibling branches, the main chain after the operation finishes, later items, all of it.
+
+That's usually what you want, but not always: a retried API call shouldn't be able to permanently clobber a
+parameter the rest of the pipeline depends on just because one attempt failed halfway through. For this,
+`ChainSplitConfig`, `ChainMergeConfig`, `ChainRepeatConfig`, and `FailSafeConfig` all accept an `isolateContext`
+option. When `true`, the sub-chain runs against its own clone of the context instead of the shared one, so any
+parameters it sets are discarded once the operation finishes.
+
+Only context **parameters** are cloned — the underlying file system and logger stay shared, since those are
+meant to remain common resources rather than be duplicated per branch or per attempt.
+
+See the isolation section on each operation's page for the specifics: [Split](/doc/20-operations/10-building/010-split.html#isolating-context),
+[Merge](/doc/20-operations/10-building/020-merge.html#isolating-context),
+[Repeat](/doc/20-operations/10-building/030-repeat.html#isolating-context),
+[Safe](/doc/20-operations/10-building/040-safe.html#isolating-context).
+

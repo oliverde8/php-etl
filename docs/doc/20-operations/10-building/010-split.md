@@ -31,6 +31,12 @@ $splitConfig
 
 Each branch is a `ChainConfig` that can contain any sequence of operations.
 
+**Parameters:**
+- `isolateContext`: When `true`, each branch runs against its own clone of the execution context instead of
+  sharing the parent's. Default `false`.
+
+{% include block/isolate-context-branch.md operation="split" var="splitConfig" config="ChainSplitConfig" %}
+
 ## Example: Splitting Data into Multiple Files
 
 Here's an example that reads a CSV file and splits data into different files based on subscription status:

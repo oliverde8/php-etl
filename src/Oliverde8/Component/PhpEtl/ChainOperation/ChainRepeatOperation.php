@@ -20,12 +20,14 @@ class ChainRepeatOperation extends AbstractChainOperation implements DetailedObs
     protected ChainProcessorInterface $chainProcessor;
     protected bool $allowAsynchronous;
     protected string $validationExpression;
+    private readonly bool $isolateContext;
 
     public function __construct(ChainBuilderV2 $chainBuilder, ChainRepeatConfig $config)
     {
         $this->chainProcessor = $chainBuilder->createChain($config->getChainConfig());
         $this->validationExpression = $config->validationExpression;
         $this->allowAsynchronous = $config->allowAsynchronous;
+        $this->isolateContext = $config->isolateContext;
 
         $this->onSplittedChainOperationConstruct([$this->chainProcessor]);
         $this->expressionLanguage = new ExpressionLanguage();
@@ -39,11 +41,13 @@ class ChainRepeatOperation extends AbstractChainOperation implements DetailedObs
 
     public function repeatOnItem(DataItemInterface $inputItem, ExecutionContext $context): \Generator
     {
+        $branchContext = $this->isolateContext ? clone $context : $context;
+
         $invalidItem = false;
         do {
             $item = null;
-            foreach ($this->chainProcessor->processGenerator($inputItem, $context, withStop: false, allowAsynchronous: $this->allowAsynchronous) as $item) {
-                if ($this->itemIsValid($item, $context)) {
+            foreach ($this->chainProcessor->processGenerator($inputItem, $branchContext, withStop: false, allowAsynchronous: $this->allowAsynchronous) as $item) {
+                if ($this->itemIsValid($item, $branchContext)) {
                     yield $item;
                 } else {
                     $invalidItem = true;

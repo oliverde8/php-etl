@@ -13,6 +13,17 @@ class ChainMergeConfig extends AbstractOperationConfig
     private array $chainConfigs = [];
 
     /**
+     * @param string $flavor
+     * @param bool $isolateContext When true, each branch runs against its own clone of the execution context,
+     *                              so parameter changes made inside a branch are not visible to the other
+     *                              branches or to the chain once the merge is done.
+     */
+    public function __construct(string $flavor = 'default', public readonly bool $isolateContext = false)
+    {
+        parent::__construct($flavor);
+    }
+
+    /**
      * @return ChainConfig[]
      */
     public function getChainConfigs(): array

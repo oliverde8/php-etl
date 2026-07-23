@@ -7,6 +7,8 @@ subTitle: Release history
 # 2.1.0
 
 - 🌟 - Allow naming chain links when using new chain builder
+- 🌟 - `ChainSplitConfig`, `ChainMergeConfig`, `ChainRepeatConfig`, and `FailSafeConfig` now accept an `isolateContext` option to give a sub-chain its own copy of the execution context instead of sharing the parent's
+- 🔧 - Fixed Mermaid static diagram not rendering a Merge operation's branches (they were silently skipped, unlike Split's)
 
 # 🌟 2.0.0 🌟
 
