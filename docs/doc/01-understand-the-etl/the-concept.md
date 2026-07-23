@@ -260,3 +260,19 @@ For instance, the following command will process two input files and merge their
 ### Output
 
 The output of this ETL will be a output.csv file containing all customer data from files customers1.csv and customers2.csv.
+
+### Naming chain links
+
+By default, each link added with `addLink()` is only identified by its position in the chain (`0`, `1`, `2`...).
+You can give it a name instead by passing it as the second argument:
+
+```php
+$chainConfig
+    ->addLink(new CsvExtractConfig(), 'extract-customers')
+    ->addLink(new RuleTransformConfig(/* ... */), 'normalize-data')
+    ->addLink(new CsvFileWriterConfig('output.csv'), 'write-output');
+```
+
+Names are optional and have no effect on how the chain runs, but they replace the numeric position
+in generated Mermaid diagrams, logs, and exception messages, which makes a chain of more than a
+handful of operations much easier to read. Names must be unique within a `ChainConfig`.

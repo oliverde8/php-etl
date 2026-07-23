@@ -1,3 +1,7 @@
+# 2.1.0
+
+- :star2: - Allow naming chain links when using new chain builder
+
 # 🌟 2.0.0 🌟
 
 - :star2: - **NEW PARADIGM** - use php for configurations instead of yaml

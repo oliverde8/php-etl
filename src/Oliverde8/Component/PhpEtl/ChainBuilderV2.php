@@ -20,8 +20,8 @@ class ChainBuilderV2
     public function createChain(ChainConfig $chainConfig): ChainProcessorInterface
     {
         $operations = [];
-        foreach ($chainConfig->getConfigs() as $linkConfig) {
-            $operations[] = $this->getOperationFromConfig($linkConfig);
+        foreach ($chainConfig->getConfigs() as $key => $linkConfig) {
+            $operations[$key] = $this->getOperationFromConfig($linkConfig);
         }
         return new ChainProcessor($operations, $this->contextFactory, $chainConfig->maxAsynchronousItems);
     }

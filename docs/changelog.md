@@ -4,6 +4,10 @@ title: PHP-ETL - Changelog
 subTitle: Release history
 ---
 
+# 2.1.0
+
+- 🌟 - Allow naming chain links when using new chain builder
+
 # 🌟 2.0.0 🌟
 
 - 🌟 - **NEW PARADIGM** - use php for configurations instead of yaml
@@ -12,6 +16,7 @@ subTitle: Release history
 - 🌟 - Allows ChainProcessor to output through generators the items at the end. This is great to remove all limitations of the current sub chains.
 - 🌟 - ChainRepeatOperation now can handle more complex cases & asynchronous tasks. The operation is not considered as experimental anymore.
 - 🌟 - Added FailSafe operation allowing to execute sub-chains and catching exception in them.
+- 🌟 - `ChainConfig::addLink()` now accepts an optional name for the link, used in place of its numeric position in generated Mermaid diagrams, logs, and exceptions.
 
 - ❗ **Deprecation** The chainProcessorInterface was changed significantly.
   - This means any complex custom operations using the chainProcessor needs to be redone. => This shouldn't affect any load/extract or transform operation.
