@@ -4,6 +4,14 @@ title: PHP-ETL - Changelog
 subTitle: Release history
 ---
 
+# 2.1.0
+
+- 🌟 - Allow naming chain links when using new chain builder
+- 🌟 - `ChainSplitConfig`, `ChainMergeConfig`, `ChainRepeatConfig`, and `FailSafeConfig` now accept an `isolateContext` option to give a sub-chain its own copy of the execution context instead of sharing the parent's
+- 🌟 - Added `BatchConfig` operation to collect items into fixed-size chunks, emitted as soon as each chunk is full, without buffering the whole stream in memory
+- 🌟 - Added `IfConfig` operation to route an item to exactly one of two sub-chains based on a Rule Engine condition, letting the chosen branch freely modify the item (unlike `Split`, where multiple branches could run in parallel)
+- 🔧 - Fixed Mermaid static diagram not rendering a Merge operation's branches (they were silently skipped, unlike Split's)
+
 # 🌟 2.0.0 🌟
 
 - 🌟 - **NEW PARADIGM** - use php for configurations instead of yaml
@@ -12,6 +20,7 @@ subTitle: Release history
 - 🌟 - Allows ChainProcessor to output through generators the items at the end. This is great to remove all limitations of the current sub chains.
 - 🌟 - ChainRepeatOperation now can handle more complex cases & asynchronous tasks. The operation is not considered as experimental anymore.
 - 🌟 - Added FailSafe operation allowing to execute sub-chains and catching exception in them.
+- 🌟 - `ChainConfig::addLink()` now accepts an optional name for the link, used in place of its numeric position in generated Mermaid diagrams, logs, and exceptions.
 
 - ❗ **Deprecation** The chainProcessorInterface was changed significantly.
   - This means any complex custom operations using the chainProcessor needs to be redone. => This shouldn't affect any load/extract or transform operation.

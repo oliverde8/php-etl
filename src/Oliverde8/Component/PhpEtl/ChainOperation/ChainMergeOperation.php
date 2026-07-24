@@ -20,7 +20,7 @@ use Oliverde8\Component\PhpEtl\OperationConfig\ChainMergeConfig;
  * @copyright 2018 Oliverde8
  * @package Oliverde8\Component\PhpEtl\ChainOperation
  */
-class ChainMergeOperation extends AbstractChainOperation implements DataChainOperationInterface, DetailedObservableOperation, ConfigurableChainOperationInterface
+class ChainMergeOperation extends AbstractChainOperation implements DataChainOperationInterface, DetailedObservableOperation, ConfigurableChainOperationInterface, SubChainsAwareOperationInterface
 {
     use SplittedChainOperationTrait;
 
@@ -29,11 +29,14 @@ class ChainMergeOperation extends AbstractChainOperation implements DataChainOpe
      */
     private array $chainProcessors = [];
 
+    private readonly bool $isolateContext;
+
     public function __construct(ChainBuilderV2 $chainBuilder, ChainMergeConfig $config)
     {
         foreach ($config->getChainConfigs() as $chainConfig) {
             $this->chainProcessors[] = $chainBuilder->createChain($chainConfig);
         }
+        $this->isolateContext = $config->isolateContext;
         $this->onSplittedChainOperationConstruct($this->chainProcessors);
     }
 
@@ -42,7 +45,8 @@ class ChainMergeOperation extends AbstractChainOperation implements DataChainOpe
     {
         $returnItems = [];
         foreach ($this->chainProcessors as $chainProcessor) {
-            foreach ($chainProcessor->processGenerator($item, $context, withStop: false) as $newItem) {
+            $branchContext = $this->isolateContext ? clone $context : $context;
+            foreach ($chainProcessor->processGenerator($item, $branchContext, withStop: false) as $newItem) {
                 $returnItems[] = $newItem;
             }
         }
@@ -54,7 +58,8 @@ class ChainMergeOperation extends AbstractChainOperation implements DataChainOpe
     public function processStop(StopItem $item, ExecutionContext $context): ItemInterface
     {
         foreach ($this->chainProcessors as $chainProcessor) {
-            foreach ($chainProcessor->processGenerator($item, $context) as $newItem) {}
+            $branchContext = $this->isolateContext ? clone $context : $context;
+            foreach ($chainProcessor->processGenerator($item, $branchContext) as $newItem) {}
         }
 
         return $item;
@@ -63,6 +68,7 @@ class ChainMergeOperation extends AbstractChainOperation implements DataChainOpe
     /**
      * @return ChainProcessorInterface[]
      */
+    #[\Override]
     public function getChainProcessors(): array
     {
         return $this->chainProcessors;

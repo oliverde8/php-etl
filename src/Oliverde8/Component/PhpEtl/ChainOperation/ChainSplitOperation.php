@@ -20,7 +20,7 @@ use Oliverde8\Component\PhpEtl\OperationConfig\ChainSplitConfig;
  * @copyright 2018 Oliverde8
  * @package Oliverde8\Component\PhpEtl\ChainOperation
  */
-class ChainSplitOperation extends AbstractChainOperation implements DataChainOperationInterface, DetailedObservableOperation, ConfigurableChainOperationInterface
+class ChainSplitOperation extends AbstractChainOperation implements DataChainOperationInterface, DetailedObservableOperation, ConfigurableChainOperationInterface, SubChainsAwareOperationInterface
 {
     use SplittedChainOperationTrait;
 
@@ -29,12 +29,14 @@ class ChainSplitOperation extends AbstractChainOperation implements DataChainOpe
      */
     protected array $chainProcessors = [];
 
+    private readonly bool $isolateContext;
 
     public function __construct(ChainBuilderV2 $chainProcessors, ChainSplitConfig $config)
     {
         foreach ($config->getChainConfigs() as $chainConfig) {
             $this->chainProcessors[] = $chainProcessors->createChain($chainConfig);
         }
+        $this->isolateContext = $config->isolateContext;
         $this->onSplittedChainOperationConstruct($this->chainProcessors);
     }
 
@@ -42,7 +44,8 @@ class ChainSplitOperation extends AbstractChainOperation implements DataChainOpe
     public function processData(DataItemInterface $item, ExecutionContext $context): ItemInterface
     {
         foreach ($this->chainProcessors as $chainProcessor) {
-            foreach ($chainProcessor->processGenerator($item, $context, withStop: false) as $newItem) {}
+            $branchContext = $this->isolateContext ? clone $context : $context;
+            foreach ($chainProcessor->processGenerator($item, $branchContext, withStop: false) as $newItem) {}
         }
 
         // Nothing to process.
@@ -52,7 +55,8 @@ class ChainSplitOperation extends AbstractChainOperation implements DataChainOpe
     public function processStop(StopItem $item, ExecutionContext $context): ItemInterface
     {
         foreach ($this->chainProcessors as $chainProcessor) {
-            foreach ($chainProcessor->processGenerator($item, $context) as $newItem) {}
+            $branchContext = $this->isolateContext ? clone $context : $context;
+            foreach ($chainProcessor->processGenerator($item, $branchContext) as $newItem) {}
         }
 
         return $item;
@@ -61,6 +65,7 @@ class ChainSplitOperation extends AbstractChainOperation implements DataChainOpe
     /**
      * @return ChainProcessorInterface[]
      */
+    #[\Override]
     public function getChainProcessors(): array
     {
         return $this->chainProcessors;

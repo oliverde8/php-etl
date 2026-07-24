@@ -34,7 +34,7 @@ This glossary defines common terms used throughout the PHP-ETL documentation.
 : The chain builder for the current PHP-configuration paradigm. Takes a `ChainConfig` and a list of `GenericChainFactory` registrations and builds a chain processor. See [Migrating from YAML](/doc/01-understand-the-etl/migration-from-yaml.html).
 
 **ChainConfig**
-: A typed, fluent object describing a chain: `->addLink()` each operation's config in order, then pass it to `ChainBuilderV2::createChain()`.
+: A typed, fluent object describing a chain: `->addLink()` each operation's config in order, then pass it to `ChainBuilderV2::createChain()`. Each link can optionally be given a name (`->addLink($config, 'name')`), used in place of its numeric position in Mermaid diagrams, logs, and exceptions. See [The Concept](/doc/01-understand-the-etl/the-concept.html#naming-chain-links).
 
 ### D
 

@@ -20,12 +20,14 @@ class FailSafeOperation extends AbstractChainOperation implements DataChainOpera
     private ChainProcessorInterface $chainProcessor;
     private array $exceptionsToCatch = [];
     private int $nbAttempts = 1;
+    private readonly bool $isolateContext;
 
     public function __construct(ChainBuilderV2 $chainBuilder, FailSafeConfig $config)
     {
         $this->chainProcessor = $chainBuilder->createChain($config->getChainConfig());
         $this->exceptionsToCatch = $config->exceptionsToCatch;
         $this->nbAttempts = $config->nbAttempts;
+        $this->isolateContext = $config->isolateContext;
         $this->onSplittedChainOperationConstruct([$this->chainProcessor]);
     }
 
@@ -43,10 +45,12 @@ class FailSafeOperation extends AbstractChainOperation implements DataChainOpera
 
     public function repeatOnItem(ItemInterface $inputItem, ExecutionContext $context): \Generator
     {
+        $branchContext = $this->isolateContext ? clone $context : $context;
+
         $nbAttempts = 0;
         do {
             try {
-                foreach ($this->chainProcessor->processGenerator($inputItem, $context, withStop: false) as $newItem) {
+                foreach ($this->chainProcessor->processGenerator($inputItem, $branchContext, withStop: false) as $newItem) {
                     yield $newItem;
                 }
                 return; // success - stop retrying
@@ -64,10 +68,10 @@ class FailSafeOperation extends AbstractChainOperation implements DataChainOpera
                     }
                 }
                 if (!$handled || $nbAttempts >= $this->nbAttempts) {
-                    $context->getLogger()->error('FailSafeOperation giving up', ['attempts' => $nbAttempts, 'exception' => $exception]);
+                    $branchContext->getLogger()->error('FailSafeOperation giving up', ['attempts' => $nbAttempts, 'exception' => $exception]);
                     throw $exception;
                 }
-                $context->getLogger()->warning('FailSafeOperation retrying', ['attempts' => $nbAttempts, 'exception' => $exception]);
+                $branchContext->getLogger()->warning('FailSafeOperation retrying', ['attempts' => $nbAttempts, 'exception' => $exception]);
             }
         } while ($nbAttempts < $this->nbAttempts);
     }
