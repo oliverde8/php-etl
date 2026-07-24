@@ -10,6 +10,7 @@ use Oliverde8\Component\PhpEtl\ChainOperation\Extract\ExternalFileFinderOperatio
 use Oliverde8\Component\PhpEtl\ChainOperation\Extract\JsonExtractOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Grouping\BatchOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Grouping\SimpleGroupingOperation;
+use Oliverde8\Component\PhpEtl\ChainOperation\IfOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Loader\FileWriterOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\CallbackTransformerOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\ExternalFileProcessorOperation;
@@ -31,6 +32,7 @@ use Oliverde8\Component\PhpEtl\OperationConfig\Extract\ExternalFileFinderConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Extract\JsonExtractConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Grouping\BatchConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Grouping\SimpleGroupingConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\IfConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Loader\CsvFileWriterConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\CallBackTransformerConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\ExternalFileProcessorConfig;
@@ -91,6 +93,7 @@ $chainBuilder = new ChainBuilderV2(
         new GenericChainFactory(SimpleGroupingOperation::class, SimpleGroupingConfig::class),
         new GenericChainFactory(BatchOperation::class, BatchConfig::class),
         new GenericChainFactory(FilterDataOperation::class, FilterDataConfig::class, injections: ['ruleApplier' => $ruleApplier]),
+        new GenericChainFactory(IfOperation::class, IfConfig::class, injections: ['ruleApplier' => $ruleApplier]),
         new GenericChainFactory(ChainMergeOperation::class, ChainMergeConfig::class),
         new GenericChainFactory(ChainRepeatOperation::class, ChainRepeatConfig::class),
         new GenericChainFactory(ChainSplitOperation::class, ChainSplitConfig::class),

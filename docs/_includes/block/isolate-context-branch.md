@@ -5,7 +5,10 @@ By default, all branches share the same execution context as the main chain — 
 {{ include.operation }} is done. Pass `isolateContext: true` to give each branch its own independent copy instead:
 
 ```php
-${{ include.var }} = new {{ include.config }}(isolateContext: true);
+${{ include.var }} = new {{ include.config }}(
+    // ...
+    isolateContext: true
+);
 ```
 
 Branches can then no longer see each other's context changes, and nothing leaks back to the main chain. The

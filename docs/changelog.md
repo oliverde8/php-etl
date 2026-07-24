@@ -9,6 +9,7 @@ subTitle: Release history
 - 🌟 - Allow naming chain links when using new chain builder
 - 🌟 - `ChainSplitConfig`, `ChainMergeConfig`, `ChainRepeatConfig`, and `FailSafeConfig` now accept an `isolateContext` option to give a sub-chain its own copy of the execution context instead of sharing the parent's
 - 🌟 - Added `BatchConfig` operation to collect items into fixed-size chunks, emitted as soon as each chunk is full, without buffering the whole stream in memory
+- 🌟 - Added `IfConfig` operation to route an item to exactly one of two sub-chains based on a Rule Engine condition, letting the chosen branch freely modify the item (unlike `Split`, where multiple branches could run in parallel)
 - 🔧 - Fixed Mermaid static diagram not rendering a Merge operation's branches (they were silently skipped, unlike Split's)
 
 # 🌟 2.0.0 🌟
