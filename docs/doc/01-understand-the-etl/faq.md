@@ -14,12 +14,23 @@ The [symfony bundle](https://github.com/oliverde8/phpEtlBundle) will allow you t
 
 ### Is there a validation of the chain configuration ?
 
-Yes there is. you will get an error like this :
+That depends which configuration paradigm you're using.
+
+With the legacy YAML `ChainBuilder`, yes: options are validated against a Symfony `Constraint` per operation, and
+you get a field-scoped error like this :
 
 ```
 There was an error building the operation 'simple-grouping' : 
  - "grouping-key" : This field is missing.
  - "file" : This field was not expected.
+```
+
+With the current `ChainConfig`/`ChainBuilderV2` paradigm, each operation config validates itself in its own
+`validate()` method, and throws a plain `\InvalidArgumentException` with a message specific to that operation
+instead, e.g. :
+
+```
+Group key cannot be empty
 ```
 
 ### How is this project maintained
