@@ -16,7 +16,7 @@ class LoggerContext
 
     protected function setLoggerContext($key, $value)
     {
-        AssociativeArray::setFromKey($loggerContext, $key, $value, ".");
+        AssociativeArray::setFromKey($this->loggerContext, $key, $value, ".");
     }
 
     protected function replaceLoggerContext(array $loggerContext): void
