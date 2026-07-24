@@ -144,27 +144,21 @@ lines of the csv file.
 ```php
 use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\RuleTransformConfig;
 
-$chainConfig->addLink(new RuleTransformConfig(
-    columns: [
-        'Name' => [
-            'rules' => [
-                ['implode' => [
-                    'values' => [
-                        [['get' => ['field' => 'FirstName']]],
-                        [['get' => ['field' => 'LastName']]]
-                    ],
-                    'with' => ' '
-                ]]
-            ]
-        ],
-        'SubscriptionStatus' => [
-            'rules' => [
-                ['get' => ['field' => 'IsSubscribed']]
-            ]
-        ]
-    ],
-    add: false  // Replace existing columns with transformed columns
-));
+$chainConfig->addLink(
+    (new RuleTransformConfig(add: false)) // Replace existing columns with transformed columns
+        ->addColumn('Name', [
+            ['implode' => [
+                'values' => [
+                    [['get' => ['field' => 'FirstName']]],
+                    [['get' => ['field' => 'LastName']]]
+                ],
+                'with' => ' '
+            ]]
+        ])
+        ->addColumn('SubscriptionStatus', [
+            ['get' => ['field' => 'IsSubscribed']]
+        ])
+);
 ```
 
 {% endcapture %}

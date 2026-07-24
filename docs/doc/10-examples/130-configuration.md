@@ -114,27 +114,21 @@ $config = [
 $chainConfig = new ChainConfig();
 $chainConfig
     ->addLink(new CsvExtractConfig())
-    ->addLink(new RuleTransformConfig(
-        columns: [
-            'Name' => [
-                'rules' => [
-                    ['implode' => [
-                        'values' => [
-                            [['get' => ['field' => 'FirstName']]],
-                            [['get' => ['field' => 'LastName']]]
-                        ],
-                        'with' => ' '
-                    ]]
-                ]
-            ],
-            'SubscriptionStatus' => [
-                'rules' => [
-                    ['get' => ['field' => 'IsSubscribed']]
-                ]
-            ]
-        ],
-        add: false
-    ))
+    ->addLink(
+        (new RuleTransformConfig(add: false))
+            ->addColumn('Name', [
+                ['implode' => [
+                    'values' => [
+                        [['get' => ['field' => 'FirstName']]],
+                        [['get' => ['field' => 'LastName']]]
+                    ],
+                    'with' => ' '
+                ]]
+            ])
+            ->addColumn('SubscriptionStatus', [
+                ['get' => ['field' => 'IsSubscribed']]
+            ])
+    )
     ->addLink(new CsvFileWriterConfig($config['outputFileName']));
 
 // Create and execute the chain

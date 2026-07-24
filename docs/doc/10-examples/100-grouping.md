@@ -54,12 +54,9 @@ This works like the csv file, but is more suited for complex multi level datas a
 {% capture code %}
 
 ```php
-use Oliverde8\Component\PhpEtl\OperationConfig\Loader\CsvFileWriterConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\Loader\JsonFileWriterConfig;
 
-$chainConfig->addLink(new CsvFileWriterConfig(
-    file: 'output.json',
-    fileFormat: 'json'
-));
+$chainConfig->addLink(new JsonFileWriterConfig('output.json'));
 ```
 
 {% endcapture %}
@@ -71,7 +68,7 @@ $chainConfig->addLink(new CsvFileWriterConfig(
 use Oliverde8\Component\PhpEtl\ChainConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Extract\CsvExtractConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Grouping\SimpleGroupingConfig;
-use Oliverde8\Component\PhpEtl\OperationConfig\Loader\CsvFileWriterConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\Loader\JsonFileWriterConfig;
 
 $chainConfig = new ChainConfig();
 $chainConfig
@@ -80,10 +77,7 @@ $chainConfig
         groupKey: ['IsSubscribed'],
         groupIdentifierKey: []
     ))
-    ->addLink(new CsvFileWriterConfig(
-        file: 'output.json',
-        fileFormat: 'json'
-    ));
+    ->addLink(new JsonFileWriterConfig('output.json'));
 
 // Create and execute the chain
 $chainProcessor = $chainBuilder->createChain($chainConfig);

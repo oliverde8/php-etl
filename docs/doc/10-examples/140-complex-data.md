@@ -80,15 +80,12 @@ given locale is missing. `get` will simply return an empty column, symfony expre
 ```php
 use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\RuleTransformConfig;
 
-$chainConfig->addLink(new RuleTransformConfig(
-    columns: [
-        'name-{@context/locales}' => [
-            'rules' => [
-                ['get' => ['field' => ['name', '@context/locales']]]
-            ]
-        ]
-    ]
-));
+$chainConfig->addLink(
+    (new RuleTransformConfig())
+        ->addColumn('name-{@context/locales}', [
+            ['get' => ['field' => ['name', '@context/locales']]]
+        ])
+);
 ```
 
 {% endcapture %}
@@ -106,26 +103,18 @@ use Oliverde8\Component\PhpEtl\Item\DataItem;
 $chainConfig = new ChainConfig();
 $chainConfig
     ->addLink(new JsonExtractConfig())
-    ->addLink(new RuleTransformConfig(
-        columns: [
-            'productId' => [
-                'rules' => [
-                    ['get' => ['field' => 'productId']]
-                ]
-            ],
-            'sku' => [
-                'rules' => [
-                    ['get' => ['field' => 'sku']]
-                ]
-            ],
-            'name-{@context/locales}' => [
-                'rules' => [
-                    ['get' => ['field' => ['name', '@context/locales']]]
-                ]
-            ]
-        ],
-        add: false
-    ))
+    ->addLink(
+        (new RuleTransformConfig(add: false))
+            ->addColumn('productId', [
+                ['get' => ['field' => 'productId']]
+            ])
+            ->addColumn('sku', [
+                ['get' => ['field' => 'sku']]
+            ])
+            ->addColumn('name-{@context/locales}', [
+                ['get' => ['field' => ['name', '@context/locales']]]
+            ])
+    )
     ->addLink(new CsvFileWriterConfig('output.csv'));
 
 // Create and execute the chain
