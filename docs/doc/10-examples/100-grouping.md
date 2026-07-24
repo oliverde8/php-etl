@@ -38,8 +38,8 @@ that information for example.
 use Oliverde8\Component\PhpEtl\OperationConfig\Grouping\SimpleGroupingConfig;
 
 $chainConfig->addLink(new SimpleGroupingConfig(
-    groupingKey: ['IsSubscribed'],
-    groupIdentifier: []
+    groupKey: ['IsSubscribed'],
+    groupIdentifierKey: []
 ));
 ```
 
@@ -77,8 +77,8 @@ $chainConfig = new ChainConfig();
 $chainConfig
     ->addLink(new CsvExtractConfig())
     ->addLink(new SimpleGroupingConfig(
-        groupingKey: ['IsSubscribed'],
-        groupIdentifier: []
+        groupKey: ['IsSubscribed'],
+        groupIdentifierKey: []
     ))
     ->addLink(new CsvFileWriterConfig(
         file: 'output.json',
