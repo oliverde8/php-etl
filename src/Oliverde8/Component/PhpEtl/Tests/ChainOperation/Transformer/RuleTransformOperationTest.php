@@ -14,6 +14,7 @@ use Oliverde8\Component\PhpEtl\Model\ExecutionContext;
 use Oliverde8\Component\PhpEtl\Model\File\LocalFileSystem;
 use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\RuleTransformConfig;
 use Oliverde8\Component\RuleEngine\RuleApplier;
+use Oliverde8\Component\RuleEngine\RuleConfig\GetRuleConfig;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -68,6 +69,42 @@ class RuleTransformOperationTest extends TestCase
         $data = $transform->process($data, $this->context);
 
         $this->assertEquals(['test1' => 1, 'test2' => 1, 'test3' => 1], $data->getData());
+    }
+
+    public function testTypedRuleConfigColumn()
+    {
+        $this->ruleApplierMock->expects($this->once())->method('applyConfig')->willReturn('Alice');
+        $this->ruleApplierMock->expects($this->never())->method('apply');
+
+        $config = new RuleTransformConfig(add: true);
+        $config->addColumn('name', new GetRuleConfig('firstName'));
+
+        $transform = new RuleTransformOperation($this->ruleApplierMock, $config);
+
+        $data = new DataItem(['firstName' => 'Alice']);
+        $data = $transform->process($data, $this->context);
+
+        $this->assertEquals(['firstName' => 'Alice', 'name' => 'Alice'], $data->getData());
+    }
+
+    public function testMixedTypedAndArrayRuleColumns()
+    {
+        $this->ruleApplierMock->expects($this->once())->method('applyConfig')->willReturn('Alice');
+        $this->ruleApplierMock->expects($this->once())->method('apply')->willReturn('legacy value');
+
+        $config = new RuleTransformConfig(add: true);
+        $config->addColumn('name', new GetRuleConfig('firstName'))
+               ->addColumn('legacy', ['rules' => '']);
+
+        $transform = new RuleTransformOperation($this->ruleApplierMock, $config);
+
+        $data = new DataItem(['firstName' => 'Alice']);
+        $data = $transform->process($data, $this->context);
+
+        $this->assertEquals(
+            ['firstName' => 'Alice', 'name' => 'Alice', 'legacy' => 'legacy value'],
+            $data->getData()
+        );
     }
 
     public function testDynamicColumn()

@@ -8,6 +8,7 @@
 
 namespace Oliverde8\Component\RuleEngine\Tests\Rules;
 
+use Oliverde8\Component\RuleEngine\RuleConfig\ConstantRuleConfig;
 use Oliverde8\Component\RuleEngine\Rules\Constant;
 use Psr\Log\NullLogger;
 
@@ -18,6 +19,12 @@ class ConstantTest extends AbstractRule
     {
         $this->assertRuleResults(['test' => 'toto 1'], [], ['value' => 'test'], 'test');
         $this->assertRuleResults(['test' => 'toto 1'], [], ['value' => ['1' => ['toto']]], ['1' => ['toto']]);
+    }
+
+    public function testConfigConstants()
+    {
+        $this->assertRuleConfigResults(['test' => 'toto 1'], [], new ConstantRuleConfig('test'), 'test');
+        $this->assertRuleConfigResults(['test' => 'toto 1'], [], new ConstantRuleConfig(['1' => ['toto']]), ['1' => ['toto']]);
     }
 
     #[\Override]

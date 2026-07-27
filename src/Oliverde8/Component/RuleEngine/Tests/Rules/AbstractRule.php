@@ -3,6 +3,7 @@
 namespace Oliverde8\Component\RuleEngine\Tests\Rules;
 
 use Oliverde8\Component\RuleEngine\RuleApplier;
+use Oliverde8\Component\RuleEngine\RuleConfig\RuleConfigInterface;
 use Oliverde8\Component\RuleEngine\Rules\RuleInterface;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
@@ -34,6 +35,11 @@ abstract class AbstractRule extends TestCase
     {
         $this->rule->validate($options);
         $this->assertEquals($expected, $this->rule->apply($lineData, $transformedData, $options));
+    }
+
+    protected function assertRuleConfigResults(array $lineData, array $transformedData, RuleConfigInterface $config, $expected)
+    {
+        $this->assertEquals($expected, $this->rule->applyConfig($lineData, $transformedData, $config));
     }
 
     public function testRuleCode()

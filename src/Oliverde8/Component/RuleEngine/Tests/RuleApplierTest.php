@@ -5,6 +5,8 @@ namespace Oliverde8\Component\RuleEngine\Tests;
 use Oliverde8\Component\RuleEngine\Exceptions\RuleException;
 use Oliverde8\Component\RuleEngine\Exceptions\UnknownRuleException;
 use Oliverde8\Component\RuleEngine\RuleApplier;
+use Oliverde8\Component\RuleEngine\RuleConfig\RuleConfigInterface;
+use Oliverde8\Component\RuleEngine\Rules\ConfigurableRuleInterface;
 use Oliverde8\Component\RuleEngine\Rules\RuleInterface;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -133,6 +135,64 @@ class RuleApplierTest extends TestCase
         $this->expectException(UnknownRuleException::class);
 
         $this->ruleApplier->apply([], [], [['rule3' => ['test']]], [], ['id' => 'test']);
+    }
+
+    public function testApplyConfigDispatchesToMatchingConfigurableRule()
+    {
+        $config = $this->createMock(RuleConfigInterface::class);
+
+        $configurableRule = new class ($config) implements RuleInterface, ConfigurableRuleInterface {
+            public int $calls = 0;
+
+            public function __construct(private readonly RuleConfigInterface $expectedConfig)
+            {
+            }
+
+            public function apply(array $rowData, array &$transformedData, array $options = [])
+            {
+                return null;
+            }
+
+            public function validate(array $options): void
+            {
+            }
+
+            public function getRuleCode(): string
+            {
+                return 'configurable';
+            }
+
+            public function setApplier(RuleApplier $ruleApplier): self
+            {
+                return $this;
+            }
+
+            public function getConfigClass(): string
+            {
+                return $this->expectedConfig::class;
+            }
+
+            public function applyConfig(array $rowData, array &$transformedData, RuleConfigInterface $config): mixed
+            {
+                $this->calls++;
+                return 'config value';
+            }
+        };
+
+        $this->ruleApplier->registerRule($configurableRule);
+
+        $transformedData = [];
+        $this->assertEquals('config value', $this->ruleApplier->applyConfig([], $transformedData, $config));
+        $this->assertEquals(1, $configurableRule->calls);
+    }
+
+    public function testApplyConfigThrowsForUnregisteredConfigClass()
+    {
+        $this->expectException(UnknownRuleException::class);
+
+        $config = $this->createMock(RuleConfigInterface::class);
+        $transformedData = [];
+        $this->ruleApplier->applyConfig([], $transformedData, $config);
     }
 
     public function testValidationError()

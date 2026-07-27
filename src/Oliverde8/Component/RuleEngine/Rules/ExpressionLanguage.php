@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Oliverde8\Component\RuleEngine\Rules;
 
+use Oliverde8\Component\RuleEngine\RuleConfig\ExpressionRuleConfig;
+use Oliverde8\Component\RuleEngine\RuleConfig\RuleConfigInterface;
+
 /**
  * Class ExpressionLanguage
  *
@@ -11,7 +14,7 @@ namespace Oliverde8\Component\RuleEngine\Rules;
  * @copyright 2018 Oliverde8
  * @package Oliverde8\Component\RuleEngine\Rules
  */
-class ExpressionLanguage extends AbstractRule
+class ExpressionLanguage extends AbstractRule implements ConfigurableRuleInterface
 {
     /**
      * @inheritdoc
@@ -55,5 +58,29 @@ class ExpressionLanguage extends AbstractRule
     public function validate(array $options): void
     {
         $this->requireOption('expression', $options);
+    }
+
+    #[\Override]
+    public function getConfigClass(): string
+    {
+        return ExpressionRuleConfig::class;
+    }
+
+    #[\Override]
+    public function applyConfig(array $rowData, array &$transformedData, RuleConfigInterface $config): mixed
+    {
+        assert($config instanceof ExpressionRuleConfig);
+
+        $values = [
+            'rowData' => $rowData,
+            'transformedData' => $transformedData,
+        ];
+
+        foreach ($config->values as $valueKey => $valueConfig) {
+            $values[$valueKey] = $this->ruleApplier->applyConfig($rowData, $transformedData, $valueConfig);
+        }
+
+        $expressionLanguage = new \Symfony\Component\ExpressionLanguage\ExpressionLanguage();
+        return $expressionLanguage->evaluate($config->expression, $values);
     }
 }

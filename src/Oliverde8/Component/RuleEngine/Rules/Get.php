@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Oliverde8\Component\RuleEngine\Rules;
 
 use oliverde8\AssociativeArraySimplified\AssociativeArray;
+use Oliverde8\Component\RuleEngine\RuleConfig\GetRuleConfig;
+use Oliverde8\Component\RuleEngine\RuleConfig\RuleConfigInterface;
 
 /**
  * Class Get
@@ -13,7 +15,7 @@ use oliverde8\AssociativeArraySimplified\AssociativeArray;
  * @copyright 2018 Oliverde8
  * @package Oliverde8\Component\RuleEngine\Rules
  */
-class Get extends AbstractRule
+class Get extends AbstractRule implements ConfigurableRuleInterface
 {
     /**
      * @inheritdoc
@@ -49,5 +51,18 @@ class Get extends AbstractRule
     public function getRuleCode(): string
     {
         return 'get';
+    }
+
+    #[\Override]
+    public function getConfigClass(): string
+    {
+        return GetRuleConfig::class;
+    }
+
+    #[\Override]
+    public function applyConfig(array $rowData, array &$transformedData, RuleConfigInterface $config): mixed
+    {
+        assert($config instanceof GetRuleConfig);
+        return $this->apply($rowData, $transformedData, ['field' => $config->field]);
     }
 }

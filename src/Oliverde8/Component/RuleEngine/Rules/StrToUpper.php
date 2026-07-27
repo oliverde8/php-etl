@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Oliverde8\Component\RuleEngine\Rules;
 
 use Oliverde8\Component\RuleEngine\Exceptions\RuleOptionMissingException;
+use Oliverde8\Component\RuleEngine\RuleConfig\RuleConfigInterface;
+use Oliverde8\Component\RuleEngine\RuleConfig\StrToUpperRuleConfig;
 
 /**
  * Class StrToLower
@@ -13,7 +15,7 @@ use Oliverde8\Component\RuleEngine\Exceptions\RuleOptionMissingException;
  * @copyright 2018 Oliverde8
  * @package Oliverde8\Component\RuleEngine\Rules
  */
-class StrToUpper extends AbstractRule
+class StrToUpper extends AbstractRule implements ConfigurableRuleInterface
 {
     /**
      * @inheritdoc
@@ -43,5 +45,18 @@ class StrToUpper extends AbstractRule
     public function getRuleCode(): string
     {
         return 'str_upper';
+    }
+
+    #[\Override]
+    public function getConfigClass(): string
+    {
+        return StrToUpperRuleConfig::class;
+    }
+
+    #[\Override]
+    public function applyConfig(array $rowData, array &$transformedData, RuleConfigInterface $config): mixed
+    {
+        assert($config instanceof StrToUpperRuleConfig);
+        return strtoupper((string) $this->ruleApplier->applyConfig($rowData, $transformedData, $config->value));
     }
 }

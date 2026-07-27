@@ -8,8 +8,104 @@ The **Rule Engine** is a lightweight transformation component that converts an a
 
 It is designed to be used within PHP-ETL through the `RuleTransformConfig`.
 
+## Typed Rules (Recommended)
 
-## Available Rules
+Each rule has a matching `*RuleConfig` class under `Oliverde8\Component\RuleEngine\RuleConfig`, giving full IDE
+autocomplete and constructor validation instead of guessing array shapes:
+
+```php
+use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\RuleTransformConfig;
+use Oliverde8\Component\RuleEngine\RuleConfig\ExpressionRuleConfig;
+use Oliverde8\Component\RuleEngine\RuleConfig\GetRuleConfig;
+use Oliverde8\Component\RuleEngine\RuleConfig\ImplodeRuleConfig;
+
+$config = (new RuleTransformConfig(add: false))
+    ->addColumn('FullName', new ImplodeRuleConfig(
+        values: [new GetRuleConfig('FirstName'), new GetRuleConfig('LastName')],
+        with: ' ',
+    ))
+    ->addColumn('IsActive', new ExpressionRuleConfig(
+        "rowData['IsSubscribed'] == 'yes'"
+    ));
+```
+
+`addColumn()` accepts either a typed `RuleConfigInterface` or the legacy array syntax described below — they can
+even be mixed column-by-column in the same `RuleTransformConfig`, since each column's rule is resolved independently.
+
+### Available Typed Rules
+
+| Class | Equivalent to | Description |
+|-------|---------------|-------------|
+| `GetRuleConfig(string\|array $field)` | `get` | Fetches a value from the input array by key (or multiple keys). |
+| `ConstantRuleConfig(mixed $value)` | `constant` | Returns a constant, static value. |
+| `ImplodeRuleConfig(array $values, string $with = '')` | `implode` | Concatenates the results of `$values` (each a `RuleConfigInterface`) using `$with` as delimiter. |
+| `StrToLowerRuleConfig(RuleConfigInterface $value)` | `str_lower` | Converts the result of `$value` to lowercase. |
+| `StrToUpperRuleConfig(RuleConfigInterface $value)` | `str_upper` | Converts the result of `$value` to uppercase. |
+| `ExpressionRuleConfig(string $expression, array $values = [])` | `expression_language` | Leverages [Symfony Expression Language](https://symfony.com/doc/current/components/expression_language/syntax.html). `$values` is a map of variable name to a `RuleConfigInterface` resolved before evaluation. |
+
+### Adding Your Own Typed Rule
+
+Implement `Oliverde8\Component\RuleEngine\RuleConfig\RuleConfigInterface` for the value object, and
+`Oliverde8\Component\RuleEngine\Rules\ConfigurableRuleInterface` (alongside the existing `RuleInterface`) on the
+rule that applies it — `getConfigClass()` tells `RuleApplier` which config class this rule handles:
+
+```php
+use Oliverde8\Component\RuleEngine\RuleConfig\RuleConfigInterface;
+
+final class UppercaseFirstRuleConfig implements RuleConfigInterface
+{
+    public function __construct(public readonly RuleConfigInterface $value) {}
+}
+```
+
+```php
+use Oliverde8\Component\RuleEngine\Rules\AbstractRule;
+use Oliverde8\Component\RuleEngine\Rules\ConfigurableRuleInterface;
+
+final class UppercaseFirstRule extends AbstractRule implements ConfigurableRuleInterface
+{
+    public function apply(array $rowData, array &$transformedData, array $options = [])
+    {
+        // legacy array-based path, only needed if you also want array syntax support
+        return ucfirst((string) $options['value']);
+    }
+
+    public function validate(array $options): void
+    {
+        $this->requireOption('value', $options);
+    }
+
+    public function getRuleCode(): string
+    {
+        return 'uppercase_first';
+    }
+
+    public function getConfigClass(): string
+    {
+        return UppercaseFirstRuleConfig::class;
+    }
+
+    public function applyConfig(array $rowData, array &$transformedData, RuleConfigInterface $config): mixed
+    {
+        assert($config instanceof UppercaseFirstRuleConfig);
+        $value = $this->ruleApplier->applyConfig($rowData, $transformedData, $config->value);
+        return ucfirst((string) $value);
+    }
+}
+```
+
+Register the rule instance with `RuleApplier` exactly as you would any other rule (see
+[Adding Your Own Rules](#adding-your-own-rules) below) — `RuleApplier::registerRule()` automatically indexes it
+under `getConfigClass()` as well as `getRuleCode()`, so both `addColumn('field', ['uppercase_first' => [...]])` and
+`addColumn('field', new UppercaseFirstRuleConfig(...))` work through the same registered rule.
+
+---
+
+## Array-Based Rules (Deprecated)
+
+The original syntax — plain nested arrays, each keyed by rule name — still works exactly as before, but
+`RuleTransformConfig::addColumn()` now triggers a deprecation notice when given an array instead of a
+`RuleConfigInterface`. Existing chains keep running unchanged; migrate at your own pace to the typed classes above.
 
 Each rule defines how a specific value in the output array is computed. Rules can be nested and composed for complex transformations.
 
@@ -88,7 +184,7 @@ A basic conditional evaluator for branching logic.
 
 ## Example Use
 
-Here’s an example of how to use rules to transform a CSV row:
+Here's an example of how to use rules to transform a CSV row:
 
 ```yaml
 operation: rule-engine-transformer
