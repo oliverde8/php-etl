@@ -25,7 +25,7 @@ class ChainRepeatOperation extends AbstractChainOperation implements DetailedObs
     public function __construct(
         ChainBuilderV2 $chainBuilder,
         ChainRepeatConfig $config,
-        private readonly ExpressionEvaluatorInterface $expressionEvaluator = new ExpressionEvaluator(),
+        protected ExpressionEvaluatorInterface $expressionEvaluator = new ExpressionEvaluator(),
     ) {
         $this->chainProcessor = $chainBuilder->createChain($config->getChainConfig());
         $this->validationExpression = $config->validationExpression;
