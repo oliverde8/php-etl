@@ -5,6 +5,8 @@ namespace Oliverde8\Component\PhpEtl\ChainOperation\Transformer;
 use Oliverde8\Component\PhpEtl\ChainOperation\AbstractChainOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\ConfigurableChainOperationInterface;
 use Oliverde8\Component\PhpEtl\ChainOperation\DataChainOperationInterface;
+use Oliverde8\Component\PhpEtl\Expression\ExpressionEvaluator;
+use Oliverde8\Component\PhpEtl\Expression\ExpressionEvaluatorInterface;
 use Oliverde8\Component\PhpEtl\Item\ChainBreakItem;
 use Oliverde8\Component\PhpEtl\Item\DataItemInterface;
 use Oliverde8\Component\PhpEtl\Item\ItemInterface;
@@ -17,7 +19,8 @@ class FilterDataOperation extends AbstractChainOperation implements DataChainOpe
 
     public function __construct(
         private readonly RuleApplier $ruleApplier,
-        private readonly FilterDataConfig $config
+        private readonly FilterDataConfig $config,
+        private readonly ExpressionEvaluatorInterface $expressionEvaluator = new ExpressionEvaluator(),
     ) {}
 
 
@@ -26,8 +29,12 @@ class FilterDataOperation extends AbstractChainOperation implements DataChainOpe
     {
         $data = $item->getData();
 
-        $resultData = [];
-        $result = $this->ruleApplier->apply($data, $resultData, $this->config->rules);
+        if ($this->config->expression !== null) {
+            $result = $this->expressionEvaluator->evaluate($this->config->expression, ['data' => $data, 'context' => $context->getParameters()]);
+        } else {
+            $resultData = [];
+            $result = $this->ruleApplier->apply($data, $resultData, $this->config->rules);
+        }
 
         if (($this->config->negate && $result == false) || (!$this->config->negate && $result == true)) {
             return $item;

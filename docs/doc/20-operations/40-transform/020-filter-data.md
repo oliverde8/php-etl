@@ -31,20 +31,34 @@ $config = new FilterDataConfig([
 ]);
 ```
 
+### Expression-Based Configuration
+
+For a simple boolean condition, a [Symfony Expression Language](https://symfony.com/doc/current/components/expression_language.html) string is often less verbose than rule engine rules. Use `expression` instead of `rules` — the two are mutually exclusive:
+
+```php
+use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\FilterDataConfig;
+
+$config = new FilterDataConfig(expression: 'data["IsSubscribed"] == true');
+```
+
+The expression has access to `data` (the item's data) and `context` (the execution context's parameters).
+
 ### Constructor Parameters
 
 ```php
 public function __construct(
-    public readonly array $rules,
+    public readonly array $rules = [],
     public readonly bool $negate = false,
+    public readonly ?string $expression = null,
     string $flavor = 'default'
 )
 ```
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `rules` | `array` | *required* | Rule engine rules to evaluate. Item kept if rule evaluates to truthy value |
+| `rules` | `array` | `[]` | Rule engine rules to evaluate. Item kept if rule evaluates to truthy value. Mutually exclusive with `expression` — exactly one of the two must be provided |
 | `negate` | `bool` | `false` | If `true`, inverts the logic (keeps items that evaluate to falsy) |
+| `expression` | `string\|null` | `null` | A Symfony Expression Language condition, evaluated against `data`/`context`. Alternative to `rules` for simple boolean conditions |
 | `flavor` | `string` | `'default'` | Operation flavor for custom implementations |
 
 ---

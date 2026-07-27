@@ -6,6 +6,7 @@ subTitle: Release history
 
 # 2.1.0
 
+- 🌟 - `FilterDataConfig` and `IfConfig` now accept an optional `expression` (Symfony Expression Language) as a lighter-weight alternative to Rule Engine `rules` for simple boolean conditions; mutually exclusive with `rules`
 - 🌟 - Added a shared `ExpressionEvaluatorInterface`/`ExpressionEvaluator` used by `LogConfig`, `SimpleHttpConfig`, `ExternalFileFinderConfig`, and `ChainRepeatConfig`'s expressions, standardizing `data`/`context` variables across all four and letting `SimpleHttpConfig`'s `url` use `context` for the first time
 - 🔧 - Fixed `ChainRepeatConfig`'s `validationExpression` not being able to use `context[...]` (it received the raw `ExecutionContext` object instead of its parameters)
 - 🌟 - Allow naming chain links when using new chain builder

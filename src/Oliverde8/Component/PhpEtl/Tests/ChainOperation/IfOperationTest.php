@@ -218,4 +218,53 @@ class IfOperationTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         new IfConfig(rules: [], then: new ChainConfig());
     }
+
+    public function testRulesAndExpressionAreMutuallyExclusive(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        new IfConfig(then: new ChainConfig(), rules: [true], expression: 'data["a"] == true');
+    }
+
+    public function testExpressionConditionRunsThenBranch(): void
+    {
+        $then = new ChainConfig();
+        $then->addLink(new CallBackTransformerConfig(fn(ItemInterface $item) => new DataItem(['branch' => 'then'])));
+
+        $config = new IfConfig(then: $then, expression: 'data["subscribed"] == true');
+        $operation = new IfOperation($this->chainBuilder, $this->createMock(RuleApplier::class), $config);
+
+        $result = $operation->process(new DataItem(['subscribed' => true]), $this->context);
+
+        $this->assertEquals(['branch' => 'then'], $this->singleResult($result)->getData());
+    }
+
+    public function testExpressionConditionRunsElseBranch(): void
+    {
+        $then = new ChainConfig();
+        $then->addLink(new CallBackTransformerConfig(fn(ItemInterface $item) => new DataItem(['branch' => 'then'])));
+
+        $else = new ChainConfig();
+        $else->addLink(new CallBackTransformerConfig(fn(ItemInterface $item) => new DataItem(['branch' => 'else'])));
+
+        $config = new IfConfig(then: $then, else: $else, expression: 'data["subscribed"] == true');
+        $operation = new IfOperation($this->chainBuilder, $this->createMock(RuleApplier::class), $config);
+
+        $result = $operation->process(new DataItem(['subscribed' => false]), $this->context);
+
+        $this->assertEquals(['branch' => 'else'], $this->singleResult($result)->getData());
+    }
+
+    public function testExpressionConditionCanReadContext(): void
+    {
+        $then = new ChainConfig();
+        $then->addLink(new CallBackTransformerConfig(fn(ItemInterface $item) => new DataItem(['branch' => 'then'])));
+
+        $config = new IfConfig(then: $then, expression: 'context["country"] == "US"');
+        $operation = new IfOperation($this->chainBuilder, $this->createMock(RuleApplier::class), $config);
+
+        $context = new ExecutionContext(['country' => 'US'], new LocalFileSystem());
+        $result = $operation->process(new DataItem([]), $context);
+
+        $this->assertEquals(['branch' => 'then'], $this->singleResult($result)->getData());
+    }
 }
