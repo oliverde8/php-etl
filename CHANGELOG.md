@@ -1,5 +1,7 @@
 # 2.1.0
 
+- :star2: - Added a shared `ExpressionEvaluatorInterface`/`ExpressionEvaluator` used by `LogConfig`, `SimpleHttpConfig`, `ExternalFileFinderConfig`, and `ChainRepeatConfig`'s expressions, standardizing `data`/`context` variables across all four and letting `SimpleHttpConfig`'s `url` use `context` for the first time
+- :wrench: - Fixed `ChainRepeatConfig`'s `validationExpression` not being able to use `context[...]` (it received the raw `ExecutionContext` object instead of its parameters)
 - :star2: - Allow naming chain links when using new chain builder
 - :star2: - `ChainSplitConfig`, `ChainMergeConfig`, `ChainRepeatConfig`, and `FailSafeConfig` now accept an `isolateContext` option to give a sub-chain its own copy of the execution context instead of sharing the parent's
 - :star2: - Added `BatchConfig` operation to collect items into fixed-size chunks, emitted as soon as each chunk is full, without buffering the whole stream in memory

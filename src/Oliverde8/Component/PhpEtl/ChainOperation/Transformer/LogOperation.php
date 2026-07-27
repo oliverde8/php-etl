@@ -7,30 +7,29 @@ use oliverde8\AssociativeArraySimplified\AssociativeArray;
 use Oliverde8\Component\PhpEtl\ChainOperation\AbstractChainOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\ConfigurableChainOperationInterface;
 use Oliverde8\Component\PhpEtl\ChainOperation\DataChainOperationInterface;
+use Oliverde8\Component\PhpEtl\Expression\ExpressionEvaluator;
+use Oliverde8\Component\PhpEtl\Expression\ExpressionEvaluatorInterface;
 use Oliverde8\Component\PhpEtl\Item\DataItemInterface;
 use Oliverde8\Component\PhpEtl\Item\ItemInterface;
 use Oliverde8\Component\PhpEtl\Model\ExecutionContext;
 use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\LogConfig;
-use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
 class LogOperation extends AbstractChainOperation implements DataChainOperationInterface, ConfigurableChainOperationInterface
 {
-    protected readonly ExpressionLanguage $expressionLanguage;
-
-    public function __construct(protected readonly LogConfig $config)
-    {
-        $this->expressionLanguage = new ExpressionLanguage();
+    public function __construct(
+        protected readonly LogConfig $config,
+        private readonly ExpressionEvaluatorInterface $expressionEvaluator = new ExpressionEvaluator(),
+    ) {
     }
 
     #[\Override]
     public function processData(DataItemInterface $item, ExecutionContext $context): ItemInterface
     {
         $data = new AssociativeArray($item->getData());
-        $message = $this->config->message;
-        if (str_starts_with($message, "@")) {
-            $message = ltrim($message, "@");
-            $message = $this->expressionLanguage->evaluate($message, ['data' => $item->getData(), 'context' => $context->getParameters()]);
-        }
+        $message = $this->expressionEvaluator->evaluateIfExpression(
+            $this->config->message,
+            ['data' => $item->getData(), 'context' => $context->getParameters()],
+        );
 
         $logContext = [];
         foreach ($this->config->context as $key => $valueKey) {

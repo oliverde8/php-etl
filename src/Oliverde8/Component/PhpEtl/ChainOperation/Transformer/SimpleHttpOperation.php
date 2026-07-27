@@ -8,21 +8,22 @@ use oliverde8\AssociativeArraySimplified\AssociativeArray;
 use Oliverde8\Component\PhpEtl\ChainOperation\AbstractChainOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\ConfigurableChainOperationInterface;
 use Oliverde8\Component\PhpEtl\ChainOperation\DataChainOperationInterface;
+use Oliverde8\Component\PhpEtl\Expression\ExpressionEvaluator;
+use Oliverde8\Component\PhpEtl\Expression\ExpressionEvaluatorInterface;
 use Oliverde8\Component\PhpEtl\Item\AsyncHttpClientResponseItem;
 use Oliverde8\Component\PhpEtl\Item\DataItemInterface;
 use Oliverde8\Component\PhpEtl\Item\ItemInterface;
 use Oliverde8\Component\PhpEtl\Model\ExecutionContext;
 use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\SimpleHttpConfig;
-use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class SimpleHttpOperation extends AbstractChainOperation implements DataChainOperationInterface, ConfigurableChainOperationInterface
 {
-    private readonly ExpressionLanguage $expressionLanguage;
-
-    public function __construct(private readonly HttpClientInterface $client, private readonly SimpleHttpConfig $config)
-    {
-        $this->expressionLanguage = new ExpressionLanguage();
+    public function __construct(
+        private readonly HttpClientInterface $client,
+        private readonly SimpleHttpConfig $config,
+        private readonly ExpressionEvaluatorInterface $expressionEvaluator = new ExpressionEvaluator(),
+    ) {
     }
 
     #[\Override]
@@ -35,11 +36,10 @@ class SimpleHttpOperation extends AbstractChainOperation implements DataChainOpe
             $options = $data;
         }
 
-        $url = $this->config->url;
-        if (str_starts_with($url, "@")) {
-            $url = ltrim($url, '@');
-            $url = $this->expressionLanguage->evaluate($url, ['data' => $data]);
-        }
+        $url = $this->expressionEvaluator->evaluateIfExpression(
+            $this->config->url,
+            ['data' => $data, 'context' => $context->getParameters()],
+        );
 
         $response = $this->client->request($this->config->method, $url, $options);
         $response->getInfo();

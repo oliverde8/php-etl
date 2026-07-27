@@ -9,7 +9,7 @@ The `http` operation makes HTTP requests to external services using the [Symfony
 ## Options
 
 - **method:** The HTTP method to use (e.g., `GET`, `POST`, `PUT`).
-- **url:** The URL to send the request to. You can use the [Symfony Expression Language](https://symfony.com/doc/current/components/expression_language.html) to dynamically generate the URL. To use the expression language, prefix the URL with `@`.
+- **url:** The URL to send the request to. You can use the [Symfony Expression Language](https://symfony.com/doc/current/components/expression_language.html) to dynamically generate the URL. To use the expression language, prefix the URL with `@`. The expression has access to `data` (the item being processed) and `context` (the execution context's parameters), e.g. `'@"https://api.example.com/users/" ~ context["userId"]'`.
 - **options:** (Optional) An array of options for the HTTP client. See the [Symfony HTTP Client documentation](https://symfony.com/doc/current/components/http_client.html#request-options) for a list of available options.
 - **response_is_json:** (Optional) If set to `true`, the response will be automatically decoded as JSON.
 - **option_key:** (Optional) The key in the input data that contains the options for the HTTP request.

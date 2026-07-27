@@ -6,6 +6,8 @@ namespace Oliverde8\Component\PhpEtl\ChainOperation\Extract;
 use Oliverde8\Component\PhpEtl\ChainOperation\AbstractChainOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\ConfigurableChainOperationInterface;
 use Oliverde8\Component\PhpEtl\ChainOperation\DataChainOperationInterface;
+use Oliverde8\Component\PhpEtl\Expression\ExpressionEvaluator;
+use Oliverde8\Component\PhpEtl\Expression\ExpressionEvaluatorInterface;
 use Oliverde8\Component\PhpEtl\Item\DataItemInterface;
 use Oliverde8\Component\PhpEtl\Item\ExternalFileItem;
 use Oliverde8\Component\PhpEtl\Item\ItemInterface;
@@ -13,18 +15,14 @@ use Oliverde8\Component\PhpEtl\Item\MixItem;
 use Oliverde8\Component\PhpEtl\Model\ExecutionContext;
 use Oliverde8\Component\PhpEtl\Model\File\FileSystemInterface;
 use Oliverde8\Component\PhpEtl\OperationConfig\Extract\ExternalFileFinderConfig;
-use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
 class ExternalFileFinderOperation extends AbstractChainOperation implements DataChainOperationInterface, ConfigurableChainOperationInterface
 {
-    private readonly ExpressionLanguage $expressionLanguage;
-
     public function __construct(
         private readonly FileSystemInterface $fileSystem,
-        private readonly ExternalFileFinderConfig $config
+        private readonly ExternalFileFinderConfig $config,
+        private readonly ExpressionEvaluatorInterface $expressionEvaluator = new ExpressionEvaluator(),
     ) {
-        $this->expressionLanguage = new ExpressionLanguage();
-
     }
 
     #[\Override]
@@ -33,11 +31,10 @@ class ExternalFileFinderOperation extends AbstractChainOperation implements Data
         $pattern = $item->getData();
         $files = [];
 
-        $directory = $this->config->directory;
-        if (str_starts_with($this->config->directory, "@")) {
-            $directory = ltrim($this->config->directory, '@');
-            $directory = $this->expressionLanguage->evaluate($directory, ['context' => $context->getParameters()]);
-        }
+        $directory = $this->expressionEvaluator->evaluateIfExpression(
+            $this->config->directory,
+            ['context' => $context->getParameters()],
+        );
 
         // Ensure pattern has delimiters for preg_match
         if (!preg_match('/^[\/~#!]/', (string) $pattern)) {

@@ -108,6 +108,24 @@ class ChainRepeatOperationTest extends TestCase
         ], $results);
     }
 
+    public function testValidationExpressionCanReadContextParameters()
+    {
+        $callNum = 0;
+        $results = [];
+        $repeatedOperation = new CallbackTransformerOperation(new CallBackTransformerConfig(function (ItemInterface $item) use (&$callNum) {
+            return new DataItem(['val' => $callNum++]);
+        }));
+        $endOperation = new CallbackTransformerOperation(new CallBackTransformerConfig(function (ItemInterface $item) use (&$results) {
+            $results[] = $item->getData();
+            return $item;
+        }));
+
+        $chain = $this->createChain([$repeatedOperation], [$endOperation], 'data["val"] != context["limit"]');
+        $chain->process(new \ArrayIterator([['var' => 1]]), ['limit' => 2]);
+
+        $this->assertEquals([['val' => 0], ['val' => 1]], $results);
+    }
+
     protected function createChain(array $repeatedOperations, array $afterOperations, string $expression, bool $allowAsync = false): ChainProcessor
     {
         $executionFactory = new ExecutionContextFactory();

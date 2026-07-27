@@ -21,6 +21,7 @@ use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\SimpleHttpOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\SplitItemOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\FailSafeOperation;
 use Oliverde8\Component\PhpEtl\ExecutionContextFactory;
+use Oliverde8\Component\PhpEtl\Expression\ExpressionEvaluator;
 use Oliverde8\Component\PhpEtl\GenericChainFactory;
 
 use Oliverde8\Component\PhpEtl\Model\File\LocalFileSystem;
@@ -76,6 +77,7 @@ $ruleApplier = new RuleApplier(
 );
 
 $client = HttpClient::create(['headers' => ['Accept' => 'application/json']]);
+$expressionEvaluator = new ExpressionEvaluator();
 
 if (!function_exists('getEtlExecutionContextFactory')) {
     function getEtlExecutionContextFactory() {
@@ -95,14 +97,14 @@ $chainBuilder = new ChainBuilderV2(
         new GenericChainFactory(FilterDataOperation::class, FilterDataConfig::class, injections: ['ruleApplier' => $ruleApplier]),
         new GenericChainFactory(IfOperation::class, IfConfig::class, injections: ['ruleApplier' => $ruleApplier]),
         new GenericChainFactory(ChainMergeOperation::class, ChainMergeConfig::class),
-        new GenericChainFactory(ChainRepeatOperation::class, ChainRepeatConfig::class),
+        new GenericChainFactory(ChainRepeatOperation::class, ChainRepeatConfig::class, injections: ['expressionEvaluator' => $expressionEvaluator]),
         new GenericChainFactory(ChainSplitOperation::class, ChainSplitConfig::class),
         new GenericChainFactory(JsonExtractOperation::class, JsonExtractConfig::class),
-        new GenericChainFactory(SimpleHttpOperation::class, SimpleHttpConfig::class, injections: ['client' => $client]),
+        new GenericChainFactory(SimpleHttpOperation::class, SimpleHttpConfig::class, injections: ['client' => $client, 'expressionEvaluator' => $expressionEvaluator]),
         new GenericChainFactory(SplitItemOperation::class, SplitItemConfig::class),
-        new GenericChainFactory(LogOperation::class, LogConfig::class),
+        new GenericChainFactory(LogOperation::class, LogConfig::class, injections: ['expressionEvaluator' => $expressionEvaluator]),
         new GenericChainFactory(FailSafeOperation::class, FailSafeConfig::class),
-        new GenericChainFactory(ExternalFileFinderOperation::class, ExternalFileFinderConfig::class, injections: ['fileSystem' => new LocalFileSystem("/")]),
+        new GenericChainFactory(ExternalFileFinderOperation::class, ExternalFileFinderConfig::class, injections: ['fileSystem' => new LocalFileSystem("/"), 'expressionEvaluator' => $expressionEvaluator]),
         new GenericChainFactory(ExternalFileProcessorOperation::class, ExternalFileProcessorConfig::class),
     ],
 );
