@@ -3,6 +3,7 @@
 namespace Oliverde8\Component\PhpEtl\OperationConfig\Transformer;
 
 use Oliverde8\Component\PhpEtl\OperationConfig\AbstractOperationConfig;
+use Oliverde8\Component\RuleEngine\RuleConfig\RuleConfigInterface;
 
 class RuleTransformConfig extends AbstractOperationConfig
 {
@@ -13,8 +14,23 @@ class RuleTransformConfig extends AbstractOperationConfig
         parent::__construct($flavor);
     }
 
-    public function addColumn(string $columnName, array $rules): self
+    /**
+     * @param RuleConfigInterface|array $rules A typed RuleConfigInterface (see Oliverde8\Component\RuleEngine\RuleConfig),
+     *                                           or the legacy array-based rule engine syntax.
+     *
+     * @deprecated Passing an array is deprecated, pass a RuleConfigInterface instead (e.g. new GetRuleConfig(...)).
+     */
+    public function addColumn(string $columnName, RuleConfigInterface|array $rules): self
     {
+        if (is_array($rules)) {
+            trigger_deprecation(
+                'oliverde8/php-etl',
+                '2.1',
+                'Passing an array of rules to RuleTransformConfig::addColumn() for column "%s" is deprecated, pass a RuleConfigInterface instead (e.g. new GetRuleConfig(...)). See Oliverde8\Component\RuleEngine\RuleConfig.',
+                $columnName,
+            );
+        }
+
         $this->rules[$columnName]['rules'] = $rules;
         return $this;
     }

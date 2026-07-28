@@ -2,6 +2,7 @@
 
 namespace Oliverde8\Component\RuleEngine\Tests\Rules;
 
+use Oliverde8\Component\RuleEngine\RuleConfig\GetRuleConfig;
 use Oliverde8\Component\RuleEngine\Rules\Get;
 use Psr\Log\NullLogger;
 
@@ -28,6 +29,16 @@ class GetTest extends AbstractRule
     public function testUnfound()
     {
         $this->assertRuleResults(['test' => 'toto 1'], [], ['field' => 'test-1'], null);
+    }
+
+    public function testConfigWithoutLocale()
+    {
+        $this->assertRuleConfigResults(['test' => 'toto 1'], [], new GetRuleConfig('test'), 'toto 1');
+    }
+
+    public function testConfigUnfound()
+    {
+        $this->assertRuleConfigResults(['test' => 'toto 1'], [], new GetRuleConfig('test-1'), null);
     }
 
     /**

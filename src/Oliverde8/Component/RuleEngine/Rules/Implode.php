@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Oliverde8\Component\RuleEngine\Rules;
 
+use Oliverde8\Component\RuleEngine\RuleConfig\ImplodeRuleConfig;
+use Oliverde8\Component\RuleEngine\RuleConfig\RuleConfigInterface;
+
 /**
  * Class Implode
  *
@@ -11,7 +14,7 @@ namespace Oliverde8\Component\RuleEngine\Rules;
  * @copyright 2018 Oliverde8
  * @package Oliverde8\Component\RuleEngine\Rules
  */
-class Implode extends AbstractRule
+class Implode extends AbstractRule implements ConfigurableRuleInterface
 {
     /**
      * @inheritdoc
@@ -23,10 +26,40 @@ class Implode extends AbstractRule
         unset($subOptions['values']);
         unset($subOptions['with']);
 
-        $data = [];
+        $resolved = [];
         foreach ($options['values'] as $ruleData) {
-            $value = $this->ruleApplier->apply($rowData, $transformedData, $ruleData, $subOptions);
+            $resolved[] = $this->ruleApplier->apply($rowData, $transformedData, $ruleData, $subOptions);
+        }
 
+        return $this->combine($resolved, $options['with']);
+    }
+
+    #[\Override]
+    public function getConfigClass(): string
+    {
+        return ImplodeRuleConfig::class;
+    }
+
+    #[\Override]
+    public function applyConfig(array $rowData, array &$transformedData, RuleConfigInterface $config): mixed
+    {
+        assert($config instanceof ImplodeRuleConfig);
+
+        $resolved = [];
+        foreach ($config->values as $valueConfig) {
+            $resolved[] = $this->ruleApplier->applyConfig($rowData, $transformedData, $valueConfig);
+        }
+
+        return $this->combine($resolved, $config->with);
+    }
+
+    /**
+     * Flatten and join already-resolved values, matching Implode's legacy behaviour.
+     */
+    private function combine(array $resolvedValues, string $with): string
+    {
+        $data = [];
+        foreach ($resolvedValues as $value) {
             if (!empty($value)) {
                 if (is_array($value)) {
                     foreach ($this->flatten($value) as $v) {
@@ -38,7 +71,7 @@ class Implode extends AbstractRule
             }
         }
 
-        return implode($options['with'], $data);
+        return implode($with, $data);
     }
 
     /**

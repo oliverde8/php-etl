@@ -149,8 +149,3 @@ parameters:
 			message: "#^Strict comparison using \\=\\=\\= between ''\\|null and false will always evaluate to false\\.$#"
 			count: 1
 			path: src/Oliverde8/Component/RuleEngine/RuleApplier.php
-
-		-
-			message: "#^Call to function is_array\\(\\) with non\\-falsy\\-string will always evaluate to false\\.$#"
-			count: 1
-			path: src/Oliverde8/Component/RuleEngine/Rules/Implode.php

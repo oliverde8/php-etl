@@ -6,6 +6,8 @@ namespace Oliverde8\Component\RuleEngine;
 
 use Oliverde8\Component\RuleEngine\Exceptions\RuleException;
 use Oliverde8\Component\RuleEngine\Exceptions\UnknownRuleException;
+use Oliverde8\Component\RuleEngine\RuleConfig\RuleConfigInterface;
+use Oliverde8\Component\RuleEngine\Rules\ConfigurableRuleInterface;
 use Oliverde8\Component\RuleEngine\Rules\RuleInterface;
 use Psr\Log\LoggerInterface;
 
@@ -20,6 +22,9 @@ class RuleApplier
 {
     /** @var RuleInterface[] */
     protected array $rules;
+
+    /** @var array<class-string<RuleConfigInterface>, ConfigurableRuleInterface> */
+    protected array $configurableRules = [];
 
     protected array $currentIdentity;
 
@@ -46,6 +51,30 @@ class RuleApplier
     public function registerRule(RuleInterface $rule)
     {
         $this->rules[$rule->getRuleCode()] = $rule;
+
+        if ($rule instanceof ConfigurableRuleInterface) {
+            $this->configurableRules[$rule->getConfigClass()] = $rule;
+        }
+    }
+
+    /**
+     * Apply a typed RuleConfigInterface, the typed alternative to apply()'s array-based rules.
+     *
+     * @param array $rowData Data that is being transformed.
+     * @param array $transformedData Transformed data at the current stage.
+     * @param RuleConfigInterface $config Typed rule configuration to apply.
+     *
+     * @throws UnknownRuleException When no registered rule declares support for $config's class.
+     */
+    public function applyConfig(array $rowData, array &$transformedData, RuleConfigInterface $config): mixed
+    {
+        $configClass = $config::class;
+
+        if (!isset($this->configurableRules[$configClass])) {
+            throw new UnknownRuleException("No rule registered for config '$configClass'!");
+        }
+
+        return $this->configurableRules[$configClass]->applyConfig($rowData, $transformedData, $config);
     }
 
 
