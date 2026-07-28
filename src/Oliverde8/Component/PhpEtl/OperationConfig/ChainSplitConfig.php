@@ -7,8 +7,10 @@ use Oliverde8\Component\PhpEtl\Exception\ChainBuilderException;
 
 class ChainSplitConfig extends AbstractOperationConfig
 {
-    /** @var ChainConfig[] */
+    /** @var array<int|string, ChainConfig> */
     private array $chainConfigs = [];
+
+    private int $nextIndex = 0;
 
     /**
      * @param string $flavor
@@ -22,16 +24,25 @@ class ChainSplitConfig extends AbstractOperationConfig
     }
 
     /**
-     * @return ChainConfig[]
+     * @return array<int|string, ChainConfig>
      */
     public function getChainConfigs(): array
     {
         return $this->chainConfigs;
     }
 
-    public function addSplit(ChainConfig $chainConfig): self
+    /**
+     * @param string|null $name Optional name for this branch, used as its identifier in diagrams (e.g. Mermaid)
+     *                           and logs/exceptions instead of its numeric position. Defaults to the next numeric index.
+     */
+    public function addSplit(ChainConfig $chainConfig, ?string $name = null): self
     {
-        $this->chainConfigs[] = $chainConfig;
+        $key = $name ?? $this->nextIndex++;
+        if (array_key_exists($key, $this->chainConfigs)) {
+            throw new \InvalidArgumentException("A branch named '$key' already exists.");
+        }
+
+        $this->chainConfigs[$key] = $chainConfig;
         return $this;
     }
 

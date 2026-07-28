@@ -25,7 +25,7 @@ class ChainMergeOperation extends AbstractChainOperation implements DataChainOpe
     use SplittedChainOperationTrait;
 
     /**
-     * @var ChainProcessorInterface[]
+     * @var array<int|string, ChainProcessorInterface>
      */
     private array $chainProcessors = [];
 
@@ -33,8 +33,8 @@ class ChainMergeOperation extends AbstractChainOperation implements DataChainOpe
 
     public function __construct(ChainBuilderV2 $chainBuilder, ChainMergeConfig $config)
     {
-        foreach ($config->getChainConfigs() as $chainConfig) {
-            $this->chainProcessors[] = $chainBuilder->createChain($chainConfig);
+        foreach ($config->getChainConfigs() as $key => $chainConfig) {
+            $this->chainProcessors[$key] = $chainBuilder->createChain($chainConfig);
         }
         $this->isolateContext = $config->isolateContext;
         $this->onSplittedChainOperationConstruct($this->chainProcessors);

@@ -25,7 +25,7 @@ class ChainSplitOperation extends AbstractChainOperation implements DataChainOpe
     use SplittedChainOperationTrait;
 
     /**
-     * @var ChainProcessorInterface[]
+     * @var array<int|string, ChainProcessorInterface>
      */
     protected array $chainProcessors = [];
 
@@ -33,8 +33,8 @@ class ChainSplitOperation extends AbstractChainOperation implements DataChainOpe
 
     public function __construct(ChainBuilderV2 $chainProcessors, ChainSplitConfig $config)
     {
-        foreach ($config->getChainConfigs() as $chainConfig) {
-            $this->chainProcessors[] = $chainProcessors->createChain($chainConfig);
+        foreach ($config->getChainConfigs() as $key => $chainConfig) {
+            $this->chainProcessors[$key] = $chainProcessors->createChain($chainConfig);
         }
         $this->isolateContext = $config->isolateContext;
         $this->onSplittedChainOperationConstruct($this->chainProcessors);

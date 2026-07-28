@@ -204,6 +204,20 @@ class ChainMergeOperationTest extends TestCase
         $this->assertContainsOnlyInstancesOf(\Oliverde8\Component\PhpEtl\ChainProcessorInterface::class, $processors);
     }
 
+    public function testGetChainProcessorsPreservesNamedKeys()
+    {
+        $chain1Config = new ChainConfig();
+        $chain2Config = new ChainConfig();
+
+        $mergeConfig = new ChainMergeConfig();
+        $mergeConfig->addMerge($chain1Config, 'premium')->addMerge($chain2Config);
+
+        $operation = new ChainMergeOperation($this->chainBuilder, $mergeConfig);
+
+        $processors = $operation->getChainProcessors();
+        $this->assertSame(['premium', 0], array_keys($processors));
+    }
+
     public function testMergeWithDifferentDataTypes()
     {
         $chain1Config = new ChainConfig();
