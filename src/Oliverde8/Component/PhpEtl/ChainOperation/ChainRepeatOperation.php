@@ -13,7 +13,7 @@ use Oliverde8\Component\PhpEtl\Item\ItemInterface;
 use Oliverde8\Component\PhpEtl\Model\ExecutionContext;
 use Oliverde8\Component\PhpEtl\OperationConfig\ChainRepeatConfig;
 
-class ChainRepeatOperation extends AbstractChainOperation implements DetailedObservableOperation, ConfigurableChainOperationInterface
+class ChainRepeatOperation extends AbstractChainOperation implements DetailedObservableOperation, ConfigurableChainOperationInterface, SubChainsAwareOperationInterface
 {
     use SplittedChainOperationTrait;
 
@@ -72,5 +72,14 @@ class ChainRepeatOperation extends AbstractChainOperation implements DetailedObs
     public function getConfigurationClass(): string
     {
         return ChainRepeatConfig::class;
+    }
+
+    /**
+     * @return ChainProcessorInterface[]
+     */
+    #[\Override]
+    public function getChainProcessors(): array
+    {
+        return [$this->chainProcessor];
     }
 }
