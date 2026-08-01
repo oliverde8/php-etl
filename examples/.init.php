@@ -20,6 +20,7 @@ use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\RuleTransformOperation
 use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\SimpleHttpOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\SplitItemOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\FailSafeOperation;
+use Oliverde8\Component\PhpEtl\ChainOperation\SwitchOperation;
 use Oliverde8\Component\PhpEtl\ExecutionContextFactory;
 use Oliverde8\Component\PhpEtl\Expression\ExpressionEvaluator;
 use Oliverde8\Component\PhpEtl\GenericChainFactory;
@@ -43,6 +44,7 @@ use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\RuleTransformConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\SimpleHttpConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\SplitItemConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\FailSafeConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\SwitchConfig;
 
 use Oliverde8\Component\RuleEngine\RuleApplier;
 use Oliverde8\Component\RuleEngine\Rules\ExpressionLanguage;
@@ -96,6 +98,7 @@ $chainBuilder = new ChainBuilderV2(
         new GenericChainFactory(BatchOperation::class, BatchConfig::class),
         new GenericChainFactory(FilterDataOperation::class, FilterDataConfig::class, injections: ['ruleApplier' => $ruleApplier, 'expressionEvaluator' => $expressionEvaluator]),
         new GenericChainFactory(IfOperation::class, IfConfig::class, injections: ['ruleApplier' => $ruleApplier, 'expressionEvaluator' => $expressionEvaluator]),
+        new GenericChainFactory(SwitchOperation::class, SwitchConfig::class, injections: ['ruleApplier' => $ruleApplier, 'expressionEvaluator' => $expressionEvaluator]),
         new GenericChainFactory(ChainMergeOperation::class, ChainMergeConfig::class),
         new GenericChainFactory(ChainRepeatOperation::class, ChainRepeatConfig::class, injections: ['expressionEvaluator' => $expressionEvaluator]),
         new GenericChainFactory(ChainSplitOperation::class, ChainSplitConfig::class),

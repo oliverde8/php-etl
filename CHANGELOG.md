@@ -1,5 +1,6 @@
 # 2.1.0
 
+- :star2: - Added `SwitchConfig`/`SwitchOperation`, an N-way generalization of `IfConfig`: cases are added fluently with `addCase()` and evaluated in order, routing the item to the first matching case's branch (or an optional `default`), avoiding deeply nested `If`/`else`
 - :star2: - Added typed `RuleConfig` classes (`GetRuleConfig`, `ConstantRuleConfig`, `ImplodeRuleConfig`, `StrToLowerRuleConfig`, `StrToUpperRuleConfig`, `ExpressionRuleConfig`) as an IDE-friendly alternative to Rule Engine's array-based rule syntax. `RuleTransformConfig::addColumn()` accepts either. Custom rules can opt in via the new `ConfigurableRuleInterface`
 - :exclamation: **Deprecation** Passing an array of rules to `RuleTransformConfig::addColumn()` now triggers a deprecation notice; it keeps working unchanged, but new code should use a typed `RuleConfigInterface` instead
 - :star2: - `ChainSplitConfig::addSplit()` and `ChainMergeConfig::addMerge()` now accept an optional `$name`, mirroring `ChainConfig::addLink()`, so branches can be identified by name instead of numeric position
