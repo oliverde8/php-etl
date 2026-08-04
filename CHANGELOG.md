@@ -1,3 +1,8 @@
+# 2.0.1
+
+- :wrench: Fix #75 - `LoggerContext::setLoggerContext()` mutated an undefined local variable instead of `$this->loggerContext`, so per-operation logger context tagging never actually worked.
+- :wrench: Fix #74 - Mermaid static output now renders `Repeat` and `FailSafe` sub-chains instead of drawing them as a single opaque node. Thanks @PuvaanRaaj!
+
 # 🌟 2.0.0 🌟
 
 - :star2: - **NEW PARADIGM** - use php for configurations instead of yaml

@@ -4,6 +4,11 @@ title: PHP-ETL - Changelog
 subTitle: Release history
 ---
 
+# 2.0.1
+
+- 🔧 Fix #75 - `LoggerContext::setLoggerContext()` mutated an undefined local variable instead of `$this->loggerContext`, so per-operation logger context tagging never actually worked.
+- 🔧 Fix #74 - Mermaid static output now renders `Repeat` and `FailSafe` sub-chains instead of drawing them as a single opaque node. Thanks @PuvaanRaaj!
+
 # 🌟 2.0.0 🌟
 
 - 🌟 - **NEW PARADIGM** - use php for configurations instead of yaml
