@@ -58,6 +58,24 @@ class ChainRepeatOperationTest extends TestCase
         $this->assertEquals([['val' => 0], ['val' => 1], ['val' => 2]], $results);
     }
 
+    public function testRepeatUsingContextExpression()
+    {
+        $callNum = 0;
+        $results = [];
+        $repeatedOperation = new CallbackTransformerOperation(new CallBackTransformerConfig(function (ItemInterface $item) use (&$callNum) {
+            return new DataItem(['val' => $callNum++]);
+        }));
+        $endOperation = new CallbackTransformerOperation(new CallBackTransformerConfig(function (ItemInterface $item) use (&$results) {
+            $results[] = $item->getData();
+            return $item;
+        }));
+
+        $chain = $this->createChain([$repeatedOperation], [$endOperation], 'context["maxVal"] != data["val"]');
+        $chain->process(new \ArrayIterator([['var' => 1]]), ['maxVal' => 3]);
+
+        $this->assertEquals([['val' => 0], ['val' => 1], ['val' => 2]], $results);
+    }
+
     public function testAsyncDisabled()
     {
         $results = [];

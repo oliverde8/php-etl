@@ -55,7 +55,7 @@ class ChainRepeatOperation extends AbstractChainOperation implements DetailedObs
     public function itemIsValid(ItemInterface $item, ExecutionContext $context): bool
     {
         if ($item instanceof DataItemInterface) {
-            $values = ['data' => $item->getData(), 'context' => $context];
+            $values = ['data' => $item->getData(), 'context' => $context->getParameters()];
             return $this->expressionLanguage->evaluate($this->validationExpression, $values);
         }
 
