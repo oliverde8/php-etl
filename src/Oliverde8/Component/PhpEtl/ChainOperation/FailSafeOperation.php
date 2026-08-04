@@ -76,4 +76,12 @@ class FailSafeOperation extends AbstractChainOperation implements DataChainOpera
     {
         return FailSafeConfig::class;
     }
+
+    /**
+     * @return ChainProcessorInterface[]
+     */
+    public function getChainProcessors(): array
+    {
+        return [$this->chainProcessor];
+    }
 }
