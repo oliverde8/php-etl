@@ -67,4 +67,12 @@ class ChainRepeatOperation extends AbstractChainOperation implements DetailedObs
     {
         return ChainRepeatConfig::class;
     }
+
+    /**
+     * @return ChainProcessorInterface[]
+     */
+    public function getChainProcessors(): array
+    {
+        return [$this->chainProcessor];
+    }
 }

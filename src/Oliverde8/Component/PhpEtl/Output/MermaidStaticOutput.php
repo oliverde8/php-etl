@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace Oliverde8\Component\PhpEtl\Output;
 
+use Oliverde8\Component\PhpEtl\ChainOperation\ChainRepeatOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\ChainSplitOperation;
+use Oliverde8\Component\PhpEtl\ChainOperation\FailSafeOperation;
 use Oliverde8\Component\PhpEtl\ChainProcessorInterface;
 
 class MermaidStaticOutput
@@ -48,6 +50,9 @@ class MermaidStaticOutput
                 if ($chainLink instanceof ChainSplitOperation) {
                     $text .= "\t" . $newPrefix . $id . "B(" . $chainLinkNames[$id] . ")@{ shape: hex}\n";
                     $text .= $this->generateNodes($chainLink->getChainProcessors(), $newPrefix . $id);
+                } elseif ($chainLink instanceof ChainRepeatOperation || $chainLink instanceof FailSafeOperation) {
+                    $text .= "\t" . $newPrefix . $id . "B(" . $chainLinkNames[$id] . ")@{ shape: hex}\n";
+                    $text .= $this->generateNodes($chainLink->getChainProcessors(), $newPrefix . $id);
                 } else {
                     $text .= "\t" . $newPrefix . $id . "B(" . $chainLinkNames[$id] . ")\n";
                 }
@@ -74,7 +79,10 @@ class MermaidStaticOutput
                 }
                 $previous = $newPrefix . $id;
 
-                if ($chainLink instanceof ChainSplitOperation) {
+                if ($chainLink instanceof ChainSplitOperation
+                    || $chainLink instanceof ChainRepeatOperation
+                    || $chainLink instanceof FailSafeOperation
+                ) {
                     $text .= $this->generateLinks($chainLink->getChainProcessors(), $newPrefix . $id, $previous);
                 }
             }
