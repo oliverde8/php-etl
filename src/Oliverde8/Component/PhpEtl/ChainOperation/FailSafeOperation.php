@@ -13,7 +13,7 @@ use Oliverde8\Component\PhpEtl\Item\StopItem;
 use Oliverde8\Component\PhpEtl\Model\ExecutionContext;
 use Oliverde8\Component\PhpEtl\OperationConfig\FailSafeConfig;
 
-class FailSafeOperation extends AbstractChainOperation implements DataChainOperationInterface, DetailedObservableOperation, ConfigurableChainOperationInterface
+class FailSafeOperation extends AbstractChainOperation implements DataChainOperationInterface, DetailedObservableOperation, ConfigurableChainOperationInterface, SubChainsAwareOperationInterface
 {
     use SplittedChainOperationTrait;
 
@@ -79,5 +79,14 @@ class FailSafeOperation extends AbstractChainOperation implements DataChainOpera
     public function getConfigurationClass(): string
     {
         return FailSafeConfig::class;
+    }
+
+    /**
+     * @return ChainProcessorInterface[]
+     */
+    #[\Override]
+    public function getChainProcessors(): array
+    {
+        return [$this->chainProcessor];
     }
 }

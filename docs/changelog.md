@@ -18,6 +18,8 @@ subTitle: Release history
 - 🌟 - Added `BatchConfig` operation to collect items into fixed-size chunks, emitted as soon as each chunk is full, without buffering the whole stream in memory
 - 🌟 - Added `IfConfig` operation to route an item to exactly one of two sub-chains based on a Rule Engine condition, letting the chosen branch freely modify the item (unlike `Split`, where multiple branches could run in parallel)
 - 🔧 - Fixed Mermaid static diagram not rendering a Merge operation's branches (they were silently skipped, unlike Split's)
+- 🔧 - Fixed Mermaid static diagram not rendering `Repeat` and `FailSafe` sub-chains (they were drawn as a single opaque node). Thanks @PuvaanRaaj!
+- 🔧 - Fixed `LoggerContext::setLoggerContext()` mutating an undefined local variable instead of `$this->loggerContext`, so per-operation logger context tagging never actually took effect
 
 # 🌟 2.0.0 🌟
 

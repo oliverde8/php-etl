@@ -150,31 +150,21 @@ $chainConfig
             'headers' => ['Accept' => 'application/json']
         ]
     ))
-    ->addLink(new RuleTransformConfig(
-        columns: [
-            'createdAt' => [
-                'rules' => [
-                    ['get' => ['field' => ['content', 'createdAt']]]
-                ]
-            ],
-            'name' => [
-                'rules' => [
-                    ['get' => ['field' => ['content', 'name']]]
-                ]
-            ],
-            'avatar' => [
-                'rules' => [
-                    ['get' => ['field' => ['content', 'avatar']]]
-                ]
-            ],
-            'id' => [
-                'rules' => [
-                    ['get' => ['field' => ['content', 'id']]]
-                ]
-            ]
-        ],
-        add: false
-    ))
+    ->addLink(
+        (new RuleTransformConfig(add: false))
+            ->addColumn('createdAt', [
+                ['get' => ['field' => ['content', 'createdAt']]]
+            ])
+            ->addColumn('name', [
+                ['get' => ['field' => ['content', 'name']]]
+            ])
+            ->addColumn('avatar', [
+                ['get' => ['field' => ['content', 'avatar']]]
+            ])
+            ->addColumn('id', [
+                ['get' => ['field' => ['content', 'id']]]
+            ])
+    )
     ->addLink(new CsvFileWriterConfig('output.csv'));
 
 // Create and execute the chain

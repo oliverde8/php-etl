@@ -30,17 +30,11 @@ $subscribedBranch
         rules: [['get' => ['field' => 'IsSubscribed']]],
         negate: false
     ))
-    ->addLink(new RuleTransformConfig(
-        columns: [
-            'FirstName' => [
-                'rules' => [['get' => ['field' => 'FirstName']]]
-            ],
-            'LastName' => [
-                'rules' => [['get' => ['field' => 'LastName']]]
-            ]
-        ],
-        add: false
-    ))
+    ->addLink(
+        (new RuleTransformConfig(add: false))
+            ->addColumn('FirstName', [['get' => ['field' => 'FirstName']]])
+            ->addColumn('LastName', [['get' => ['field' => 'LastName']]])
+    )
     ->addLink(new CsvFileWriterConfig('subscribed.csv'));
 
 // Second branch: unsubscribed customers
@@ -52,9 +46,11 @@ $unsubscribedBranch
     ))
     ->addLink(new CsvFileWriterConfig('unsubscribed.csv'));
 
-$chainConfig->addLink(new ChainSplitConfig(
-    branches: [$subscribedBranch, $unsubscribedBranch]
-));
+$chainConfig->addLink(
+    (new ChainSplitConfig())
+        ->addSplit($subscribedBranch)
+        ->addSplit($unsubscribedBranch)
+);
 ```
 
 In order to do the same for both subscribed & unsubscribed customer we would need to duplicate the whole transformation
@@ -72,17 +68,11 @@ We can create a function that returns a configured ChainConfig for the necessary
 function createCustomTransform(): ChainConfig
 {
     $config = new ChainConfig();
-    $config->addLink(new RuleTransformConfig(
-        columns: [
-            'FirstName' => [
-                'rules' => [['get' => ['field' => 'FirstName']]]
-            ],
-            'LastName' => [
-                'rules' => [['get' => ['field' => 'LastName']]]
-            ]
-        ],
-        add: false
-    ));
+    $config->addLink(
+        (new RuleTransformConfig(add: false))
+            ->addColumn('FirstName', [['get' => ['field' => 'FirstName']]])
+            ->addColumn('LastName', [['get' => ['field' => 'LastName']]])
+    );
     return $config;
 }
 ```
@@ -145,17 +135,11 @@ use Oliverde8\Component\PhpEtl\Item\DataItem;
 function createCustomTransform(): ChainConfig
 {
     $config = new ChainConfig();
-    $config->addLink(new RuleTransformConfig(
-        columns: [
-            'FirstName' => [
-                'rules' => [['get' => ['field' => 'FirstName']]]
-            ],
-            'LastName' => [
-                'rules' => [['get' => ['field' => 'LastName']]]
-            ]
-        ],
-        add: false
-    ));
+    $config->addLink(
+        (new RuleTransformConfig(add: false))
+            ->addColumn('FirstName', [['get' => ['field' => 'FirstName']]])
+            ->addColumn('LastName', [['get' => ['field' => 'LastName']]])
+    );
     return $config;
 }
 
@@ -186,9 +170,11 @@ foreach (createCustomTransform()->getLinks() as $link) {
 $unsubscribedBranch->addLink(new CsvFileWriterConfig('unsubscribed.csv'));
 
 // Add split operation with both branches
-$chainConfig->addLink(new ChainSplitConfig(
-    branches: [$subscribedBranch, $unsubscribedBranch]
-));
+$chainConfig->addLink(
+    (new ChainSplitConfig())
+        ->addSplit($subscribedBranch)
+        ->addSplit($unsubscribedBranch)
+);
 
 // Create and execute the chain
 $chainProcessor = $chainBuilder->createChain($chainConfig);

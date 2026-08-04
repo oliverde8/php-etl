@@ -49,9 +49,11 @@ $unsubscribedBranch
     ->addLink(new CsvFileWriterConfig('unsubscribed.csv'));
 
 // Add split operation with both branches
-$chainConfig->addLink(new ChainSplitConfig(
-    branches: [$subscribedBranch, $unsubscribedBranch]
-));
+$chainConfig->addLink(
+    (new ChainSplitConfig())
+        ->addSplit($subscribedBranch)
+        ->addSplit($unsubscribedBranch)
+);
 ```
 
 {% endcapture %}
@@ -90,9 +92,11 @@ $unsubscribedBranch
     ->addLink(new CsvFileWriterConfig('unsubscribed.csv'));
 
 // Add split operation
-$chainConfig->addLink(new ChainSplitConfig(
-    branches: [$subscribedBranch, $unsubscribedBranch]
-));
+$chainConfig->addLink(
+    (new ChainSplitConfig())
+        ->addSplit($subscribedBranch)
+        ->addSplit($unsubscribedBranch)
+);
 
 // Write all customers to main output
 $chainConfig->addLink(new CsvFileWriterConfig('output.csv'));
