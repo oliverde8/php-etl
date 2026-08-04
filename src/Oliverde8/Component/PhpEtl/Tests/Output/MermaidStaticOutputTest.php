@@ -4,6 +4,7 @@ namespace Oliverde8\Component\PhpEtl\Tests\Output;
 
 use Oliverde8\Component\PhpEtl\ChainBuilderV2;
 use Oliverde8\Component\PhpEtl\ChainConfig;
+use Oliverde8\Component\PhpEtl\ChainOperation\ChainMergeOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\ChainRepeatOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\ChainSplitOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\FailSafeOperation;
@@ -12,6 +13,7 @@ use Oliverde8\Component\PhpEtl\ChainProcessor;
 use Oliverde8\Component\PhpEtl\ExecutionContextFactory;
 use Oliverde8\Component\PhpEtl\GenericChainFactory;
 use Oliverde8\Component\PhpEtl\Item\ItemInterface;
+use Oliverde8\Component\PhpEtl\OperationConfig\ChainMergeConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\ChainRepeatConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\ChainSplitConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\FailSafeConfig;
@@ -57,6 +59,28 @@ class MermaidStaticOutputTest extends TestCase
         $text = (new MermaidStaticOutput())->generateGrapText($chainProcessor);
 
         $this->assertStringContainsString('split-step', $text);
+        $this->assertStringContainsString('shape: hex', $text);
+        $this->assertStringContainsString('00B-->0000B', $text);
+    }
+
+    public function testMergeBranchesAreRenderedAsNodes(): void
+    {
+        $branch1 = new ChainConfig();
+        $branch1->addLink(new CallBackTransformerConfig($this->noop()));
+
+        $mergeConfig = new ChainMergeConfig();
+        $mergeConfig->addMerge($branch1);
+
+        $mergeOperation = new ChainMergeOperation($this->chainBuilder, $mergeConfig);
+
+        $chainProcessor = new ChainProcessor(
+            ['merge-step' => $mergeOperation],
+            new ExecutionContextFactory()
+        );
+
+        $text = (new MermaidStaticOutput())->generateGrapText($chainProcessor);
+
+        $this->assertStringContainsString('merge-step', $text);
         $this->assertStringContainsString('shape: hex', $text);
         $this->assertStringContainsString('00B-->0000B', $text);
     }

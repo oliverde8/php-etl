@@ -8,6 +8,7 @@ subTitle: Release history
 
 - 🔧 Fix #75 - `LoggerContext::setLoggerContext()` mutated an undefined local variable instead of `$this->loggerContext`, so per-operation logger context tagging never actually worked.
 - 🔧 Fix #74 - Mermaid static output now renders `Repeat` and `FailSafe` sub-chains instead of drawing them as a single opaque node. Thanks @PuvaanRaaj!
+- 🔧 Fix #44 - Mermaid static output now renders `Merge` branches instead of drawing them as a single opaque node.
 
 # 🌟 2.0.0 🌟
 
