@@ -13,6 +13,8 @@ use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\SimpleHttpConfig;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\MockResponse;
 
 class SimpleHttpOperationTest extends TestCase
 {
@@ -31,6 +33,31 @@ class SimpleHttpOperationTest extends TestCase
 
         $this->expectException(TransportException::class);
         $chain->process(new \ArrayIterator([['var' => 1]]), []);
+    }
+
+    public function testUrlExpressionUsesContext()
+    {
+        $requestedUrls = [];
+        $client = new MockHttpClient(function (string $method, string $url) use (&$requestedUrls) {
+            $requestedUrls[] = $url;
+            return new MockResponse('{}');
+        });
+
+        $operation = new SimpleHttpOperation(
+            $client,
+            new SimpleHttpConfig(
+                method: 'GET',
+                url: '@"https://api.example.com/users/" ~ context["userId"]',
+                optionKey: 'options',
+                responseKey: 'result',
+            ),
+        );
+
+        $executionFactory = new ExecutionContextFactory();
+        $chain = new ChainProcessor([$operation], $executionFactory);
+        $chain->process(new \ArrayIterator([['options' => []]]), ['userId' => 42]);
+
+        $this->assertSame(['https://api.example.com/users/42'], $requestedUrls);
     }
 
     protected function createChain(string $url, string $method, array $afterOperations, bool $responseIsJson = false): ChainProcessor

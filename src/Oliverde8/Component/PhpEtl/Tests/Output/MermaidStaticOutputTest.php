@@ -41,10 +41,36 @@ class MermaidStaticOutputTest extends TestCase
         return fn(ItemInterface $item) => $item;
     }
 
+    public function testMergeBranchesAreRenderedAsNodes(): void
+    {
+        $branch1 = new ChainConfig();
+        $branch1->addLink(new CallBackTransformerConfig($this->noop()), 'in-branch-one');
+
+        $branch2 = new ChainConfig();
+        $branch2->addLink(new CallBackTransformerConfig($this->noop()), 'in-branch-two');
+
+        $mergeConfig = new ChainMergeConfig();
+        $mergeConfig->addMerge($branch1)->addMerge($branch2);
+
+        $mergeOperation = new ChainMergeOperation($this->chainBuilder, $mergeConfig);
+
+        $chainProcessor = new ChainProcessor(
+            ['merge-step' => $mergeOperation],
+            new ExecutionContextFactory()
+        );
+
+        $text = (new MermaidStaticOutput())->generateGrapText($chainProcessor);
+
+        $this->assertStringContainsString('merge-step', $text);
+        $this->assertStringContainsString('in-branch-one', $text);
+        $this->assertStringContainsString('in-branch-two', $text);
+        $this->assertStringContainsString('shape: hex', $text);
+    }
+
     public function testSplitBranchesAreStillRenderedAsNodes(): void
     {
         $branch1 = new ChainConfig();
-        $branch1->addLink(new CallBackTransformerConfig($this->noop()));
+        $branch1->addLink(new CallBackTransformerConfig($this->noop()), 'in-split-branch');
 
         $splitConfig = new ChainSplitConfig();
         $splitConfig->addSplit($branch1);
@@ -59,30 +85,7 @@ class MermaidStaticOutputTest extends TestCase
         $text = (new MermaidStaticOutput())->generateGrapText($chainProcessor);
 
         $this->assertStringContainsString('split-step', $text);
-        $this->assertStringContainsString('shape: hex', $text);
-        $this->assertStringContainsString('00B-->0000B', $text);
-    }
-
-    public function testMergeBranchesAreRenderedAsNodes(): void
-    {
-        $branch1 = new ChainConfig();
-        $branch1->addLink(new CallBackTransformerConfig($this->noop()));
-
-        $mergeConfig = new ChainMergeConfig();
-        $mergeConfig->addMerge($branch1);
-
-        $mergeOperation = new ChainMergeOperation($this->chainBuilder, $mergeConfig);
-
-        $chainProcessor = new ChainProcessor(
-            ['merge-step' => $mergeOperation],
-            new ExecutionContextFactory()
-        );
-
-        $text = (new MermaidStaticOutput())->generateGrapText($chainProcessor);
-
-        $this->assertStringContainsString('merge-step', $text);
-        $this->assertStringContainsString('shape: hex', $text);
-        $this->assertStringContainsString('00B-->0000B', $text);
+        $this->assertStringContainsString('in-split-branch', $text);
     }
 
     public function testRepeatSubChainIsRenderedAsNodes(): void

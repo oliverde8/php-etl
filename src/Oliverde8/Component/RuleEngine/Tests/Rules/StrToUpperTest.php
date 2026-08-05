@@ -2,6 +2,9 @@
 
 namespace Oliverde8\Component\RuleEngine\Tests\Rules;
 
+use Oliverde8\Component\RuleEngine\RuleApplier;
+use Oliverde8\Component\RuleEngine\RuleConfig\ConstantRuleConfig;
+use Oliverde8\Component\RuleEngine\RuleConfig\StrToUpperRuleConfig;
 use Oliverde8\Component\RuleEngine\Rules\StrToUpper;
 use Psr\Log\NullLogger;
 
@@ -20,6 +23,15 @@ class StrToUpperTest extends AbstractRule
     public function testStrToUpper()
     {
         $this->assertRuleResults([], [], ['value' => 'My tEsT'], 'MY TEST');
+    }
+
+    public function testConfigStrToUpper()
+    {
+        $ruleApplier = $this->getMockBuilder(RuleApplier::class)->disableOriginalConstructor()->getMock();
+        $ruleApplier->method('applyConfig')->willReturn('My tEsT');
+        $this->rule->setApplier($ruleApplier);
+
+        $this->assertRuleConfigResults([], [], new StrToUpperRuleConfig(new ConstantRuleConfig('My tEsT')), 'MY TEST');
     }
 
     /**

@@ -24,7 +24,8 @@ use Oliverde8\Component\PhpEtl\ChainConfig;
 $failSafeConfig = new FailSafeConfig(
     chainConfig: $chainToProtect,           // ChainConfig to wrap
     exceptionsToCatch: [\Exception::class], // Array of exception classes to catch
-    nbAttempts: 3                           // Number of attempts (default: 3)
+    nbAttempts: 3,                          // Number of attempts (default: 3)
+    isolateContext: false                   // Optional: isolate the retry loop's context from the parent (default: false)
 );
 ```
 
@@ -32,6 +33,9 @@ $failSafeConfig = new FailSafeConfig(
 - `chainConfig`: The `ChainConfig` to execute with error protection
 - `exceptionsToCatch`: Array of exception class names to catch and retry
 - `nbAttempts`: Total number of attempts (including first try). Default is 3
+- `isolateContext`: When `true`, the whole retry loop runs against its own clone of the execution context instead of the parent's. Default `false`.
+
+{% include block/isolate-context-loop.md unit="retry loop" var="failSafeConfig" config="FailSafeConfig" persistNote="between retry attempts on the same item" %}
 
 ## Example: Basic API Error Handling
 

@@ -58,24 +58,6 @@ class ChainRepeatOperationTest extends TestCase
         $this->assertEquals([['val' => 0], ['val' => 1], ['val' => 2]], $results);
     }
 
-    public function testRepeatUsingContextExpression()
-    {
-        $callNum = 0;
-        $results = [];
-        $repeatedOperation = new CallbackTransformerOperation(new CallBackTransformerConfig(function (ItemInterface $item) use (&$callNum) {
-            return new DataItem(['val' => $callNum++]);
-        }));
-        $endOperation = new CallbackTransformerOperation(new CallBackTransformerConfig(function (ItemInterface $item) use (&$results) {
-            $results[] = $item->getData();
-            return $item;
-        }));
-
-        $chain = $this->createChain([$repeatedOperation], [$endOperation], 'context["maxVal"] != data["val"]');
-        $chain->process(new \ArrayIterator([['var' => 1]]), ['maxVal' => 3]);
-
-        $this->assertEquals([['val' => 0], ['val' => 1], ['val' => 2]], $results);
-    }
-
     public function testAsyncDisabled()
     {
         $results = [];
@@ -124,6 +106,24 @@ class ChainRepeatOperationTest extends TestCase
             ['val' => 2, 'speed' => 'slow'],
             ['val' => 4, 'speed' => 'slow'], // The second fast is not returned as our condition blocks it.
         ], $results);
+    }
+
+    public function testValidationExpressionCanReadContextParameters()
+    {
+        $callNum = 0;
+        $results = [];
+        $repeatedOperation = new CallbackTransformerOperation(new CallBackTransformerConfig(function (ItemInterface $item) use (&$callNum) {
+            return new DataItem(['val' => $callNum++]);
+        }));
+        $endOperation = new CallbackTransformerOperation(new CallBackTransformerConfig(function (ItemInterface $item) use (&$results) {
+            $results[] = $item->getData();
+            return $item;
+        }));
+
+        $chain = $this->createChain([$repeatedOperation], [$endOperation], 'data["val"] != context["limit"]');
+        $chain->process(new \ArrayIterator([['var' => 1]]), ['limit' => 2]);
+
+        $this->assertEquals([['val' => 0], ['val' => 1]], $results);
     }
 
     protected function createChain(array $repeatedOperations, array $afterOperations, string $expression, bool $allowAsync = false): ChainProcessor

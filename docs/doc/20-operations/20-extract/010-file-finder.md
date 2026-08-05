@@ -43,6 +43,14 @@ $fileFinderConfig = new ExternalFileFinderConfig(
 
 **Input Data:** The operation expects a DataItem containing a regex pattern string to match files against filenames (not full paths).
 
+**Dynamic directory:** `directory` can use the [Symfony Expression Language](https://symfony.com/doc/current/components/expression_language.html) instead of a fixed path. Prefix it with `@`; the expression has access to `context` (the execution context's parameters):
+
+```php
+new ExternalFileFinderConfig(
+    directory: '@context["basePath"] ~ "/" ~ context["date"]'
+)
+```
+
 ---
 
 ### Registering the Operation

@@ -3,10 +3,7 @@ declare(strict_types=1);
 
 namespace Oliverde8\Component\PhpEtl\Output;
 
-use Oliverde8\Component\PhpEtl\ChainOperation\ChainMergeOperation;
-use Oliverde8\Component\PhpEtl\ChainOperation\ChainRepeatOperation;
-use Oliverde8\Component\PhpEtl\ChainOperation\ChainSplitOperation;
-use Oliverde8\Component\PhpEtl\ChainOperation\FailSafeOperation;
+use Oliverde8\Component\PhpEtl\ChainOperation\SubChainsAwareOperationInterface;
 use Oliverde8\Component\PhpEtl\ChainProcessorInterface;
 
 class MermaidStaticOutput
@@ -48,10 +45,7 @@ class MermaidStaticOutput
 
             $chainLinkNames = $chainProcessor->getChainLinkNames();
             foreach ($chainProcessor->getChainLinks() as $id => $chainLink) {
-                if ($chainLink instanceof ChainSplitOperation) {
-                    $text .= "\t" . $newPrefix . $id . "B(" . $chainLinkNames[$id] . ")@{ shape: hex}\n";
-                    $text .= $this->generateNodes($chainLink->getChainProcessors(), $newPrefix . $id);
-                } elseif ($chainLink instanceof ChainMergeOperation || $chainLink instanceof ChainRepeatOperation || $chainLink instanceof FailSafeOperation) {
+                if ($chainLink instanceof SubChainsAwareOperationInterface) {
                     $text .= "\t" . $newPrefix . $id . "B(" . $chainLinkNames[$id] . ")@{ shape: hex}\n";
                     $text .= $this->generateNodes($chainLink->getChainProcessors(), $newPrefix . $id);
                 } else {
@@ -80,11 +74,7 @@ class MermaidStaticOutput
                 }
                 $previous = $newPrefix . $id;
 
-                if ($chainLink instanceof ChainSplitOperation
-                    || $chainLink instanceof ChainMergeOperation
-                    || $chainLink instanceof ChainRepeatOperation
-                    || $chainLink instanceof FailSafeOperation
-                ) {
+                if ($chainLink instanceof SubChainsAwareOperationInterface) {
                     $text .= $this->generateLinks($chainLink->getChainProcessors(), $newPrefix . $id, $previous);
                 }
             }

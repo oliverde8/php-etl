@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Oliverde8\Component\PhpEtl\ChainOperation;
 
 use Oliverde8\Component\PhpEtl\ChainProcessorInterface;
-use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+use Oliverde8\Component\PhpEtl\Expression\ExpressionEvaluator;
 
 class ChainRepeatOperationV1 extends ChainRepeatOperation
 {
@@ -16,6 +16,6 @@ class ChainRepeatOperationV1 extends ChainRepeatOperation
         protected bool $allowAsynchronous = false,
     ) {
         $this->onSplittedChainOperationConstruct([$chainProcessor]);
-        $this->expressionLanguage = new ExpressionLanguage();
+        $this->expressionEvaluator = new ExpressionEvaluator();
     }
 }

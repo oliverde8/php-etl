@@ -12,6 +12,7 @@ use Oliverde8\Component\PhpEtl\ChainBuilderV2;
 use Oliverde8\Component\PhpEtl\ChainConfig;
 use Oliverde8\Component\PhpEtl\ChainOperation\ChainSplitOperation;
 use Oliverde8\Component\PhpEtl\ChainProcessorInterface;
+use Oliverde8\Component\PhpEtl\ExecutionContextFactory;
 use Oliverde8\Component\PhpEtl\Item\DataItem;
 use Oliverde8\Component\PhpEtl\Item\StopItem;
 use Oliverde8\Component\PhpEtl\Model\ExecutionContext;
@@ -100,6 +101,18 @@ class ChainSplitOperationTest extends TestCase
         $splitOperation->process($datas[1], $context);
 
         while ($splitOperation->process($stopItem, $context) !== $stopItem);
+    }
+
+    public function testGetChainProcessorsPreservesNamedKeys()
+    {
+        $chainBuilder = new ChainBuilderV2(new ExecutionContextFactory(), []);
+
+        $splitConfig = new ChainSplitConfig();
+        $splitConfig->addSplit(new ChainConfig(), 'subscribed')->addSplit(new ChainConfig());
+
+        $splitOperation = new ChainSplitOperation($chainBuilder, $splitConfig);
+
+        $this->assertSame(['subscribed', 0], array_keys($splitOperation->getChainProcessors()));
     }
 
     protected function arrayAsGenerator(array $array)

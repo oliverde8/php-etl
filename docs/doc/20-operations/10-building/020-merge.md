@@ -34,6 +34,24 @@ $mergeConfig
 
 Each branch is a `ChainConfig` that can contain any sequence of operations.
 
+`addMerge()` takes an optional `$name`, used as the branch's identifier instead of its numeric position — the
+same naming `ChainConfig::addLink()` already supports for individual links:
+
+```php
+$mergeConfig = new ChainMergeConfig();
+$mergeConfig
+    ->addMerge($simpleChainConfig, 'simple')
+    ->addMerge($configurableChainConfig, 'configurable');
+```
+
+Naming is optional and can be mixed with unnamed branches; a duplicate name throws `\InvalidArgumentException`.
+
+**Parameters:**
+- `isolateContext`: When `true`, each branch runs against its own clone of the execution context instead of
+  sharing the parent's. Default `false`.
+
+{% include block/isolate-context-branch.md operation="merge" var="mergeConfig" config="ChainMergeConfig" %}
+
 ## Example: Creating Multiple Product Variants
 
 Here's an example that creates both simple and configurable product records from a single input:

@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Oliverde8\Component\RuleEngine\Rules;
 
 use Oliverde8\Component\RuleEngine\Exceptions\RuleException;
+use Oliverde8\Component\RuleEngine\RuleConfig\ConstantRuleConfig;
+use Oliverde8\Component\RuleEngine\RuleConfig\RuleConfigInterface;
 
 /**
  * Class Constant
@@ -13,7 +15,7 @@ use Oliverde8\Component\RuleEngine\Exceptions\RuleException;
  * @copyright 2018 Oliverde8
  * @package Oliverde8\Component\RuleEngine\Rules
  */
-class Constant extends AbstractRule
+class Constant extends AbstractRule implements ConfigurableRuleInterface
 {
 
     /**
@@ -49,5 +51,18 @@ class Constant extends AbstractRule
     public function getRuleCode(): string
     {
         return 'constant';
+    }
+
+    #[\Override]
+    public function getConfigClass(): string
+    {
+        return ConstantRuleConfig::class;
+    }
+
+    #[\Override]
+    public function applyConfig(array $rowData, array &$transformedData, RuleConfigInterface $config): mixed
+    {
+        assert($config instanceof ConstantRuleConfig);
+        return $config->value;
     }
 }

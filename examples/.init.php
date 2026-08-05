@@ -8,7 +8,9 @@ use Oliverde8\Component\PhpEtl\ChainOperation\ChainSplitOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Extract\CsvExtractOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Extract\ExternalFileFinderOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Extract\JsonExtractOperation;
+use Oliverde8\Component\PhpEtl\ChainOperation\Grouping\BatchOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Grouping\SimpleGroupingOperation;
+use Oliverde8\Component\PhpEtl\ChainOperation\IfOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Loader\FileWriterOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\CallbackTransformerOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\ExternalFileProcessorOperation;
@@ -18,7 +20,9 @@ use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\RuleTransformOperation
 use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\SimpleHttpOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\SplitItemOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\FailSafeOperation;
+use Oliverde8\Component\PhpEtl\ChainOperation\SwitchOperation;
 use Oliverde8\Component\PhpEtl\ExecutionContextFactory;
+use Oliverde8\Component\PhpEtl\Expression\ExpressionEvaluator;
 use Oliverde8\Component\PhpEtl\GenericChainFactory;
 
 use Oliverde8\Component\PhpEtl\Model\File\LocalFileSystem;
@@ -28,7 +32,9 @@ use Oliverde8\Component\PhpEtl\OperationConfig\ChainSplitConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Extract\CsvExtractConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Extract\ExternalFileFinderConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Extract\JsonExtractConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\Grouping\BatchConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Grouping\SimpleGroupingConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\IfConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Loader\CsvFileWriterConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\CallBackTransformerConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\ExternalFileProcessorConfig;
@@ -38,6 +44,7 @@ use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\RuleTransformConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\SimpleHttpConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\SplitItemConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\FailSafeConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\SwitchConfig;
 
 use Oliverde8\Component\RuleEngine\RuleApplier;
 use Oliverde8\Component\RuleEngine\Rules\ExpressionLanguage;
@@ -72,6 +79,7 @@ $ruleApplier = new RuleApplier(
 );
 
 $client = HttpClient::create(['headers' => ['Accept' => 'application/json']]);
+$expressionEvaluator = new ExpressionEvaluator();
 
 if (!function_exists('getEtlExecutionContextFactory')) {
     function getEtlExecutionContextFactory() {
@@ -87,16 +95,19 @@ $chainBuilder = new ChainBuilderV2(
         new GenericChainFactory(RuleTransformOperation::class, RuleTransformConfig::class, injections: ['ruleApplier' => $ruleApplier]),
         new GenericChainFactory(FileWriterOperation::class, CsvFileWriterConfig::class),
         new GenericChainFactory(SimpleGroupingOperation::class, SimpleGroupingConfig::class),
-        new GenericChainFactory(FilterDataOperation::class, FilterDataConfig::class, injections: ['ruleApplier' => $ruleApplier]),
+        new GenericChainFactory(BatchOperation::class, BatchConfig::class),
+        new GenericChainFactory(FilterDataOperation::class, FilterDataConfig::class, injections: ['ruleApplier' => $ruleApplier, 'expressionEvaluator' => $expressionEvaluator]),
+        new GenericChainFactory(IfOperation::class, IfConfig::class, injections: ['ruleApplier' => $ruleApplier, 'expressionEvaluator' => $expressionEvaluator]),
+        new GenericChainFactory(SwitchOperation::class, SwitchConfig::class, injections: ['ruleApplier' => $ruleApplier, 'expressionEvaluator' => $expressionEvaluator]),
         new GenericChainFactory(ChainMergeOperation::class, ChainMergeConfig::class),
-        new GenericChainFactory(ChainRepeatOperation::class, ChainRepeatConfig::class),
+        new GenericChainFactory(ChainRepeatOperation::class, ChainRepeatConfig::class, injections: ['expressionEvaluator' => $expressionEvaluator]),
         new GenericChainFactory(ChainSplitOperation::class, ChainSplitConfig::class),
         new GenericChainFactory(JsonExtractOperation::class, JsonExtractConfig::class),
-        new GenericChainFactory(SimpleHttpOperation::class, SimpleHttpConfig::class, injections: ['client' => $client]),
+        new GenericChainFactory(SimpleHttpOperation::class, SimpleHttpConfig::class, injections: ['client' => $client, 'expressionEvaluator' => $expressionEvaluator]),
         new GenericChainFactory(SplitItemOperation::class, SplitItemConfig::class),
-        new GenericChainFactory(LogOperation::class, LogConfig::class),
+        new GenericChainFactory(LogOperation::class, LogConfig::class, injections: ['expressionEvaluator' => $expressionEvaluator]),
         new GenericChainFactory(FailSafeOperation::class, FailSafeConfig::class),
-        new GenericChainFactory(ExternalFileFinderOperation::class, ExternalFileFinderConfig::class, injections: ['fileSystem' => new LocalFileSystem("/")]),
+        new GenericChainFactory(ExternalFileFinderOperation::class, ExternalFileFinderConfig::class, injections: ['fileSystem' => new LocalFileSystem("/"), 'expressionEvaluator' => $expressionEvaluator]),
         new GenericChainFactory(ExternalFileProcessorOperation::class, ExternalFileProcessorConfig::class),
     ],
 );

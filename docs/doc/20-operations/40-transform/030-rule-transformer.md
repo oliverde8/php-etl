@@ -1,213 +1,78 @@
 ---
 layout: base
 title: PHP-ETL - Operations
-subTitle: Transform - Rule Engine – Data Transformation
+subTitle: Transform - Rule Transformer
 ---
 
-The **Rule Engine** is a lightweight transformation component that converts an associative array into another associative array using a flexible set of rules.
-
-It is designed to be used within PHP-ETL through the `RuleTransformConfig`.
-
-
-## Available Rules
-
-Each rule defines how a specific value in the output array is computed. Rules can be nested and composed for complex transformations.
-
-### Expression Language (`expression_language`)
-
-Leverages the [Symfony Expression Language](https://symfony.com/doc/3.4/components/expression_language/syntax.html) to compute values dynamically.
-
-| Parameter     | Type   | Description |
-|---------------|--------|-------------|
-| `expression`  | string | The expression to evaluate. Input data is available as `rowData`. |
-| `values`      | array  | (Optional) Additional variables made available to the expression. |
-
-
-### Value Fetcher (`get`)
-
-Fetches a value from the input array by key.
-
-| Parameter | Type   | Description |
-|-----------|--------|-------------|
-| `field`   | string | The key of the input array to retrieve the value from. |
-
-
-### Implode (`implode`)
-
-Concatenates multiple values into a single string using a delimiter.
-
-| Parameter | Type   | Description |
-|-----------|--------|-------------|
-| `value`   | rule   | A rule (or nested rules) that returns an array to implode. |
-| `with`    | string | The delimiter used to join the values. |
-
-
-### String To Lower (`str_lower`)
-
-Converts a string to lowercase.
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `value`   | rule | A rule that resolves to the string to lowercase. |
-
-
-### String To Upper (`str_upper`)
-
-Converts a string to uppercase.
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `value`   | rule | A rule that resolves to the string to uppercase. |
-
-
-### Constant (`constant`)
-
-Returns a constant, static value.
-
-| Parameter | Type  | Description |
-|-----------|-------|-------------|
-| `value`   | mixed | The fixed value to be returned. |
-
-
-## Deprecated Rule
-
-### Condition (`condition`) – *Deprecated*
-
-**Deprecated:** Use `expression_language` instead, which provides more powerful and flexible conditional logic.
-
-A basic conditional evaluator for branching logic.
-
-| Parameter   | Type | Description |
-|-------------|------|-------------|
-| `if`        | rule | The left-hand value to compare. |
-| `value`     | rule | The right-hand value to compare against. |
-| `operation` | rule | The comparison operator (`eq`, `neq`, `in`). |
-| `then`      | rule | The result if the condition is `true`. |
-| `else`      | rule | The result if the condition is `false`. |
-
-
-## Example Use
-
-Here’s an example of how to use rules to transform a CSV row:
-
-```yaml
-operation: rule-engine-transformer
-options:
-  add: false
-  columns:
-    FullName:
-      rules:
-        - implode:
-            values:
-              - [{ get: { field: "FirstName" } }]
-              - [{ get: { field: "LastName" } }]
-            with: " "
-    IsActive:
-      rules:
-        - expression_language:
-            expression: "rowData['IsSubscribed'] == 'yes'"
-```
+The **Rule Transformer** operation builds a new associative array from an item's data, one column at a time,
+by applying a [Rule Engine](/doc/15-rule-engine/010-rule-engine.html) rule to compute each column's value.
 
 ---
 
-## Adding Your Own Rules
+## Purpose
 
-While PHP-ETL provides a powerful set of built-in rules, you may encounter situations where you need to implement your own custom logic. You can extend the `RuleApplier` class to add your own rules.
+Use `RuleTransformConfig` to:
+- Reshape an item's data into a new structure (rename, combine, or drop fields)
+- Compute derived columns (concatenation, case conversion, conditional values, ...)
+- Either replace the item's data entirely, or add computed columns alongside the existing data
 
-Here's how you can create and use a custom rule:
+---
 
-**1. Create a custom `RuleApplier` class:**
-
-First, create a new class that extends `Oliverde8\Component\RuleEngine\RuleApplier`.
-
-```php
-<?php
-
-namespace App\Etl\RuleEngine;
-
-use Oliverde8\Component\RuleEngine\RuleApplier;
-
-class CustomRuleApplier extends RuleApplier
-{
-    public function apply($data, $rowData, $params)
-    {
-        // Implement your custom rule logic here.
-        return "new value";
-    }
-}
-```
-
-**2. Register your custom `RuleApplier` with the `ChainBuilderV2`:**
-
-When creating your `ChainBuilderV2`, pass your custom `RuleApplier` to the `GenericChainFactory` for `RuleTransformConfig`.
-
-{% capture column1 %}
-#### 🐘 Standalone
+## Configuration
 
 ```php
-<?php
-
-use App\Etl\RuleEngine\CustomRuleApplier;
-use Oliverde8\Component\PhpEtl\ChainBuilderV2;
-use Oliverde8\Component\PhpEtl\ChainConfig;
-use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\RuleTransformOperation;
 use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\RuleTransformConfig;
-use Oliverde8\Component\PhpEtl\Builder\Factories\GenericChainFactory;
+use Oliverde8\Component\RuleEngine\RuleConfig\ExpressionRuleConfig;
+use Oliverde8\Component\RuleEngine\RuleConfig\GetRuleConfig;
+use Oliverde8\Component\RuleEngine\RuleConfig\ImplodeRuleConfig;
 
-$customRuleApplier = new CustomRuleApplier();
-
-$chainBuilder = new ChainBuilderV2([
-    new GenericChainFactory(
-        RuleTransformOperation::class,
-        RuleTransformConfig::class,
-        injections: ['ruleApplier' => $customRuleApplier]
-    ),
-    // ... other factories
-]);
-
-// Use the custom rule in your chain
-$chainConfig = new ChainConfig();
-$chainConfig->addLink((new RuleTransformConfig(add: false))
-    ->addColumn('MyCustomField', [
-        ['myCustomRule' => [
-            'field1' => ['get' => ['field' => 'FirstName']],
-            'field2' => ['get' => ['field' => 'LastName']],
-        ]]
-    ])
-);
-
-$processor = $chainBuilder->createChain($chainConfig);
+$config = (new RuleTransformConfig(add: false))
+    ->addColumn('FullName', new ImplodeRuleConfig(
+        values: [new GetRuleConfig('FirstName'), new GetRuleConfig('LastName')],
+        with: ' ',
+    ))
+    ->addColumn('IsActive', new ExpressionRuleConfig(
+        "rowData['IsSubscribed'] == 'yes'"
+    ));
 ```
-{% endcapture %}
-{% capture column2 %}
-#### 🎵 Symfony
 
-```yaml
-services:
-  App\Etl\RuleEngine\CustomRuleApplier:
-    class: App\Etl\RuleEngine\CustomRuleApplier
-    autowire: true
-    tags:
-      - { name: etl.rule }
+**Parameters:**
+- `add` (bool, default `true`): when `true`, computed columns are merged into the item's existing data; when
+  `false`, the item's data is replaced entirely by the computed columns
+- `addColumn(string $columnName, RuleConfigInterface|array $rules)`: registers one output column, computed by
+  `$rules`. Call it once per column, in any order
 
-  # The GenericChainFactory will automatically use your custom RuleApplier
-  # when it's injected via dependency injection
-```
-{% endcapture %}
-{% include block/2column.html column1=column1 column2=column2 %}
+`addColumn()` accepts either a typed `RuleConfigInterface` (see the [Rule Engine](/doc/15-rule-engine/010-rule-engine.html)
+page for the full catalog and [Custom Rules](/doc/15-rule-engine/020-custom-rules.html) for writing your own) or
+the legacy array-based rule syntax, which is deprecated — pass a `RuleConfigInterface`
+(e.g. `new GetRuleConfig(...)`) instead.
 
-**3. Use your custom rule in your chain configuration:**
+---
 
-Once you have configured your `ChainBuilderV2` to use your custom `RuleApplier`, you can use your custom rule in your chain.
+## Example: Tagging Subscribed Customers
 
 ```php
+use Oliverde8\Component\PhpEtl\ChainConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\Extract\CsvExtractConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\RuleTransformConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\Loader\CsvFileWriterConfig;
+use Oliverde8\Component\RuleEngine\RuleConfig\ExpressionRuleConfig;
+use Oliverde8\Component\RuleEngine\RuleConfig\GetRuleConfig;
+use Oliverde8\Component\RuleEngine\RuleConfig\ImplodeRuleConfig;
+
 $chainConfig = new ChainConfig();
-$chainConfig->addLink((new RuleTransformConfig(add: false))
-    ->addColumn('MyCustomField', [
-        ['myCustomRule' => [
-            'field1' => ['get' => ['field' => 'FirstName']],
-            'field2' => ['get' => ['field' => 'LastName']],
-        ]]
-    ])
-);
+$chainConfig
+    ->addLink(new CsvExtractConfig())
+    ->addLink((new RuleTransformConfig(add: true))
+        ->addColumn('FullName', new ImplodeRuleConfig(
+            values: [new GetRuleConfig('FirstName'), new GetRuleConfig('LastName')],
+            with: ' ',
+        ))
+        ->addColumn('IsActive', new ExpressionRuleConfig(
+            "rowData['IsSubscribed'] == 'yes'"
+        )))
+    ->addLink(new CsvFileWriterConfig('customers-tagged.csv'));
 ```
+
+**Result**: Every row keeps its original columns (`add: true`) plus two computed ones: `FullName` (first and
+last name joined by a space) and `IsActive` (a boolean derived from `IsSubscribed`).

@@ -14,6 +14,7 @@ use Oliverde8\Component\PhpEtl\Item\ItemInterface;
 use Oliverde8\Component\PhpEtl\Model\ExecutionContext;
 use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\RuleTransformConfig;
 use Oliverde8\Component\RuleEngine\RuleApplier;
+use Oliverde8\Component\RuleEngine\RuleConfig\RuleConfigInterface;
 
 
 class RuleTransformOperation extends AbstractChainOperation implements DataChainOperationInterface, ConfigurableChainOperationInterface
@@ -47,7 +48,11 @@ class RuleTransformOperation extends AbstractChainOperation implements DataChain
 
             foreach ($possibleColumns as $column => $values) {
                 $data['@column'] = $values;
-                AssociativeArray::setFromKey($newData, $column, $this->ruleApplier->apply($data, $newData, $rule['rules'], []));
+                $ruleConfig = $rule['rules'];
+                $result = $ruleConfig instanceof RuleConfigInterface
+                    ? $this->ruleApplier->applyConfig($data, $newData, $ruleConfig)
+                    : $this->ruleApplier->apply($data, $newData, $ruleConfig, []);
+                AssociativeArray::setFromKey($newData, $column, $result);
             }
         }
 
