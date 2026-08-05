@@ -1,19 +1,21 @@
 # 2.1.0
 
-- :star2: - Added `SwitchConfig`/`SwitchOperation`, an N-way generalization of `IfConfig`: cases are added fluently with `addCase()` and evaluated in order, routing the item to the first matching case's branch (or an optional `default`), avoiding deeply nested `If`/`else`
-- :star2: - Added typed `RuleConfig` classes (`GetRuleConfig`, `ConstantRuleConfig`, `ImplodeRuleConfig`, `StrToLowerRuleConfig`, `StrToUpperRuleConfig`, `ExpressionRuleConfig`) as an IDE-friendly alternative to Rule Engine's array-based rule syntax. `RuleTransformConfig::addColumn()` accepts either. Custom rules can opt in via the new `ConfigurableRuleInterface`
-- :exclamation: **Deprecation** Passing an array of rules to `RuleTransformConfig::addColumn()` now triggers a deprecation notice; it keeps working unchanged, but new code should use a typed `RuleConfigInterface` instead
-- :star2: - `ChainSplitConfig::addSplit()` and `ChainMergeConfig::addMerge()` now accept an optional `$name`, mirroring `ChainConfig::addLink()`, so branches can be identified by name instead of numeric position
-- :star2: - `FilterDataConfig` and `IfConfig` now accept an optional `expression` (Symfony Expression Language) as a lighter-weight alternative to Rule Engine `rules` for simple boolean conditions; mutually exclusive with `rules`
-- :star2: - Added a shared `ExpressionEvaluatorInterface`/`ExpressionEvaluator` used by `LogConfig`, `SimpleHttpConfig`, `ExternalFileFinderConfig`, and `ChainRepeatConfig`'s expressions, standardizing `data`/`context` variables across all four and letting `SimpleHttpConfig`'s `url` use `context` for the first time
-- :wrench: - Fixed `ChainRepeatConfig`'s `validationExpression` not being able to use `context[...]` (it received the raw `ExecutionContext` object instead of its parameters)
-- :star2: - Allow naming chain links when using new chain builder
-- :star2: - `ChainSplitConfig`, `ChainMergeConfig`, `ChainRepeatConfig`, and `FailSafeConfig` now accept an `isolateContext` option to give a sub-chain its own copy of the execution context instead of sharing the parent's
-- :star2: - Added `BatchConfig` operation to collect items into fixed-size chunks, emitted as soon as each chunk is full, without buffering the whole stream in memory
-- :star2: - Added `IfConfig` operation to route an item to exactly one of two sub-chains based on a Rule Engine condition, letting the chosen branch freely modify the item (unlike `Split`, where multiple branches could run in parallel)
-- :wrench: - Fixed Mermaid static diagram not rendering a Merge operation's branches (they were silently skipped, unlike Split's)
-- :wrench: - Fixed Mermaid static diagram not rendering `Repeat` and `FailSafe` sub-chains (they were drawn as a single opaque node). Thanks @PuvaanRaaj!
-- :wrench: - Fixed `LoggerContext::setLoggerContext()` mutating an undefined local variable instead of `$this->loggerContext`, so per-operation logger context tagging never actually took effect
+- :star2: #84 - Add typed `RuleConfig` classes as an IDE-friendly alternative to Rule Engine's array-based rule syntax. (#84)
+  - :exclamation: **Deprecation** Passing an array of rules to `RuleTransformConfig::addColumn()` now triggers a deprecation notice; use a typed `RuleConfigInterface` instead. (#84)
+- :star2: #62 - Add `BatchConfig` operation to collect items into fixed-size chunks, emitted as each one fills up. (#62)
+- :star2: #59 - Add `IfConfig` operation to route an item to one of two sub-chains, letting the chosen branch freely modify it. (#59)
+- :star2: #72 - Add a shared `ExpressionEvaluator` for Log/SimpleHttp/ExternalFileFinder/Repeat, standardizing `data`/`context` across all four. (#72) 
+- :star2: #73 - `FilterDataConfig`/`IfConfig` accept an `expression` (Symfony Expression Language) as a lighter alternative to Rule Engine `rules`. (#73)
+- :star2: Allow naming chain links when using the new chain builder.
+- :star2: #33 - `ChainSplitConfig`, `ChainMergeConfig`, `ChainRepeatConfig`, `FailSafeConfig` gain an `isolateContext` option so a sub-chain can run against its own copy of the execution context. (#33)
+- :star2: #79 - Add `SwitchConfig`/`SwitchOperation`, an N-way generalization of `IfConfig`, for multi-way conditional branching.
+
+# 2.0.1
+
+- :wrench: Fix #75 - `LoggerContext::setLoggerContext()` mutated an undefined local variable instead of `$this->loggerContext`, so per-operation logger context tagging never actually worked.
+- :wrench: Fix #74 - Mermaid static output now renders `Repeat` and `FailSafe` sub-chains instead of drawing them as a single opaque node. Thanks @PuvaanRaaj!
+- :wrench: Fix #44 - Mermaid static output now renders `Merge` branches instead of drawing them as a single opaque node.
+- :wrench: Fix #72 - `ChainRepeatConfig`'s `validationExpression` now correctly supports `context["..."]`, previously always threw at runtime since `ExecutionContext` isn't array-accessible.
 
 # 🌟 2.0.0 🌟
 
