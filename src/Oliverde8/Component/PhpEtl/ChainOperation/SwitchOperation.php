@@ -6,6 +6,7 @@ namespace Oliverde8\Component\PhpEtl\ChainOperation;
 
 use Oliverde8\Component\PhpEtl\ChainBuilderV2;
 use Oliverde8\Component\PhpEtl\ChainProcessorInterface;
+use Oliverde8\Component\PhpEtl\Expression\Expression;
 use Oliverde8\Component\PhpEtl\Expression\ExpressionEvaluator;
 use Oliverde8\Component\PhpEtl\Expression\ExpressionEvaluatorInterface;
 use Oliverde8\Component\PhpEtl\Item\DataItemInterface;
@@ -15,12 +16,13 @@ use Oliverde8\Component\PhpEtl\Item\StopItem;
 use Oliverde8\Component\PhpEtl\Model\ExecutionContext;
 use Oliverde8\Component\PhpEtl\OperationConfig\SwitchConfig;
 use Oliverde8\Component\RuleEngine\RuleApplier;
+use Oliverde8\Component\RuleEngine\RuleConfig\RuleConfigInterface;
 
 class SwitchOperation extends AbstractChainOperation implements DataChainOperationInterface, DetailedObservableOperation, ConfigurableChainOperationInterface, SubChainsAwareOperationInterface
 {
     use SplittedChainOperationTrait;
 
-    /** @var array<int, array{rules: array, expression: ?string, processor: ChainProcessorInterface}> */
+    /** @var array<int, array{rules: RuleConfigInterface|Expression|array, processor: ChainProcessorInterface}> */
     private array $cases = [];
 
     private ?ChainProcessorInterface $defaultProcessor = null;
@@ -36,7 +38,6 @@ class SwitchOperation extends AbstractChainOperation implements DataChainOperati
         foreach ($config->getCases() as $case) {
             $this->cases[] = [
                 'rules' => $case['rules'],
-                'expression' => $case['expression'],
                 'processor' => $chainBuilder->createChain($case['then']),
             ];
         }
@@ -81,14 +82,19 @@ class SwitchOperation extends AbstractChainOperation implements DataChainOperati
     private function matchCase(DataItemInterface $item, ExecutionContext $context): ?ChainProcessorInterface
     {
         foreach ($this->cases as $case) {
-            if ($case['expression'] !== null) {
+            $rules = $case['rules'];
+
+            if ($rules instanceof Expression) {
                 $result = $this->expressionEvaluator->evaluate(
-                    $case['expression'],
+                    $rules->expression,
                     ['data' => $item->getData(), 'context' => $context->getParameters()],
                 );
+            } elseif ($rules instanceof RuleConfigInterface) {
+                $resultData = [];
+                $result = $this->ruleApplier->applyConfig($item->getData(), $resultData, $rules);
             } else {
                 $resultData = [];
-                $result = $this->ruleApplier->apply($item->getData(), $resultData, $case['rules']);
+                $result = $this->ruleApplier->apply($item->getData(), $resultData, $rules);
             }
 
             if ($result) {

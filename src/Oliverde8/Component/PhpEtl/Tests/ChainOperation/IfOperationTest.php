@@ -9,6 +9,7 @@ use Oliverde8\Component\PhpEtl\ChainConfig;
 use Oliverde8\Component\PhpEtl\ChainOperation\Grouping\BatchOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\IfOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\CallbackTransformerOperation;
+use Oliverde8\Component\PhpEtl\Expression\Expression;
 use Oliverde8\Component\PhpEtl\ExecutionContextFactory;
 use Oliverde8\Component\PhpEtl\GenericChainFactory;
 use Oliverde8\Component\PhpEtl\Item\DataItem;
@@ -21,6 +22,7 @@ use Oliverde8\Component\PhpEtl\OperationConfig\Grouping\BatchConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\IfConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\CallBackTransformerConfig;
 use Oliverde8\Component\RuleEngine\RuleApplier;
+use Oliverde8\Component\RuleEngine\RuleConfig\GetRuleConfig;
 use PHPUnit\Framework\TestCase;
 
 class IfOperationTest extends TestCase
@@ -219,18 +221,12 @@ class IfOperationTest extends TestCase
         new IfConfig(rules: [], then: new ChainConfig());
     }
 
-    public function testRulesAndExpressionAreMutuallyExclusive(): void
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        new IfConfig(then: new ChainConfig(), rules: [true], expression: 'data["a"] == true');
-    }
-
     public function testExpressionConditionRunsThenBranch(): void
     {
         $then = new ChainConfig();
         $then->addLink(new CallBackTransformerConfig(fn(ItemInterface $item) => new DataItem(['branch' => 'then'])));
 
-        $config = new IfConfig(then: $then, expression: 'data["subscribed"] == true');
+        $config = new IfConfig(then: $then, rules: new Expression('data["subscribed"] == true'));
         $operation = new IfOperation($this->chainBuilder, $this->createMock(RuleApplier::class), $config);
 
         $result = $operation->process(new DataItem(['subscribed' => true]), $this->context);
@@ -246,7 +242,7 @@ class IfOperationTest extends TestCase
         $else = new ChainConfig();
         $else->addLink(new CallBackTransformerConfig(fn(ItemInterface $item) => new DataItem(['branch' => 'else'])));
 
-        $config = new IfConfig(then: $then, else: $else, expression: 'data["subscribed"] == true');
+        $config = new IfConfig(then: $then, else: $else, rules: new Expression('data["subscribed"] == true'));
         $operation = new IfOperation($this->chainBuilder, $this->createMock(RuleApplier::class), $config);
 
         $result = $operation->process(new DataItem(['subscribed' => false]), $this->context);
@@ -259,11 +255,27 @@ class IfOperationTest extends TestCase
         $then = new ChainConfig();
         $then->addLink(new CallBackTransformerConfig(fn(ItemInterface $item) => new DataItem(['branch' => 'then'])));
 
-        $config = new IfConfig(then: $then, expression: 'context["country"] == "US"');
+        $config = new IfConfig(then: $then, rules: new Expression('context["country"] == "US"'));
         $operation = new IfOperation($this->chainBuilder, $this->createMock(RuleApplier::class), $config);
 
         $context = new ExecutionContext(['country' => 'US'], new LocalFileSystem());
         $result = $operation->process(new DataItem([]), $context);
+
+        $this->assertEquals(['branch' => 'then'], $this->singleResult($result)->getData());
+    }
+
+    public function testRuleConfigConditionRunsThenBranch(): void
+    {
+        $then = new ChainConfig();
+        $then->addLink(new CallBackTransformerConfig(fn(ItemInterface $item) => new DataItem(['branch' => 'then'])));
+
+        $ruleApplier = $this->createMock(RuleApplier::class);
+        $ruleApplier->method('applyConfig')->willReturn(true);
+
+        $config = new IfConfig(then: $then, rules: new GetRuleConfig('subscribed'));
+        $operation = new IfOperation($this->chainBuilder, $ruleApplier, $config);
+
+        $result = $operation->process(new DataItem(['subscribed' => true]), $this->context);
 
         $this->assertEquals(['branch' => 'then'], $this->singleResult($result)->getData());
     }

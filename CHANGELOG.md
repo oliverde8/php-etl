@@ -5,7 +5,8 @@
 - :star2: #62 - Add `BatchConfig` operation to collect items into fixed-size chunks, emitted as each one fills up. (#62)
 - :star2: #59 - Add `IfConfig` operation to route an item to one of two sub-chains, letting the chosen branch freely modify it. (#59)
 - :star2: #72 - Add a shared `ExpressionEvaluator` for Log/SimpleHttp/ExternalFileFinder/Repeat, standardizing `data`/`context` across all four. (#72) 
-- :star2: #73 - `FilterDataConfig`/`IfConfig` accept an `expression` (Symfony Expression Language) as a lighter alternative to Rule Engine `rules`. (#73)
+- :star2: #73 - `FilterDataConfig`/`IfConfig`'s `rules` now accepts a typed `RuleConfigInterface`, an `Expression` (Symfony Expression Language), or the legacy array. (#73)
+  - :exclamation: **Deprecation** Passing an array to `FilterDataConfig`/`IfConfig`'s `rules` now triggers a deprecation notice; use a typed `RuleConfigInterface` or an `Expression` instead. (#73)
 - :star2: Allow naming chain links when using the new chain builder.
 - :star2: #33 - `ChainSplitConfig`, `ChainMergeConfig`, `ChainRepeatConfig`, `FailSafeConfig` gain an `isolateContext` option so a sub-chain can run against its own copy of the execution context. (#33)
 - :star2: #79 - Add `SwitchConfig`/`SwitchOperation`, an N-way generalization of `IfConfig`, for multi-way conditional branching.

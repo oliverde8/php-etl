@@ -2,21 +2,25 @@
 
 namespace Oliverde8\Component\PhpEtl\OperationConfig\Transformer;
 
+use Oliverde8\Component\PhpEtl\Expression\Expression;
 use Oliverde8\Component\PhpEtl\OperationConfig\AbstractOperationConfig;
+use Oliverde8\Component\RuleEngine\RuleConfig\RuleConfigInterface;
 
 class FilterDataConfig extends AbstractOperationConfig
 {
     /**
-     * @param array $rules Rule Engine rules, evaluated against the item's data. Mutually exclusive with $expression.
+     * @param RuleConfigInterface|Expression|array $rules A typed RuleConfigInterface, an Expression (Symfony
+     *                                                      Expression Language), or the legacy array-based Rule
+     *                                                      Engine syntax. Evaluated against the item's data; the
+     *                                                      item is kept when the result is truthy (or falsy, if
+     *                                                      $negate is true).
      * @param bool $negate Inverts the condition result.
-     * @param string|null $expression A Symfony Expression Language condition, evaluated against `data` (the item's
-     *                                 data) and `context` (the execution context's parameters). Alternative to
-     *                                 $rules for simple boolean conditions. Mutually exclusive with $rules.
+     *
+     * @deprecated Passing an array is deprecated, pass a RuleConfigInterface or an Expression instead.
      */
     public function __construct(
-        public readonly array $rules = [],
+        public readonly RuleConfigInterface|Expression|array $rules = [],
         public readonly bool $negate = false,
-        public readonly ?string $expression = null,
         string $flavor = 'default',
     )
     {
@@ -26,11 +30,18 @@ class FilterDataConfig extends AbstractOperationConfig
     #[\Override]
     protected function validate(bool $constructOnly): void
     {
-        if (empty($this->rules) && $this->expression === null) {
-            throw new \InvalidArgumentException('Either rules or expression must be provided');
+        if (!is_array($this->rules)) {
+            return;
         }
-        if (!empty($this->rules) && $this->expression !== null) {
-            throw new \InvalidArgumentException('rules and expression are mutually exclusive');
+
+        if (empty($this->rules)) {
+            throw new \InvalidArgumentException('rules must be provided');
         }
+
+        trigger_deprecation(
+            'oliverde8/php-etl',
+            '2.1',
+            'Passing an array of rules to FilterDataConfig is deprecated, pass a RuleConfigInterface or an Expression instead (e.g. new GetRuleConfig(...) or new Expression(\'...\')). See Oliverde8\Component\RuleEngine\RuleConfig and Oliverde8\Component\PhpEtl\Expression\Expression.',
+        );
     }
 }

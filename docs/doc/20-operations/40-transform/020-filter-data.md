@@ -24,48 +24,48 @@ Use `FilterDataConfig` to:
 
 ```php
 use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\FilterDataConfig;
+use Oliverde8\Component\RuleEngine\RuleConfig\GetRuleConfig;
 
 // Keep items where field value is truthy
-$config = new FilterDataConfig([
-    ["get" => ["field" => "IsSubscribed"]]
-]);
+$config = new FilterDataConfig(new GetRuleConfig('IsSubscribed'));
 ```
 
 ### Expression-Based Configuration
 
-For a simple boolean condition, a [Symfony Expression Language](https://symfony.com/doc/current/components/expression_language.html) string is often less verbose than rule engine rules. Use `expression` instead of `rules` — the two are mutually exclusive:
+For a simple boolean condition, an `Expression` is often less verbose than a typed rule — a [Symfony Expression Language](https://symfony.com/doc/current/components/expression_language.html) string evaluated against `data` (the item's data) and `context` (the execution context's parameters):
 
 ```php
+use Oliverde8\Component\PhpEtl\Expression\Expression;
 use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\FilterDataConfig;
 
-$config = new FilterDataConfig(expression: 'data["IsSubscribed"] == true');
+$config = new FilterDataConfig(new Expression('data["IsSubscribed"] == true'));
 ```
-
-The expression has access to `data` (the item's data) and `context` (the execution context's parameters).
 
 ### Constructor Parameters
 
 ```php
 public function __construct(
-    public readonly array $rules = [],
+    public readonly RuleConfigInterface|Expression|array $rules = [],
     public readonly bool $negate = false,
-    public readonly ?string $expression = null,
     string $flavor = 'default'
 )
 ```
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `rules` | `array` | `[]` | Rule engine rules to evaluate. Item kept if rule evaluates to truthy value. Mutually exclusive with `expression` — exactly one of the two must be provided |
+| `rules` | `RuleConfigInterface\|Expression\|array` | `[]` | A typed rule, an `Expression`, or (deprecated) a Rule Engine array. Item kept if the result is truthy |
 | `negate` | `bool` | `false` | If `true`, inverts the logic (keeps items that evaluate to falsy) |
-| `expression` | `string\|null` | `null` | A Symfony Expression Language condition, evaluated against `data`/`context`. Alternative to `rules` for simple boolean conditions |
 | `flavor` | `string` | `'default'` | Operation flavor for custom implementations |
+
+> **Deprecated:** passing a plain array to `rules` still works but triggers a deprecation notice — pass a `RuleConfigInterface` (e.g. `new GetRuleConfig(...)`, see [Rule Transformer](030-rule-transformer.html)) or an `Expression` instead.
 
 ---
 
 ## Rule Engine Basics
 
-The `rules` parameter uses the rule engine syntax. The rule engine has the following operations:
+The examples below use the legacy array-based rule engine syntax accepted by `rules` (deprecated — see
+[Rule Transformer](030-rule-transformer.html) for the typed `RuleConfigInterface` equivalents). The rule engine
+has the following operations:
 
 ### Get Field Value
 

@@ -6,6 +6,7 @@ namespace Oliverde8\Component\PhpEtl\ChainOperation;
 
 use Oliverde8\Component\PhpEtl\ChainBuilderV2;
 use Oliverde8\Component\PhpEtl\ChainProcessorInterface;
+use Oliverde8\Component\PhpEtl\Expression\Expression;
 use Oliverde8\Component\PhpEtl\Expression\ExpressionEvaluator;
 use Oliverde8\Component\PhpEtl\Expression\ExpressionEvaluatorInterface;
 use Oliverde8\Component\PhpEtl\Item\DataItemInterface;
@@ -15,6 +16,7 @@ use Oliverde8\Component\PhpEtl\Item\StopItem;
 use Oliverde8\Component\PhpEtl\Model\ExecutionContext;
 use Oliverde8\Component\PhpEtl\OperationConfig\IfConfig;
 use Oliverde8\Component\RuleEngine\RuleApplier;
+use Oliverde8\Component\RuleEngine\RuleConfig\RuleConfigInterface;
 
 class IfOperation extends AbstractChainOperation implements DataChainOperationInterface, DetailedObservableOperation, ConfigurableChainOperationInterface, SubChainsAwareOperationInterface
 {
@@ -42,14 +44,19 @@ class IfOperation extends AbstractChainOperation implements DataChainOperationIn
     #[\Override]
     public function processData(DataItemInterface $item, ExecutionContext $context): ItemInterface
     {
-        if ($this->config->expression !== null) {
+        $rules = $this->config->rules;
+
+        if ($rules instanceof Expression) {
             $result = $this->expressionEvaluator->evaluate(
-                $this->config->expression,
+                $rules->expression,
                 ['data' => $item->getData(), 'context' => $context->getParameters()],
             );
+        } elseif ($rules instanceof RuleConfigInterface) {
+            $resultData = [];
+            $result = $this->ruleApplier->applyConfig($item->getData(), $resultData, $rules);
         } else {
             $resultData = [];
-            $result = $this->ruleApplier->apply($item->getData(), $resultData, $this->config->rules);
+            $result = $this->ruleApplier->apply($item->getData(), $resultData, $rules);
         }
 
         $conditionMet = $this->config->negate ? !$result : (bool) $result;

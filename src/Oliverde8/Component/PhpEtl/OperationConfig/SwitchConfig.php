@@ -6,6 +6,8 @@ namespace Oliverde8\Component\PhpEtl\OperationConfig;
 
 use Oliverde8\Component\PhpEtl\ChainConfig;
 use Oliverde8\Component\PhpEtl\Exception\ChainBuilderException;
+use Oliverde8\Component\PhpEtl\Expression\Expression;
+use Oliverde8\Component\RuleEngine\RuleConfig\RuleConfigInterface;
 
 /**
  * Routes an item to exactly one of several branches: cases are evaluated in the order they were added, the
@@ -15,7 +17,7 @@ use Oliverde8\Component\PhpEtl\Exception\ChainBuilderException;
  */
 class SwitchConfig extends AbstractOperationConfig
 {
-    /** @var array<int, array{rules: array, expression: ?string, then: ChainConfig}> */
+    /** @var array<int, array{rules: RuleConfigInterface|Expression|array, then: ChainConfig}> */
     private array $cases = [];
 
     /**
@@ -34,26 +36,32 @@ class SwitchConfig extends AbstractOperationConfig
 
     /**
      * @param ChainConfig $then Sub-chain executed when this case matches.
-     * @param array $rules Rule Engine rules, evaluated against the item's data. Mutually exclusive with $expression.
-     * @param string|null $expression A Symfony Expression Language condition, evaluated against `data` (the item's
-     *                                 data) and `context` (the execution context's parameters). Alternative to
-     *                                 $rules for simple boolean conditions. Mutually exclusive with $rules.
+     * @param RuleConfigInterface|Expression|array $rules A typed RuleConfigInterface, an Expression (Symfony
+     *                                                      Expression Language), or the legacy array-based Rule
+     *                                                      Engine syntax, evaluated against the item's data.
+     *
+     * @deprecated Passing an array of rules is deprecated, pass a RuleConfigInterface or an Expression instead.
      */
-    public function addCase(ChainConfig $then, array $rules = [], ?string $expression = null): self
+    public function addCase(ChainConfig $then, RuleConfigInterface|Expression|array $rules = []): self
     {
-        if (empty($rules) && $expression === null) {
-            throw new \InvalidArgumentException('Either rules or expression must be provided for a switch case');
-        }
-        if (!empty($rules) && $expression !== null) {
-            throw new \InvalidArgumentException('rules and expression are mutually exclusive for a switch case');
+        if (is_array($rules)) {
+            if (empty($rules)) {
+                throw new \InvalidArgumentException('rules must be provided for a switch case');
+            }
+
+            trigger_deprecation(
+                'oliverde8/php-etl',
+                '2.1',
+                'Passing an array of rules to SwitchConfig::addCase() is deprecated, pass a RuleConfigInterface or an Expression instead (e.g. new GetRuleConfig(...) or new Expression(\'...\')). See Oliverde8\Component\RuleEngine\RuleConfig and Oliverde8\Component\PhpEtl\Expression\Expression.',
+            );
         }
 
-        $this->cases[] = ['rules' => $rules, 'expression' => $expression, 'then' => $then];
+        $this->cases[] = ['rules' => $rules, 'then' => $then];
         return $this;
     }
 
     /**
-     * @return array<int, array{rules: array, expression: ?string, then: ChainConfig}>
+     * @return array<int, array{rules: RuleConfigInterface|Expression|array, then: ChainConfig}>
      */
     public function getCases(): array
     {

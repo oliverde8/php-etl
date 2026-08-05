@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Oliverde8\Component\PhpEtl\Tests\ChainOperation\Transformer;
 
 use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\FilterDataOperation;
+use Oliverde8\Component\PhpEtl\Expression\Expression;
 use Oliverde8\Component\PhpEtl\Item\ChainBreakItem;
 use Oliverde8\Component\PhpEtl\Item\DataItem;
 use Oliverde8\Component\PhpEtl\Model\ExecutionContext;
 use Oliverde8\Component\PhpEtl\Model\File\LocalFileSystem;
 use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\FilterDataConfig;
 use Oliverde8\Component\RuleEngine\RuleApplier;
+use Oliverde8\Component\RuleEngine\RuleConfig\GetRuleConfig;
 use PHPUnit\Framework\TestCase;
 
 class FilterDataOperationTest extends TestCase
@@ -53,7 +55,7 @@ class FilterDataOperationTest extends TestCase
 
     public function testExpressionConditionTruePassesItemThrough(): void
     {
-        $config = new FilterDataConfig(expression: 'data["subscribed"] == true');
+        $config = new FilterDataConfig(new Expression('data["subscribed"] == true'));
         $operation = new FilterDataOperation($this->createMock(RuleApplier::class), $config);
 
         $item = new DataItem(['subscribed' => true]);
@@ -64,7 +66,7 @@ class FilterDataOperationTest extends TestCase
 
     public function testExpressionConditionFalseBreaksChain(): void
     {
-        $config = new FilterDataConfig(expression: 'data["subscribed"] == true');
+        $config = new FilterDataConfig(new Expression('data["subscribed"] == true'));
         $operation = new FilterDataOperation($this->createMock(RuleApplier::class), $config);
 
         $result = $operation->process(new DataItem(['subscribed' => false]), new ExecutionContext([], new LocalFileSystem()));
@@ -74,7 +76,7 @@ class FilterDataOperationTest extends TestCase
 
     public function testExpressionConditionCanReadContext(): void
     {
-        $config = new FilterDataConfig(expression: 'context["country"] == "US"');
+        $config = new FilterDataConfig(new Expression('context["country"] == "US"'));
         $operation = new FilterDataOperation($this->createMock(RuleApplier::class), $config);
 
         $context = new ExecutionContext(['country' => 'US'], new LocalFileSystem());
@@ -86,7 +88,7 @@ class FilterDataOperationTest extends TestCase
 
     public function testNegateFlipsExpressionCondition(): void
     {
-        $config = new FilterDataConfig(expression: 'data["subscribed"] == true', negate: true);
+        $config = new FilterDataConfig(new Expression('data["subscribed"] == true'), negate: true);
         $operation = new FilterDataOperation($this->createMock(RuleApplier::class), $config);
 
         $result = $operation->process(new DataItem(['subscribed' => true]), new ExecutionContext([], new LocalFileSystem()));
@@ -94,15 +96,36 @@ class FilterDataOperationTest extends TestCase
         $this->assertInstanceOf(ChainBreakItem::class, $result);
     }
 
-    public function testMissingRulesAndExpressionThrows(): void
+    public function testRuleConfigConditionTruePassesItemThrough(): void
+    {
+        $ruleApplier = $this->createMock(RuleApplier::class);
+        $ruleApplier->method('applyConfig')->willReturn(true);
+
+        $config = new FilterDataConfig(new GetRuleConfig('subscribed'));
+        $operation = new FilterDataOperation($ruleApplier, $config);
+
+        $item = new DataItem(['subscribed' => true]);
+        $result = $operation->process($item, new ExecutionContext([], new LocalFileSystem()));
+
+        $this->assertSame($item, $result);
+    }
+
+    public function testRuleConfigConditionFalseBreaksChain(): void
+    {
+        $ruleApplier = $this->createMock(RuleApplier::class);
+        $ruleApplier->method('applyConfig')->willReturn(false);
+
+        $config = new FilterDataConfig(new GetRuleConfig('subscribed'));
+        $operation = new FilterDataOperation($ruleApplier, $config);
+
+        $result = $operation->process(new DataItem(['subscribed' => false]), new ExecutionContext([], new LocalFileSystem()));
+
+        $this->assertInstanceOf(ChainBreakItem::class, $result);
+    }
+
+    public function testMissingRulesThrows(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         new FilterDataConfig();
-    }
-
-    public function testRulesAndExpressionAreMutuallyExclusive(): void
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        new FilterDataConfig(rules: [true], expression: 'data["a"] == true');
     }
 }

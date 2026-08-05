@@ -15,7 +15,7 @@ and routes the item to the branch of the **first matching case**. If none match,
 - Routes the item to **exactly one** branch — never more than one
 - The chosen branch can **freely modify** the item, since no other branch runs alongside it
 - `default` is optional — without it, no case matching just lets the item continue unchanged
-- Each case's condition is either Rule Engine rules or a Symfony Expression Language string (same options as `FilterDataConfig`/`If`)
+- Each case's condition is a typed `RuleConfigInterface`, an `Expression`, or (deprecated) a Rule Engine array — same options as `FilterDataConfig`/`If`
 
 ## Configuration
 
@@ -24,29 +24,32 @@ Build cases fluently with `addCase()`, mirroring `addSplit()`/`addMerge()`/`addL
 ```php
 use Oliverde8\Component\PhpEtl\OperationConfig\SwitchConfig;
 use Oliverde8\Component\PhpEtl\ChainConfig;
+use Oliverde8\Component\PhpEtl\Expression\Expression;
 
 $switchConfig = (new SwitchConfig(default: $defaultChainConfig)) // default is optional, like If's `else`
-    ->addCase($usChainConfig, expression: 'data["country"] == "US"')
-    ->addCase($frChainConfig, expression: 'data["country"] == "FR"');
+    ->addCase($usChainConfig, new Expression('data["country"] == "US"'))
+    ->addCase($frChainConfig, new Expression('data["country"] == "FR"'));
 
 $chainConfig->addLink($switchConfig);
 ```
 
-Each case can use Rule Engine `rules` instead of `expression` — the two are mutually exclusive per case, exactly
-like `FilterDataConfig`/`IfConfig`:
+Each case can use a typed `RuleConfigInterface` instead of an `Expression`:
 
 ```php
-$switchConfig->addCase($chainConfig, rules: [['get' => ['field' => 'IsPremium']]]);
+use Oliverde8\Component\RuleEngine\RuleConfig\GetRuleConfig;
+
+$switchConfig->addCase($chainConfig, new GetRuleConfig('IsPremium'));
 ```
 
 **Parameters:**
 - `default`: An optional `ChainConfig` run when no case matches. Without it, the item just continues to the next step unchanged
 - `isolateContext`: When `true`, the chosen branch runs against its own clone of the execution context instead of the parent's. Default `false`
 
-`addCase(ChainConfig $then, array $rules = [], ?string $expression = null)`:
+`addCase(ChainConfig $then, RuleConfigInterface|Expression|array $rules = [])`:
 - `$then`: A `ChainConfig` run when this case's condition matches
-- `$rules`: Rule Engine rules evaluated against the item's data. Mutually exclusive with `$expression`
-- `$expression`: A Symfony Expression Language condition, evaluated against `data`/`context`. Alternative to `$rules` for simple boolean conditions
+- `$rules`: A `RuleConfigInterface`, an `Expression`, or (deprecated) a Rule Engine array, evaluated against the item's data
+
+> **Deprecated:** passing a plain array to `$rules` still works but triggers a deprecation notice — pass a `RuleConfigInterface` (e.g. `new GetRuleConfig(...)`) or an `Expression` instead.
 
 {% include block/isolate-context-branch.md operation="switch" var="switchConfig" config="SwitchConfig" %}
 
@@ -54,6 +57,7 @@ $switchConfig->addCase($chainConfig, rules: [['get' => ['field' => 'IsPremium']]
 
 ```php
 use Oliverde8\Component\PhpEtl\ChainConfig;
+use Oliverde8\Component\PhpEtl\Expression\Expression;
 use Oliverde8\Component\PhpEtl\OperationConfig\Extract\CsvExtractConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\SwitchConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\RuleTransformConfig;
@@ -74,14 +78,14 @@ $chainConfig
                 ->addLink((new RuleTransformConfig(false))
                     ->addColumn('region', [['constant' => ['value' => 'north-america']]])
                 ),
-            expression: 'data["country"] in ["US", "CA", "MX"]'
+            new Expression('data["country"] in ["US", "CA", "MX"]')
         )
         ->addCase(
             (new ChainConfig())
                 ->addLink((new RuleTransformConfig(false))
                     ->addColumn('region', [['constant' => ['value' => 'europe']]])
                 ),
-            expression: 'data["country"] in ["FR", "DE", "ES"]'
+            new Expression('data["country"] in ["FR", "DE", "ES"]')
         ))
     ->addLink(new CsvFileWriterConfig('orders-tagged.csv'));
 ```

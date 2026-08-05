@@ -9,6 +9,7 @@ use Oliverde8\Component\PhpEtl\ChainConfig;
 use Oliverde8\Component\PhpEtl\ChainOperation\Grouping\BatchOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\SwitchOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\CallbackTransformerOperation;
+use Oliverde8\Component\PhpEtl\Expression\Expression;
 use Oliverde8\Component\PhpEtl\ExecutionContextFactory;
 use Oliverde8\Component\PhpEtl\GenericChainFactory;
 use Oliverde8\Component\PhpEtl\Item\DataItem;
@@ -21,6 +22,7 @@ use Oliverde8\Component\PhpEtl\OperationConfig\Grouping\BatchConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\SwitchConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\CallBackTransformerConfig;
 use Oliverde8\Component\RuleEngine\RuleApplier;
+use Oliverde8\Component\RuleEngine\RuleConfig\GetRuleConfig;
 use PHPUnit\Framework\TestCase;
 
 class SwitchOperationTest extends TestCase
@@ -62,8 +64,8 @@ class SwitchOperationTest extends TestCase
     public function testFirstMatchingCaseWins(): void
     {
         $config = (new SwitchConfig())
-            ->addCase($this->branch('us'), expression: 'data["country"] == "US"')
-            ->addCase($this->branch('fr'), expression: 'data["country"] == "FR"');
+            ->addCase($this->branch('us'), new Expression('data["country"] == "US"'))
+            ->addCase($this->branch('fr'), new Expression('data["country"] == "FR"'));
 
         $operation = new SwitchOperation($this->chainBuilder, $this->createMock(RuleApplier::class), $config);
 
@@ -75,8 +77,8 @@ class SwitchOperationTest extends TestCase
     public function testEarlierCaseWinsOverLaterMatchingCase(): void
     {
         $config = (new SwitchConfig())
-            ->addCase($this->branch('first'), expression: 'true')
-            ->addCase($this->branch('second'), expression: 'true');
+            ->addCase($this->branch('first'), new Expression('true'))
+            ->addCase($this->branch('second'), new Expression('true'));
 
         $operation = new SwitchOperation($this->chainBuilder, $this->createMock(RuleApplier::class), $config);
 
@@ -88,7 +90,7 @@ class SwitchOperationTest extends TestCase
     public function testFallsBackToDefaultWhenNoCaseMatches(): void
     {
         $config = (new SwitchConfig(default: $this->branch('default')))
-            ->addCase($this->branch('us'), expression: 'data["country"] == "US"');
+            ->addCase($this->branch('us'), new Expression('data["country"] == "US"'));
 
         $operation = new SwitchOperation($this->chainBuilder, $this->createMock(RuleApplier::class), $config);
 
@@ -100,7 +102,7 @@ class SwitchOperationTest extends TestCase
     public function testNoMatchWithoutDefaultPassesThrough(): void
     {
         $config = (new SwitchConfig())
-            ->addCase($this->branch('us'), expression: 'data["country"] == "US"');
+            ->addCase($this->branch('us'), new Expression('data["country"] == "US"'));
 
         $operation = new SwitchOperation($this->chainBuilder, $this->createMock(RuleApplier::class), $config);
 
@@ -115,7 +117,7 @@ class SwitchOperationTest extends TestCase
         $ruleApplier = $this->createMock(RuleApplier::class);
         $ruleApplier->method('apply')->willReturn(true);
 
-        $config = (new SwitchConfig())->addCase($this->branch('matched'), rules: [true]);
+        $config = (new SwitchConfig())->addCase($this->branch('matched'), [true]);
 
         $operation = new SwitchOperation($this->chainBuilder, $ruleApplier, $config);
         $result = $operation->process(new DataItem([]), $this->context);
@@ -123,9 +125,22 @@ class SwitchOperationTest extends TestCase
         $this->assertEquals(['branch' => 'matched'], $this->singleResult($result)->getData());
     }
 
+    public function testCaseUsingRuleConfig(): void
+    {
+        $ruleApplier = $this->createMock(RuleApplier::class);
+        $ruleApplier->method('applyConfig')->willReturn(true);
+
+        $config = (new SwitchConfig())->addCase($this->branch('matched'), new GetRuleConfig('country'));
+
+        $operation = new SwitchOperation($this->chainBuilder, $ruleApplier, $config);
+        $result = $operation->process(new DataItem(['country' => 'US']), $this->context);
+
+        $this->assertEquals(['branch' => 'matched'], $this->singleResult($result)->getData());
+    }
+
     public function testCaseCanReadContext(): void
     {
-        $config = (new SwitchConfig())->addCase($this->branch('matched'), expression: 'context["country"] == "US"');
+        $config = (new SwitchConfig())->addCase($this->branch('matched'), new Expression('context["country"] == "US"'));
 
         $operation = new SwitchOperation($this->chainBuilder, $this->createMock(RuleApplier::class), $config);
 
@@ -138,8 +153,8 @@ class SwitchOperationTest extends TestCase
     public function testGetChainProcessorsIncludesCasesAndDefault(): void
     {
         $config = (new SwitchConfig(default: new ChainConfig()))
-            ->addCase(new ChainConfig(), expression: 'true')
-            ->addCase(new ChainConfig(), expression: 'true');
+            ->addCase(new ChainConfig(), new Expression('true'))
+            ->addCase(new ChainConfig(), new Expression('true'));
 
         $operation = new SwitchOperation($this->chainBuilder, $this->createMock(RuleApplier::class), $config);
 
@@ -148,7 +163,7 @@ class SwitchOperationTest extends TestCase
 
     public function testGetChainProcessorsWithoutDefault(): void
     {
-        $config = (new SwitchConfig())->addCase(new ChainConfig(), expression: 'true');
+        $config = (new SwitchConfig())->addCase(new ChainConfig(), new Expression('true'));
 
         $operation = new SwitchOperation($this->chainBuilder, $this->createMock(RuleApplier::class), $config);
 
@@ -175,7 +190,7 @@ class SwitchOperationTest extends TestCase
             }));
 
         $config = (new SwitchConfig(default: $default))
-            ->addCase($us, expression: 'data["country"] == "US"');
+            ->addCase($us, new Expression('data["country"] == "US"'));
 
         $operation = new SwitchOperation($this->chainBuilder, $this->createMock(RuleApplier::class), $config);
 
@@ -201,7 +216,7 @@ class SwitchOperationTest extends TestCase
             return $item;
         }));
 
-        $config = (new SwitchConfig(isolateContext: true))->addCase($branch, expression: 'true');
+        $config = (new SwitchConfig(isolateContext: true))->addCase($branch, new Expression('true'));
         $operation = new SwitchOperation($this->chainBuilder, $this->createMock(RuleApplier::class), $config);
 
         $operation->process(new DataItem([]), $this->context);
@@ -217,7 +232,7 @@ class SwitchOperationTest extends TestCase
             return $item;
         }));
 
-        $config = (new SwitchConfig())->addCase($branch, expression: 'true');
+        $config = (new SwitchConfig())->addCase($branch, new Expression('true'));
         $operation = new SwitchOperation($this->chainBuilder, $this->createMock(RuleApplier::class), $config);
 
         $operation->process(new DataItem([]), $this->context);
@@ -227,7 +242,7 @@ class SwitchOperationTest extends TestCase
 
     public function testGetConfigurationClass(): void
     {
-        $config = (new SwitchConfig())->addCase(new ChainConfig(), expression: 'true');
+        $config = (new SwitchConfig())->addCase(new ChainConfig(), new Expression('true'));
         $operation = new SwitchOperation($this->chainBuilder, $this->createMock(RuleApplier::class), $config);
 
         $this->assertEquals(SwitchConfig::class, $operation->getConfigurationClass());

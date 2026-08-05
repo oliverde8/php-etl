@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Oliverde8\Component\PhpEtl\Tests\OperationConfig;
 
 use Oliverde8\Component\PhpEtl\ChainConfig;
+use Oliverde8\Component\PhpEtl\Expression\Expression;
 use Oliverde8\Component\PhpEtl\OperationConfig\SwitchConfig;
+use Oliverde8\Component\RuleEngine\RuleConfig\GetRuleConfig;
 use PHPUnit\Framework\TestCase;
 
 class SwitchConfigTest extends TestCase
@@ -14,10 +16,10 @@ class SwitchConfigTest extends TestCase
     {
         $then = new ChainConfig();
         $config = new SwitchConfig();
-        $config->addCase($then, rules: [true]);
+        $config->addCase($then, [true]);
 
         $this->assertSame([
-            ['rules' => [true], 'expression' => null, 'then' => $then],
+            ['rules' => [true], 'then' => $then],
         ], $config->getCases());
     }
 
@@ -25,27 +27,32 @@ class SwitchConfigTest extends TestCase
     {
         $then = new ChainConfig();
         $config = new SwitchConfig();
-        $config->addCase($then, expression: 'data["country"] == "US"');
+        $expression = new Expression('data["country"] == "US"');
+        $config->addCase($then, $expression);
 
         $this->assertSame([
-            ['rules' => [], 'expression' => 'data["country"] == "US"', 'then' => $then],
+            ['rules' => $expression, 'then' => $then],
         ], $config->getCases());
     }
 
-    public function testMissingRulesAndExpressionThrows(): void
+    public function testAddCaseWithRuleConfig(): void
+    {
+        $then = new ChainConfig();
+        $config = new SwitchConfig();
+        $ruleConfig = new GetRuleConfig('country');
+        $config->addCase($then, $ruleConfig);
+
+        $this->assertSame([
+            ['rules' => $ruleConfig, 'then' => $then],
+        ], $config->getCases());
+    }
+
+    public function testMissingRulesThrows(): void
     {
         $config = new SwitchConfig();
 
         $this->expectException(\InvalidArgumentException::class);
         $config->addCase(new ChainConfig());
-    }
-
-    public function testRulesAndExpressionAreMutuallyExclusive(): void
-    {
-        $config = new SwitchConfig();
-
-        $this->expectException(\InvalidArgumentException::class);
-        $config->addCase(new ChainConfig(), rules: [true], expression: 'data["a"] == true');
     }
 
     public function testGetDefaultChainConfig(): void
@@ -69,8 +76,8 @@ class SwitchConfigTest extends TestCase
         $then2 = new ChainConfig();
 
         $config = new SwitchConfig();
-        $config->addCase($then1, expression: 'data["country"] == "US"')
-            ->addCase($then2, expression: 'data["country"] == "FR"');
+        $config->addCase($then1, new Expression('data["country"] == "US"'))
+            ->addCase($then2, new Expression('data["country"] == "FR"'));
 
         $cases = $config->getCases();
         $this->assertSame($then1, $cases[0]['then']);
