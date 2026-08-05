@@ -15,7 +15,7 @@ and routes the item to the branch of the **first matching case**. If none match,
 - Routes the item to **exactly one** branch — never more than one
 - The chosen branch can **freely modify** the item, since no other branch runs alongside it
 - `default` is optional — without it, no case matching just lets the item continue unchanged
-- Each case's condition is a typed `RuleConfigInterface`, an `Expression`, or (deprecated) a Rule Engine array — same options as `FilterDataConfig`/`If`
+- Each case's condition is a typed `RuleConfigInterface` or an `Expression` — same options as `FilterDataConfig`/`If`
 
 ## Configuration
 
@@ -47,9 +47,8 @@ $switchConfig->addCase($chainConfig, new GetRuleConfig('IsPremium'));
 
 `addCase(ChainConfig $then, RuleConfigInterface|Expression|array $rules = [])`:
 - `$then`: A `ChainConfig` run when this case's condition matches
-- `$rules`: A `RuleConfigInterface`, an `Expression`, or (deprecated) a Rule Engine array, evaluated against the item's data
-
-> **Deprecated:** passing a plain array to `$rules` still works but triggers a deprecation notice — pass a `RuleConfigInterface` (e.g. `new GetRuleConfig(...)`) or an `Expression` instead.
+- `$rules`: A `RuleConfigInterface` or an `Expression`, evaluated against the item's data. A plain array is also
+  accepted but deprecated, see [Legacy Array Syntax](/doc/15-rule-engine/030-legacy-array-syntax.html)
 
 {% include block/isolate-context-branch.md operation="switch" var="switchConfig" config="SwitchConfig" %}
 

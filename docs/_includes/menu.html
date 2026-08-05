@@ -4,7 +4,7 @@
 
         <details class="pe-nav-group"{% if page.url contains '/doc/getting-started' %} open{% endif %}>
             <summary class="pe-nav-group__title">
-                <a href="/doc/getting-started.html">Getting Started</a>
+                <a href="/doc/getting-started.html">🚀 Getting Started</a>
                 {{ chevron }}
             </summary>
             <ul class="pe-nav">
@@ -16,7 +16,7 @@
 
         <details class="pe-nav-group"{% if page.url contains '/doc/01-understand-the-etl' %} open{% endif %}>
             <summary class="pe-nav-group__title">
-                Core Concepts
+                ↔  Core Concepts
                 {{ chevron }}
             </summary>
             <ul class="pe-nav">
@@ -76,6 +76,18 @@
             <ul class="pe-nav pe-nav--nested">
                 <li><a class="pe-nav__item{% if page.url == '/doc/20-operations/70-load/010-csv.html' %} active{% endif %}" href="/doc/20-operations/70-load/010-csv.html">CSV</a></li>
                 <li><a class="pe-nav__item{% if page.url == '/doc/20-operations/70-load/020-json.html' %} active{% endif %}" href="/doc/20-operations/70-load/020-json.html">JSON</a></li>
+            </ul>
+        </details>
+
+        <details class="pe-nav-group"{% if page.url contains '/doc/15-rule-engine' %} open{% endif %}>
+            <summary class="pe-nav-group__title">
+                📐 Rule Engine
+                {{ chevron }}
+            </summary>
+            <ul class="pe-nav">
+                <li><a class="pe-nav__item{% if page.url == '/doc/15-rule-engine/010-rule-engine.html' %} active{% endif %}" href="/doc/15-rule-engine/010-rule-engine.html">Rules</a></li>
+                <li><a class="pe-nav__item{% if page.url == '/doc/15-rule-engine/020-custom-rules.html' %} active{% endif %}" href="/doc/15-rule-engine/020-custom-rules.html">Custom Rules</a></li>
+                <li><a class="pe-nav__item{% if page.url == '/doc/15-rule-engine/030-legacy-array-syntax.html' %} active{% endif %}" href="/doc/15-rule-engine/030-legacy-array-syntax.html">Legacy Array Syntax</a></li>
             </ul>
         </details>
 

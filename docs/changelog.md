@@ -6,15 +6,15 @@ subTitle: Release history
 
 # 2.1.0
 
-- 🌟 #84 - Add typed `RuleConfig` classes as an IDE-friendly alternative to Rule Engine's array-based rule syntax. (#84)
-  - ❗ **Deprecation** Passing an array of rules to `RuleTransformConfig::addColumn()` now triggers a deprecation notice; use a typed `RuleConfigInterface` instead. (#84)
-- 🌟 #62 - Add `BatchConfig` operation to collect items into fixed-size chunks, emitted as each one fills up. (#62)
-- 🌟 #59 - Add `IfConfig` operation to route an item to one of two sub-chains, letting the chosen branch freely modify it. (#59)
-- 🌟 #72 - Add a shared `ExpressionEvaluator` for Log/SimpleHttp/ExternalFileFinder/Repeat, standardizing `data`/`context` across all four. (#72)
-- 🌟 #73 - `FilterDataConfig`/`IfConfig`'s `rules` now accepts a typed `RuleConfigInterface`, an `Expression` (Symfony Expression Language), or the legacy array. (#73)
-  - ❗ **Deprecation** Passing an array to `FilterDataConfig`/`IfConfig`'s `rules` now triggers a deprecation notice; use a typed `RuleConfigInterface` or an `Expression` instead. (#73)
+- 🌟 #84 - Rule Engine now uses typed `RuleConfig` classes as an IDE-friendly replacement array-based syntax.
+  - ❗ **Deprecation** Passing an array of rules now triggers a deprecation notice.
+- 🌟 #62 - Add `BatchConfig` operation to collect items into fixed-size chunks, emitted as each one fills up.
+- 🌟 #59 - Add `IfConfig` operation to route an item to one of two sub-chains, letting the chosen branch freely modify it.
+- 🌟 #72 - Add a shared `ExpressionEvaluator` for Log/SimpleHttp/ExternalFileFinder/Repeat, standardizing `data`/`context` across all four.
+- 🌟 #73 - `FilterDataConfig`'s `rules` now accepts a typed `RuleConfigInterface`, an `Expression` (Symfony Expression Language), or the legacy array.
+  - ❗ **Deprecation** Passing an array now triggers a deprecation notice
 - 🌟 Allow naming chain links when using the new chain builder.
-- 🌟 #33 - `ChainSplitConfig`, `ChainMergeConfig`, `ChainRepeatConfig`, `FailSafeConfig` gain an `isolateContext` option so a sub-chain can run against its own copy of the execution context. (#33)
+- 🌟 #33 - `ChainSplitConfig`, `ChainMergeConfig`, `ChainRepeatConfig`, `FailSafeConfig` gain an `isolateContext` option so a sub-chain can run against its own copy of the execution context.
 - 🌟 #79 - Add `SwitchConfig`/`SwitchOperation`, an N-way generalization of `IfConfig`, for multi-way conditional branching.
 
 # 2.0.1

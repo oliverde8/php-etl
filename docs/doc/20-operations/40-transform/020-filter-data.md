@@ -4,7 +4,7 @@ title: PHP-ETL - Operations
 subTitle: Transform - Filter Data
 ---
 
-The **Filter Data** operation selectively skips items in the chain based on rules. It uses the [rule engine](030-rule-transformer.html) to evaluate conditions; if the condition is not met, the item is not passed to subsequent operations.
+The **Filter Data** operation selectively skips items in the chain based on rules. It uses the [Rule Engine](/doc/15-rule-engine/010-rule-engine.html) to evaluate conditions; if the condition is not met, the item is not passed to subsequent operations.
 
 ---
 
@@ -53,57 +53,9 @@ public function __construct(
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `rules` | `RuleConfigInterface\|Expression\|array` | `[]` | A typed rule, an `Expression`, or (deprecated) a Rule Engine array. Item kept if the result is truthy |
+| `rules` | `RuleConfigInterface\|Expression\|array` | `[]` | A typed rule or an `Expression`. Item kept if the result is truthy. A plain array is also accepted but deprecated, see [Legacy Array Syntax](/doc/15-rule-engine/030-legacy-array-syntax.html) |
 | `negate` | `bool` | `false` | If `true`, inverts the logic (keeps items that evaluate to falsy) |
 | `flavor` | `string` | `'default'` | Operation flavor for custom implementations |
-
-> **Deprecated:** passing a plain array to `rules` still works but triggers a deprecation notice — pass a `RuleConfigInterface` (e.g. `new GetRuleConfig(...)`, see [Rule Transformer](030-rule-transformer.html)) or an `Expression` instead.
-
----
-
-## Rule Engine Basics
-
-The examples below use the legacy array-based rule engine syntax accepted by `rules` (deprecated — see
-[Rule Transformer](030-rule-transformer.html) for the typed `RuleConfigInterface` equivalents). The rule engine
-has the following operations:
-
-### Get Field Value
-
-```php
-// Keep items where field exists and is truthy
-["get" => ["field" => "fieldName"]]
-```
-
-### Expression Language (for complex conditions)
-
-```php
-// Keep items where status equals "published" using Symfony Expression Language
-["expression_language" => [
-    "expression" => "rowData.status == 'published'"
-]]
-
-// Keep items where age >= 18
-["expression_language" => [
-    "expression" => "rowData.age >= 18"
-]]
-
-// Complex condition: status is published AND age >= 18
-["expression_language" => [
-    "expression" => "rowData.status == 'published' and rowData.age >= 18"
-]]
-```
-
-### Constant Value
-
-```php
-// Always keep all items (returns true constant)
-["constant" => ["value" => true]]
-
-// Never keep items (returns false constant)
-["constant" => ["value" => false]]
-```
-
-For all available rule engine operations, see the [Rule Transformer documentation](030-rule-transformer.html).
 
 ---
 
@@ -126,13 +78,12 @@ use Oliverde8\Component\PhpEtl\Item\DataItem;
 use Oliverde8\Component\PhpEtl\OperationConfig\Extract\CsvExtractConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\FilterDataConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Loader\CsvFileWriterConfig;
+use Oliverde8\Component\RuleEngine\RuleConfig\GetRuleConfig;
 
 $chainConfig = new ChainConfig();
 $chainConfig
     ->addLink(new CsvExtractConfig())
-    ->addLink(new FilterDataConfig([
-        ["get" => ["field" => "IsSubscribed"]]
-    ]))
+    ->addLink(new FilterDataConfig(new GetRuleConfig('IsSubscribed')))
     ->addLink(new CsvFileWriterConfig('subscribed_customers.csv'));
 
 $chainProcessor = $chainBuilder->createChain($chainConfig);
@@ -146,174 +97,47 @@ $chainProcessor->process(
 
 ### Example 2: Negated Filter
 
-Keep only non-subscribed customers using negate:
+Keep only non-subscribed customers using `negate`:
 
 ```php
-use Oliverde8\Component\PhpEtl\ChainConfig;
-use Oliverde8\Component\PhpEtl\Item\DataItem;
-use Oliverde8\Component\PhpEtl\OperationConfig\Extract\CsvExtractConfig;
-use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\FilterDataConfig;
-use Oliverde8\Component\PhpEtl\OperationConfig\Loader\CsvFileWriterConfig;
-
-$chainConfig = new ChainConfig();
-$chainConfig
-    ->addLink(new CsvExtractConfig())
-    ->addLink(new FilterDataConfig(
-        rules: [["get" => ["field" => "IsSubscribed"]]],
-        negate: true
-    ))
-    ->addLink(new CsvFileWriterConfig('not_subscribed_customers.csv'));
-
-$chainProcessor = $chainBuilder->createChain($chainConfig);
-$chainProcessor->process(
-    new ArrayIterator([new DataItem(['file' => 'data/customers.csv'])]),
-    []
-);
+->addLink(new FilterDataConfig(
+    rules: new GetRuleConfig('IsSubscribed'),
+    negate: true
+))
 ```
 
 **Result**: Only rows where `IsSubscribed` is falsy (null or false) are written to output.
 
-### Example 3: Equality Check with Expression Language
+### Example 3: Conditions with Expressions
 
-Keep only published articles:
-
-```php
-use Oliverde8\Component\PhpEtl\ChainConfig;
-use Oliverde8\Component\PhpEtl\Item\DataItem;
-use Oliverde8\Component\PhpEtl\OperationConfig\Extract\JsonExtractConfig;
-use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\FilterDataConfig;
-use Oliverde8\Component\PhpEtl\OperationConfig\Loader\CsvFileWriterConfig;
-
-$chainConfig = new ChainConfig();
-$chainConfig
-    ->addLink(new JsonExtractConfig())
-    ->addLink(new FilterDataConfig([
-        ["expression_language" => [
-            "expression" => "rowData.status == 'published'"
-        ]]
-    ]))
-    ->addLink(new CsvFileWriterConfig('published_articles.csv'));
-
-$chainProcessor = $chainBuilder->createChain($chainConfig);
-$chainProcessor->process(
-    new ArrayIterator([new DataItem('articles.json')]),
-    []
-);
-```
-
-### Example 4: Numeric Range Filter
-
-Keep only adults (age >= 18):
+For anything beyond a single truthy field, an `Expression` reads naturally and covers comparisons, boolean
+logic, membership checks, and regex matching in one line:
 
 ```php
-use Oliverde8\Component\PhpEtl\ChainConfig;
-use Oliverde8\Component\PhpEtl\Item\DataItem;
-use Oliverde8\Component\PhpEtl\OperationConfig\Extract\CsvExtractConfig;
-use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\FilterDataConfig;
-use Oliverde8\Component\PhpEtl\OperationConfig\Loader\CsvFileWriterConfig;
+use Oliverde8\Component\PhpEtl\Expression\Expression;
 
-$chainConfig = new ChainConfig();
-$chainConfig
-    ->addLink(new CsvExtractConfig())
-    ->addLink(new FilterDataConfig([
-        ["expression_language" => [
-            "expression" => "rowData.age >= 18"
-        ]]
-    ]))
-    ->addLink(new CsvFileWriterConfig('adults.csv'));
+// Equality
+new FilterDataConfig(new Expression('data["status"] == "published"'));
 
-$chainProcessor = $chainBuilder->createChain($chainConfig);
-$chainProcessor->process(
-    new ArrayIterator([new DataItem('users.csv')]),
-    []
-);
+// Numeric range
+new FilterDataConfig(new Expression('data["age"] >= 18'));
+
+// AND
+new FilterDataConfig(new Expression('data["status"] == "active" and data["verified"] == true'));
+
+// OR / membership
+new FilterDataConfig(new Expression('data["status"] in ["pending", "processing"]'));
+
+// Pattern matching
+new FilterDataConfig(new Expression('data["email"] matches "/@(company|partner)\\.com$/"'));
+
+// Reading from the execution context alongside the item's data
+new FilterDataConfig(new Expression('data["country"] == context["allowedCountry"]'));
 ```
 
-### Example 5: Multiple Conditions (AND)
+See the [Symfony Expression Language syntax](https://symfony.com/doc/current/components/expression_language/syntax.html) reference for everything expressions support.
 
-Keep only active, verified users:
-
-```php
-use Oliverde8\Component\PhpEtl\ChainConfig;
-use Oliverde8\Component\PhpEtl\Item\DataItem;
-use Oliverde8\Component\PhpEtl\OperationConfig\Extract\CsvExtractConfig;
-use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\FilterDataConfig;
-use Oliverde8\Component\PhpEtl\OperationConfig\Loader\CsvFileWriterConfig;
-
-$chainConfig = new ChainConfig();
-$chainConfig
-    ->addLink(new CsvExtractConfig())
-    ->addLink(new FilterDataConfig([
-        ["expression_language" => [
-            "expression" => "rowData.status == 'active' and rowData.verified == true"
-        ]]
-    ]))
-    ->addLink(new CsvFileWriterConfig('active_verified_users.csv'));
-
-$chainProcessor = $chainBuilder->createChain($chainConfig);
-$chainProcessor->process(
-    new ArrayIterator([new DataItem('users.csv')]),
-    []
-);
-```
-
-### Example 6: Multiple Conditions (OR)
-
-Keep orders that are either pending or processing:
-
-```php
-use Oliverde8\Component\PhpEtl\ChainConfig;
-use Oliverde8\Component\PhpEtl\Item\DataItem;
-use Oliverde8\Component\PhpEtl\OperationConfig\Extract\CsvExtractConfig;
-use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\FilterDataConfig;
-use Oliverde8\Component\PhpEtl\OperationConfig\Loader\CsvFileWriterConfig;
-
-$chainConfig = new ChainConfig();
-$chainConfig
-    ->addLink(new CsvExtractConfig())
-    ->addLink(new FilterDataConfig([
-        ["expression_language" => [
-            "expression" => "rowData.status in ['pending', 'processing']"
-        ]]
-    ]))
-    ->addLink(new CsvFileWriterConfig('active_orders.csv'));
-
-$chainProcessor = $chainBuilder->createChain($chainConfig);
-$chainProcessor->process(
-    new ArrayIterator([new DataItem('orders.csv')]),
-    []
-);
-```
-
-### Example 7: Pattern Matching with Expression Language
-
-Keep emails from specific domains:
-
-```php
-use Oliverde8\Component\PhpEtl\ChainConfig;
-use Oliverde8\Component\PhpEtl\Item\DataItem;
-use Oliverde8\Component\PhpEtl\OperationConfig\Extract\CsvExtractConfig;
-use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\FilterDataConfig;
-use Oliverde8\Component\PhpEtl\OperationConfig\Loader\CsvFileWriterConfig;
-
-$chainConfig = new ChainConfig();
-$chainConfig
-    ->addLink(new CsvExtractConfig())
-    ->addLink(new FilterDataConfig([
-        ["expression_language" => [
-            "expression" => "rowData.email matches '/@(company|partner)\\.com$/'"
-        ]]
-    ]))
-    ->addLink(new CsvFileWriterConfig('business_contacts.csv'));
-
-$chainProcessor = $chainBuilder->createChain($chainConfig);
-$chainProcessor->process(
-    new ArrayIterator([new DataItem('contacts.csv')]),
-    []
-);
-```
-
-### Example 8: Split into Multiple Files
+### Example 4: Split into Multiple Files
 
 Use `ChainSplitConfig` with filters to split data into multiple output files:
 
@@ -324,20 +148,19 @@ use Oliverde8\Component\PhpEtl\OperationConfig\Extract\CsvExtractConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\ChainSplitConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\FilterDataConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Loader\CsvFileWriterConfig;
+use Oliverde8\Component\RuleEngine\RuleConfig\GetRuleConfig;
 
 // Chain for subscribed customers
 $subscribedChain = new ChainConfig();
 $subscribedChain
-    ->addLink(new FilterDataConfig([
-        ["get" => ["field" => "IsSubscribed"]]
-    ]))
+    ->addLink(new FilterDataConfig(new GetRuleConfig('IsSubscribed')))
     ->addLink(new CsvFileWriterConfig('customers-subscribed.csv'));
 
 // Chain for non-subscribed customers
 $notSubscribedChain = new ChainConfig();
 $notSubscribedChain
     ->addLink(new FilterDataConfig(
-        rules: [["get" => ["field" => "IsSubscribed"]]],
+        rules: new GetRuleConfig('IsSubscribed'),
         negate: true
     ))
     ->addLink(new CsvFileWriterConfig('customers-not-subscribed.csv'));
@@ -361,67 +184,5 @@ $chainProcessor->process(
 
 **Result**: Three files are created:
 - `customers-subscribed.csv` - Only subscribed customers
-- `customers-not-subscribed.csv` - Only non-subscribed customers  
+- `customers-not-subscribed.csv` - Only non-subscribed customers
 - `customers-all.csv` - All customers
-
-### Example 9: Date Range Filter
-
-Keep records from the last 30 days:
-
-```php
-use Oliverde8\Component\PhpEtl\ChainConfig;
-use Oliverde8\Component\PhpEtl\Item\DataItem;
-use Oliverde8\Component\PhpEtl\OperationConfig\Extract\CsvExtractConfig;
-use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\FilterDataConfig;
-use Oliverde8\Component\PhpEtl\OperationConfig\Loader\CsvFileWriterConfig;
-
-$chainConfig = new ChainConfig();
-$chainConfig
-    ->addLink(new CsvExtractConfig())
-    ->addLink(new FilterDataConfig([
-        ["expression_language" => [
-            "expression" => "rowData.created_at >= date('-30 days')",
-            "values" => []
-        ]]
-    ]))
-    ->addLink(new CsvFileWriterConfig('recent_orders.csv'));
-
-$chainProcessor = $chainBuilder->createChain($chainConfig);
-$chainProcessor->process(
-    new ArrayIterator([new DataItem('orders.csv')]),
-    []
-);
-```
-
-### Example 10: Null/Empty Check
-
-Keep only records with non-empty email addresses:
-
-```php
-use Oliverde8\Component\PhpEtl\ChainConfig;
-use Oliverde8\Component\PhpEtl\Item\DataItem;
-use Oliverde8\Component\PhpEtl\OperationConfig\Extract\CsvExtractConfig;
-use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\FilterDataConfig;
-use Oliverde8\Component\PhpEtl\OperationConfig\Loader\CsvFileWriterConfig;
-
-$chainConfig = new ChainConfig();
-$chainConfig
-    ->addLink(new CsvExtractConfig())
-    ->addLink(new FilterDataConfig([
-        ["expression_language" => [
-            "expression" => "rowData.email is not null and rowData.email != ''"
-        ]]
-    ]))
-    ->addLink(new CsvFileWriterConfig('contacts_with_email.csv'));
-
-$chainProcessor = $chainBuilder->createChain($chainConfig);
-$chainProcessor->process(
-    new ArrayIterator([new DataItem('contacts.csv')]),
-    []
-);
-```
-
----
-
-## Available Rule Engine Operations
-For complex conditions (comparisons, AND/OR logic, etc.), use `expression_language` with [Symfony Expression Language syntax](https://symfony.com/doc/current/components/expression_language/syntax.html).

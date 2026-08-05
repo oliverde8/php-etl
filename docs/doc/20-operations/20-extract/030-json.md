@@ -273,7 +273,7 @@ $chainConfig
     ->addLink(new JsonExtractConfig())
     // Only process active products
     ->addLink(new FilterDataConfig([
-        ['expression_language' => ['expression' => "rowData.status == 'active'"]]
+        ['expression_language' => ['expression' => "rowData['status'] == 'active'"]]
     ]))
     ->addLink((new RuleTransformConfig(false))
         ->addColumn('id', [['get' => ['field' => 'id']]])

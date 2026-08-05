@@ -141,7 +141,7 @@ $chainConfig
         // Branch 1: High-value customers (> $1000)
         ->addMerge((new ChainConfig())
             ->addLink(new FilterDataConfig([
-                ['expression_language' => ['expression' => 'rowData.total_spent > 1000']]
+                ['expression_language' => ['expression' => "rowData['total_spent'] > 1000"]]
             ]))
             ->addLink((new RuleTransformConfig(false))
                 ->addColumn('customer_id', [['get' => ['field' => 'ID']]])
@@ -153,7 +153,7 @@ $chainConfig
         // Branch 2: Regular customers
         ->addMerge((new ChainConfig())
             ->addLink(new FilterDataConfig([
-                ['expression_language' => ['expression' => 'rowData.total_spent <= 1000']]
+                ['expression_language' => ['expression' => "rowData['total_spent'] <= 1000"]]
             ]))
             ->addLink((new RuleTransformConfig(false))
                 ->addColumn('customer_id', [['get' => ['field' => 'ID']]])
