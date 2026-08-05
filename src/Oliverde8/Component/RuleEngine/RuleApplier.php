@@ -50,6 +50,7 @@ class RuleApplier
      */
     public function registerRule(RuleInterface $rule)
     {
+        $rule->setApplier($this);
         $this->rules[$rule->getRuleCode()] = $rule;
 
         if ($rule instanceof ConfigurableRuleInterface) {

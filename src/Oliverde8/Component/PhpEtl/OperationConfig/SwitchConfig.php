@@ -38,9 +38,8 @@ class SwitchConfig extends AbstractOperationConfig
      * @param ChainConfig $then Sub-chain executed when this case matches.
      * @param RuleConfigInterface|Expression|array $rules A typed RuleConfigInterface, an Expression (Symfony
      *                                                      Expression Language), or the legacy array-based Rule
-     *                                                      Engine syntax, evaluated against the item's data.
-     *
-     * @deprecated Passing an array of rules is deprecated, pass a RuleConfigInterface or an Expression instead.
+     *                                                      Engine syntax, evaluated against the item's data
+     *                                                      (deprecated, triggers a deprecation notice at runtime).
      */
     public function addCase(ChainConfig $then, RuleConfigInterface|Expression|array $rules = []): self
     {

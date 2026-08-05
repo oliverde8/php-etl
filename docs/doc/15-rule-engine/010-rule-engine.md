@@ -130,4 +130,5 @@ autocomplete and constructor validation instead of guessing array shapes. Wherev
 Need custom logic beyond these six? See [Custom Rules](/doc/15-rule-engine/020-custom-rules.html).
 
 A legacy array-based syntax also still works everywhere a rule is accepted, but it's deprecated — see
-[Legacy Array Syntax](/doc/15-rule-engine/030-legacy-array-syntax.html) if you're maintaining existing chains.
+[Migrating to Typed Rules](/doc/15-rule-engine/025-migrating-to-typed-rules.html) to convert existing chains, or
+[Legacy Array Syntax](/doc/15-rule-engine/030-legacy-array-syntax.html) for reference.

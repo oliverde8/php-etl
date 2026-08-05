@@ -16,9 +16,8 @@ class RuleTransformConfig extends AbstractOperationConfig
 
     /**
      * @param RuleConfigInterface|array $rules A typed RuleConfigInterface (see Oliverde8\Component\RuleEngine\RuleConfig),
-     *                                           or the legacy array-based rule engine syntax.
-     *
-     * @deprecated Passing an array is deprecated, pass a RuleConfigInterface instead (e.g. new GetRuleConfig(...)).
+     *                                           or the legacy array-based rule engine syntax (deprecated, triggers a
+     *                                           deprecation notice at runtime).
      */
     public function addColumn(string $columnName, RuleConfigInterface|array $rules): self
     {

@@ -5,11 +5,16 @@ namespace Oliverde8\Component\RuleEngine\Tests;
 use Oliverde8\Component\RuleEngine\Exceptions\RuleException;
 use Oliverde8\Component\RuleEngine\Exceptions\UnknownRuleException;
 use Oliverde8\Component\RuleEngine\RuleApplier;
+use Oliverde8\Component\RuleEngine\RuleConfig\GetRuleConfig;
+use Oliverde8\Component\RuleEngine\RuleConfig\ImplodeRuleConfig;
 use Oliverde8\Component\RuleEngine\RuleConfig\RuleConfigInterface;
 use Oliverde8\Component\RuleEngine\Rules\ConfigurableRuleInterface;
+use Oliverde8\Component\RuleEngine\Rules\Get;
+use Oliverde8\Component\RuleEngine\Rules\Implode;
 use Oliverde8\Component\RuleEngine\Rules\RuleInterface;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 
 /**
  * Class RuleApplierTest
@@ -184,6 +189,26 @@ class RuleApplierTest extends TestCase
         $transformedData = [];
         $this->assertEquals('config value', $this->ruleApplier->applyConfig([], $transformedData, $config));
         $this->assertEquals(1, $configurableRule->calls);
+    }
+
+    /**
+     * Regression test: registerRule() must wire the applier onto the rule itself, not just onto rules resolved
+     * through the legacy apply() path. A rule whose applyConfig() recurses via $this->ruleApplier (e.g. Implode
+     * composing nested rules) must work when registered the normal way, without any test-only manual
+     * setApplier() call standing in for what registerRule() should have done.
+     */
+    public function testApplyConfigOnComposedRuleRegisteredNormally()
+    {
+        $ruleApplier = new RuleApplier(new NullLogger(), [new Get(new NullLogger()), new Implode(new NullLogger())]);
+
+        $transformedData = [];
+        $result = $ruleApplier->applyConfig(
+            ['first_name' => 'Ada', 'last_name' => 'Lovelace'],
+            $transformedData,
+            new ImplodeRuleConfig([new GetRuleConfig('first_name'), new GetRuleConfig('last_name')], ' '),
+        );
+
+        $this->assertEquals('Ada Lovelace', $result);
     }
 
     public function testApplyConfigThrowsForUnregisteredConfigClass()

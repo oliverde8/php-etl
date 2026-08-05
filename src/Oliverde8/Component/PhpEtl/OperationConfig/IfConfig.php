@@ -14,15 +14,14 @@ class IfConfig extends AbstractOperationConfig
      * @param ChainConfig $then Sub-chain executed when the condition is met.
      * @param RuleConfigInterface|Expression|array $rules A typed RuleConfigInterface, an Expression (Symfony
      *                                                      Expression Language), or the legacy array-based Rule
-     *                                                      Engine syntax. Evaluated against the item's data; the
+     *                                                      Engine syntax (deprecated, triggers a deprecation notice
+     *                                                      at runtime). Evaluated against the item's data; the
      *                                                      item is routed to $then when the result is truthy (or
      *                                                      falsy, if $negate is true), otherwise to $else.
      * @param ChainConfig|null $else Optional sub-chain executed when the condition is not met. When omitted, the
      *                                item continues to the next step in the main chain unchanged.
      * @param bool $isolateContext When true, whichever branch runs does so against its own clone of the execution
      *                              context instead of sharing the parent's.
-     *
-     * @deprecated Passing an array of rules is deprecated, pass a RuleConfigInterface or an Expression instead.
      */
     public function __construct(
         private readonly ChainConfig $then,

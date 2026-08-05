@@ -8,7 +8,8 @@ width: large
 ## Legacy Array Syntax
 
 > If you're starting a new chain, you don't need this page — use [Typed Rules](/doc/15-rule-engine/010-rule-engine.html)
-> instead. This is reference material for chains still using the original array-based syntax.
+> instead. This is reference material for chains still using the original array-based syntax. Migrating an
+> existing chain? See [Migrating to Typed Rules](/doc/15-rule-engine/025-migrating-to-typed-rules.html).
 
 The original syntax — plain nested arrays, each keyed by rule name — still works exactly as before, but every
 place that accepts rules now triggers a deprecation notice when given an array instead of a `RuleConfigInterface`.

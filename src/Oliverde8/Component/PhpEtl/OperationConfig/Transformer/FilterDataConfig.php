@@ -11,12 +11,11 @@ class FilterDataConfig extends AbstractOperationConfig
     /**
      * @param RuleConfigInterface|Expression|array $rules A typed RuleConfigInterface, an Expression (Symfony
      *                                                      Expression Language), or the legacy array-based Rule
-     *                                                      Engine syntax. Evaluated against the item's data; the
+     *                                                      Engine syntax (deprecated, triggers a deprecation notice
+     *                                                      at runtime). Evaluated against the item's data; the
      *                                                      item is kept when the result is truthy (or falsy, if
      *                                                      $negate is true).
      * @param bool $negate Inverts the condition result.
-     *
-     * @deprecated Passing an array is deprecated, pass a RuleConfigInterface or an Expression instead.
      */
     public function __construct(
         public readonly RuleConfigInterface|Expression|array $rules = [],
