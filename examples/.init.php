@@ -17,6 +17,7 @@ use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\CallbackTransformerOpe
 use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\ExternalFileProcessorOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\FilterDataOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\LogOperation;
+use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\ThrottleOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\RuleTransformOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\SimpleHttpOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Transformer\SplitItemOperation;
@@ -42,6 +43,7 @@ use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\CallBackTransformerCo
 use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\ExternalFileProcessorConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\FilterDataConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\LogConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\ThrottleConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\RuleTransformConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\SimpleHttpConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Transformer\SplitItemConfig;
@@ -109,6 +111,7 @@ $chainBuilder = new ChainBuilderV2(
         new GenericChainFactory(SimpleHttpOperation::class, SimpleHttpConfig::class, injections: ['client' => $client, 'expressionEvaluator' => $expressionEvaluator]),
         new GenericChainFactory(SplitItemOperation::class, SplitItemConfig::class),
         new GenericChainFactory(LogOperation::class, LogConfig::class, injections: ['expressionEvaluator' => $expressionEvaluator]),
+        new GenericChainFactory(ThrottleOperation::class, ThrottleConfig::class),
         new GenericChainFactory(FailSafeOperation::class, FailSafeConfig::class),
         new GenericChainFactory(ExternalFileFinderOperation::class, ExternalFileFinderConfig::class, injections: ['fileSystem' => new LocalFileSystem("/"), 'expressionEvaluator' => $expressionEvaluator]),
         new GenericChainFactory(ExternalFileProcessorOperation::class, ExternalFileProcessorConfig::class),

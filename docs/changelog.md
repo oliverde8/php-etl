@@ -16,6 +16,11 @@ subTitle: Release history
 - 🌟 Allow naming chain links when using the new chain builder.
 - 🌟 #33 - `ChainSplitConfig`, `ChainMergeConfig`, `ChainRepeatConfig`, `FailSafeConfig` gain an `isolateContext` option so a sub-chain can run against its own copy of the execution context.
 - 🌟 #79 - Add `SwitchConfig`/`SwitchOperation`, an N-way generalization of `IfConfig`, for multi-way conditional branching.
+- 🌟 `CsvExtractConfig` gains a `compression` option (`'gzip'`) to read `.csv.gz` files directly.
+- 🌟 `CsvExtractConfig` gains a `columns` option to only keep the listed columns.
+- 🌟 Add `CommandCsvExtractConfig` to read CSV from an external command (e.g. xan), for local and remote files.
+- 🌟 #83 - Add `ThrottleConfig`/`ThrottleOperation` to enforce a minimum delay (`intervalMs`) between items, e.g. to respect API rate limits.
+- 🔧 Fix - `ExpressionEvaluator` was slow on every item because Symfony's expression cache deep-cloned the parsed expression on each read. Filtering 1M rows went from 5.5s to 1.3s.
 
 # 2.0.1
 

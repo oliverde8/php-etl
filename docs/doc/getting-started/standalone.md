@@ -132,6 +132,10 @@ $chainBuilder = new ChainBuilderV2(
             \Oliverde8\Component\PhpEtl\OperationConfig\Transformer\LogConfig::class
         ),
         new GenericChainFactory(
+            \Oliverde8\Component\PhpEtl\ChainOperation\Transformer\ThrottleOperation::class,
+            \Oliverde8\Component\PhpEtl\OperationConfig\Transformer\ThrottleConfig::class
+        ),
+        new GenericChainFactory(
             \Oliverde8\Component\PhpEtl\ChainOperation\Extract\ExternalFileFinderOperation::class,
             \Oliverde8\Component\PhpEtl\OperationConfig\Extract\ExternalFileFinderConfig::class,
             injections: ['fileSystem' => new \Oliverde8\Component\PhpEtl\Model\File\LocalFileSystem("/")]
