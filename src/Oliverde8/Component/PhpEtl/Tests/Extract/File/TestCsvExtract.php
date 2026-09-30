@@ -37,4 +37,26 @@ class TestCsvExtract extends TestCase
 
         $this->assertEquals(3, $increment-1, "Expecting iterator to read all data lines.");
     }
+
+    public function testProjectedCsvRead()
+    {
+        $csvFile = new Csv(__DIR__ . "/test.csv", ',', columns: ["column 3", "column1"]);
+
+        $lines = iterator_to_array($csvFile, false);
+
+        $this->assertCount(3, $lines);
+        $this->assertSame(["column 3" => "value3-1", "column1" => "value1-1"], $lines[0]);
+        $this->assertSame(["column 3" => "value3-3", "column1" => "value1-3"], $lines[2]);
+        $this->assertEquals(["column1","column-2","column 3","column;4"], $csvFile->getHeaders());
+    }
+
+    public function testProjectedCsvReadWithMissingColumn()
+    {
+        $csvFile = new Csv(__DIR__ . "/test.csv", ',', columns: ["column1", "unknown"]);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage("unknown");
+
+        $csvFile->getHeaders();
+    }
 }

@@ -22,6 +22,13 @@ class Csv extends AbstractCsvFile implements \Iterator
     /** @var string[] CSV file headers */
     protected $headers = null;
 
+    protected ?array $columnIndexes = null;
+
+    public function __construct($filePath, string $delimiter = ';', string $enclosure = '"', string $escape = '\\', protected readonly ?array $columns = null)
+    {
+        parent::__construct($filePath, $delimiter, $enclosure, $escape);
+    }
+
     /**
      * Initialize the read of the file.
      */
@@ -49,6 +56,8 @@ class Csv extends AbstractCsvFile implements \Iterator
             $this->headers = $headers;
         }
 
+        $this->columnIndexes = $this->resolveColumnIndexes();
+
         $this->next();
     }
 
@@ -74,6 +83,27 @@ class Csv extends AbstractCsvFile implements \Iterator
         $this->init();
 
         $this->headers = $headers;
+        $this->columnIndexes = $this->resolveColumnIndexes();
+    }
+
+    protected function resolveColumnIndexes(): ?array
+    {
+        if (is_null($this->columns) || !is_array($this->headers)) {
+            return null;
+        }
+
+        $missing = array_diff($this->columns, $this->headers);
+        if (!empty($missing)) {
+            throw new \InvalidArgumentException("Columns not found in csv headers: " . implode(', ', $missing));
+        }
+
+        $headerIndexes = array_flip($this->headers);
+        $columnIndexes = [];
+        foreach ($this->columns as $column) {
+            $columnIndexes[$column] = $headerIndexes[$column];
+        }
+
+        return $columnIndexes;
     }
 
     /**
@@ -107,11 +137,21 @@ class Csv extends AbstractCsvFile implements \Iterator
         $current = fgetcsv($this->file, 0, $this->delimiter, $this->enclosure, $this->escape);
 
         if ($current) {
-            $this->current = array_combine($this->headers, $current);
+            $this->current = is_null($this->columnIndexes) ? array_combine($this->headers, $current) : $this->project($current);
             return;
         }
 
         $this->current = false;
+    }
+
+    protected function project(array $line): array
+    {
+        $row = [];
+        foreach ($this->columnIndexes as $column => $index) {
+            $row[$column] = $line[$index] ?? null;
+        }
+
+        return $row;
     }
 
     /**

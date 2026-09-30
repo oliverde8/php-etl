@@ -6,6 +6,7 @@ build
 var
 /docs/_site/
 /examples/**.csv
+/examples/20-Benchmark/data/
 /examples/00-SimpleCases/*.csv
 /composer.lock
 .phpunit.result.cache

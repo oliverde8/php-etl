@@ -1,3 +1,8 @@
+# 2.2.0
+
+- :star2: `CsvExtractConfig` gains a `compression` option (`'gzip'`) to read `.csv.gz` files directly.
+- :star2: `CsvExtractConfig` gains a `columns` option to only keep the listed columns.
+
 # 2.1.0
 
 - :star2: #84 - Rule Engine now uses typed `RuleConfig` classes as an IDE-friendly replacement array-based syntax.
