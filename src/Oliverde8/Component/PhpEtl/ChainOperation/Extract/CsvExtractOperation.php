@@ -29,7 +29,12 @@ class CsvExtractOperation extends AbstractChainOperation implements DataChainOpe
             $filename = AssociativeArray::getFromKey($filename, $this->config->fileKey);
         }
 
-        $fileIterator = new Csv($context->getFileSystem()->readStream($filename), $this->config->delimiter, $this->config->enclosure, $this->config->escape);
+        $stream = $context->getFileSystem()->readStream($filename);
+        if ($this->config->compression === 'gzip') {
+            stream_filter_append($stream, 'zlib.inflate', STREAM_FILTER_READ, ['window' => 31]);
+        }
+
+        $fileIterator = new Csv($stream, $this->config->delimiter, $this->config->enclosure, $this->config->escape, $this->config->columns);
 
         return new MixItem([new GroupedItem($fileIterator), new FileExtractedItem($filename)]);
     }

@@ -258,5 +258,50 @@ class CsvExtractOperationTest extends TestCase
 
         $this->assertEquals(CsvExtractConfig::class, $operation->getConfigurationClass());
     }
-}
 
+    public function testExtractGzipCsv()
+    {
+        file_put_contents($this->testCsvFile, gzencode("name;age;city\nJohn;30;NYC\nJane;25;LA"));
+
+        $operation = new CsvExtractOperation(new CsvExtractConfig(compression: 'gzip'));
+
+        $fileSystem = $this->createMock(FileSystemInterface::class);
+        $fileSystem->method('readStream')->willReturn(fopen($this->testCsvFile, 'r'));
+
+        $result = $operation->process(new DataItem($this->testCsvFile), new ExecutionContext([], $fileSystem));
+        $csvData = iterator_to_array($result->getItems()[0]->getIterator(), false);
+
+        $this->assertCount(2, $csvData);
+        $this->assertEquals(['name' => 'John', 'age' => '30', 'city' => 'NYC'], $csvData[0]);
+        $this->assertEquals(['name' => 'Jane', 'age' => '25', 'city' => 'LA'], $csvData[1]);
+    }
+
+    public function testExtractCsvWithColumns()
+    {
+        file_put_contents($this->testCsvFile, "name;age;city\nJohn;30;NYC\nJane;25;LA");
+
+        $operation = new CsvExtractOperation(new CsvExtractConfig(columns: ['city', 'name']));
+
+        $fileSystem = $this->createMock(FileSystemInterface::class);
+        $fileSystem->method('readStream')->willReturn(fopen($this->testCsvFile, 'r'));
+
+        $result = $operation->process(new DataItem($this->testCsvFile), new ExecutionContext([], $fileSystem));
+        $csvData = iterator_to_array($result->getItems()[0]->getIterator(), false);
+
+        $this->assertSame([['city' => 'NYC', 'name' => 'John'], ['city' => 'LA', 'name' => 'Jane']], $csvData);
+    }
+
+    public function testInvalidCompressionIsRejected()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        new CsvExtractConfig(compression: 'zip');
+    }
+
+    public function testEmptyColumnsIsRejected()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        new CsvExtractConfig(columns: []);
+    }
+}

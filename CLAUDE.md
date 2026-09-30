@@ -33,6 +33,8 @@ Each operation has a matching pair: an `OperationConfig/**` class (typed paramet
 
 The two builders are **separate registries** — a YAML-declared chain and a `ChainConfig`-declared chain can't embed each other directly.
 
+YAML/`ChainBuilder` is being dropped: new features and options only need to support `ChainBuilderV2`/`*Config`, not the old `Builder/Factories/` adapters.
+
 ### Flavor
 
 Operation configs carry a `flavor` string (default `'default'`) so multiple `GenericChainFactory` registrations can share the same config/operation class — e.g. one factory per Flysystem storage adapter, selected at config-construction time.
