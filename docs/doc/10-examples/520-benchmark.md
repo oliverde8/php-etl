@@ -17,6 +17,8 @@ Every script reads the file, keeps the rows where `keep` is `1` (5% of them) and
 | `01-ExtractFilterWrite.php` | `CsvExtractConfig` → `FilterDataConfig` → `CsvFileWriterConfig` |
 | `02-GzipExtract.php` | Same chain, reading `bench.csv.gz` with `compression: 'gzip'` |
 | `03-ProjectionExtract.php` | Same chain, keeping only 3 of the 30 columns with `columns` |
+| `04-XanExtract.php` | `CommandCsvExtractConfig` running `xan filter` on the local `.gz` file |
+| `05-XanExtractRemote.php` | Same with a remote-like file system: the file is streamed into `gzip -dc \| xan filter` |
 
 The chain scripts print the time spent in each operation using the chain observer (the third argument of `process()`).
 
@@ -29,6 +31,8 @@ php 00-RawFgetcsv.php
 php 01-ExtractFilterWrite.php
 php 02-GzipExtract.php
 php 03-ProjectionExtract.php
+php 04-XanExtract.php          # requires xan
+php 05-XanExtractRemote.php    # requires xan
 ```
 
 The scripts must be run from the `20-Benchmark` directory, since paths are relative to it.
@@ -43,6 +47,8 @@ The scripts must be run from the `20-Benchmark` directory, since paths are relat
 | `01-ExtractFilterWrite.php` | 12.6s | 4 MB |
 | `02-GzipExtract.php` | 12.8s | 4 MB |
 | `03-ProjectionExtract.php` | 12.3s | 4 MB |
+| `04-XanExtract.php` | 0.5s | 4 MB |
+| `05-XanExtractRemote.php` | 0.55s | 4 MB |
 
 Observer output for `01-ExtractFilterWrite.php`:
 
@@ -62,3 +68,5 @@ What this shows:
 - Reading the gzip file directly costs about 0.2s more and saves 358 MB of disk.
 - `columns` only saves a little, because `fgetcsv` still parses every field. It helps more when later operations
   work on the whole row.
+- Letting xan filter the rows ([CommandCsvExtractConfig](/doc/20-operations/20-extract/040-command-csv.html)) is
+  about 25× faster: PHP only handles the 50k rows that are kept.

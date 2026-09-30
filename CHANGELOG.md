@@ -1,8 +1,3 @@
-# 2.2.0
-
-- :star2: `CsvExtractConfig` gains a `compression` option (`'gzip'`) to read `.csv.gz` files directly.
-- :star2: `CsvExtractConfig` gains a `columns` option to only keep the listed columns.
-
 # 2.1.0
 
 - :star2: #84 - Rule Engine now uses typed `RuleConfig` classes as an IDE-friendly replacement array-based syntax.
@@ -15,7 +10,10 @@
 - :star2: Allow naming chain links when using the new chain builder.
 - :star2: #33 - `ChainSplitConfig`, `ChainMergeConfig`, `ChainRepeatConfig`, `FailSafeConfig` gain an `isolateContext` option so a sub-chain can run against its own copy of the execution context.
 - :star2: #79 - Add `SwitchConfig`/`SwitchOperation`, an N-way generalization of `IfConfig`, for multi-way conditional branching.
-
+- :star2: `CsvExtractConfig` gains a `compression` option (`'gzip'`) to read `.csv.gz` files directly.
+- :star2: `CsvExtractConfig` gains a `columns` option to only keep the listed columns.
+- :star2: Add `CommandCsvExtractConfig` to read CSV from an external command (e.g. xan), for local and remote files.
+- 
 # 2.0.1
 
 - :wrench: Fix #75 - `LoggerContext::setLoggerContext()` mutated an undefined local variable instead of `$this->loggerContext`, so per-operation logger context tagging never actually worked.

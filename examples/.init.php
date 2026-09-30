@@ -5,6 +5,7 @@ use Oliverde8\Component\PhpEtl\ChainBuilderV2;
 use Oliverde8\Component\PhpEtl\ChainOperation\ChainMergeOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\ChainRepeatOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\ChainSplitOperation;
+use Oliverde8\Component\PhpEtl\ChainOperation\Extract\CommandCsvExtractOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Extract\CsvExtractOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Extract\ExternalFileFinderOperation;
 use Oliverde8\Component\PhpEtl\ChainOperation\Extract\JsonExtractOperation;
@@ -29,6 +30,7 @@ use Oliverde8\Component\PhpEtl\Model\File\LocalFileSystem;
 use Oliverde8\Component\PhpEtl\OperationConfig\ChainMergeConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\ChainRepeatConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\ChainSplitConfig;
+use Oliverde8\Component\PhpEtl\OperationConfig\Extract\CommandCsvExtractConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Extract\CsvExtractConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Extract\ExternalFileFinderConfig;
 use Oliverde8\Component\PhpEtl\OperationConfig\Extract\JsonExtractConfig;
@@ -91,6 +93,7 @@ $chainBuilder = new ChainBuilderV2(
     getEtlExecutionContextFactory(),
     [
         new GenericChainFactory(CsvExtractOperation::class, CsvExtractConfig::class),
+        new GenericChainFactory(CommandCsvExtractOperation::class, CommandCsvExtractConfig::class),
         new GenericChainFactory(CallbackTransformerOperation::class, CallBackTransformerConfig::class),
         new GenericChainFactory(RuleTransformOperation::class, RuleTransformConfig::class, injections: ['ruleApplier' => $ruleApplier]),
         new GenericChainFactory(FileWriterOperation::class, CsvFileWriterConfig::class),
