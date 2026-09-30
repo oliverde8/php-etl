@@ -79,7 +79,7 @@ class CommandPipeline
                 $this->pump();
             }
 
-            if (!empty($read)) {
+            if (in_array($this->stdout, $read, true)) {
                 $data = fread($this->stdout, $length);
                 if ($data !== '' && $data !== false) {
                     return $data;

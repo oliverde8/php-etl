@@ -13,7 +13,8 @@
 - :star2: `CsvExtractConfig` gains a `compression` option (`'gzip'`) to read `.csv.gz` files directly.
 - :star2: `CsvExtractConfig` gains a `columns` option to only keep the listed columns.
 - :star2: Add `CommandCsvExtractConfig` to read CSV from an external command (e.g. xan), for local and remote files.
-- 
+- :wrench: Fix - `ExpressionEvaluator` was slow on every item because Symfony's expression cache deep-cloned the parsed expression on each read. Filtering 1M rows went from 5.5s to 1.3s.
+
 # 2.0.1
 
 - :wrench: Fix #75 - `LoggerContext::setLoggerContext()` mutated an undefined local variable instead of `$this->loggerContext`, so per-operation logger context tagging never actually worked.

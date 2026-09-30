@@ -1,6 +1,11 @@
 parameters:
 	ignoreErrors:
 		-
+			message: "#^Offset 'wrapper_type' on array\\{.*\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: src/Oliverde8/Component/PhpEtl/Model/Process/CommandPipeline.php
+
+		-
 			message: "#^Parameter \\#1 \\$type of class Symfony\\\\Component\\\\Validator\\\\Constraints\\\\Type constructor expects array\\<int, string\\>\\|string\\|null, array\\<string, string\\> given\\.$#"
 			count: 3
 			path: src/Oliverde8/Component/PhpEtl/Builder/Factories/ChainRepeatFactory.php
