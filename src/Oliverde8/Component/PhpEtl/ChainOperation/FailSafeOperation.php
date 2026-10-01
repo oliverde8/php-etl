@@ -18,6 +18,7 @@ class FailSafeOperation extends AbstractChainOperation implements DataChainOpera
     use SplittedChainOperationTrait;
 
     private ChainProcessorInterface $chainProcessor;
+    private ?ChainProcessorInterface $onFailureProcessor = null;
     private array $exceptionsToCatch = [];
     private int $nbAttempts = 1;
     private readonly bool $isolateContext;
@@ -25,10 +26,13 @@ class FailSafeOperation extends AbstractChainOperation implements DataChainOpera
     public function __construct(ChainBuilderV2 $chainBuilder, FailSafeConfig $config)
     {
         $this->chainProcessor = $chainBuilder->createChain($config->getChainConfig());
+        if ($config->getOnFailureChainConfig() !== null) {
+            $this->onFailureProcessor = $chainBuilder->createChain($config->getOnFailureChainConfig());
+        }
         $this->exceptionsToCatch = $config->exceptionsToCatch;
         $this->nbAttempts = $config->nbAttempts;
         $this->isolateContext = $config->isolateContext;
-        $this->onSplittedChainOperationConstruct([$this->chainProcessor]);
+        $this->onSplittedChainOperationConstruct($this->getChainProcessors());
     }
 
     #[\Override]
@@ -40,6 +44,10 @@ class FailSafeOperation extends AbstractChainOperation implements DataChainOpera
     public function processStop(StopItem $item, ExecutionContext $context): ItemInterface
     {
         foreach ($this->repeatOnItem($item, $context) as $ignored) {}
+        if ($this->onFailureProcessor !== null) {
+            $branchContext = $this->isolateContext ? clone $context : $context;
+            foreach ($this->onFailureProcessor->processGenerator($item, $branchContext, withStop: false) as $ignored) {}
+        }
         return $item;
     }
 
@@ -67,6 +75,11 @@ class FailSafeOperation extends AbstractChainOperation implements DataChainOpera
                         $handled = true; break;
                     }
                 }
+                if ($handled && $nbAttempts >= $this->nbAttempts && $this->onFailureProcessor !== null && $inputItem instanceof DataItemInterface) {
+                    $branchContext->getLogger()->error('FailSafeOperation giving up, sending item to onFailure chain', ['attempts' => $nbAttempts, 'exception' => $exception]);
+                    foreach ($this->onFailureProcessor->processGenerator($inputItem, $branchContext, withStop: false) as $ignored) {}
+                    return;
+                }
                 if (!$handled || $nbAttempts >= $this->nbAttempts) {
                     $branchContext->getLogger()->error('FailSafeOperation giving up', ['attempts' => $nbAttempts, 'exception' => $exception]);
                     throw $exception;
@@ -87,6 +100,11 @@ class FailSafeOperation extends AbstractChainOperation implements DataChainOpera
     #[\Override]
     public function getChainProcessors(): array
     {
-        return [$this->chainProcessor];
+        $processors = [$this->chainProcessor];
+        if ($this->onFailureProcessor !== null) {
+            $processors[] = $this->onFailureProcessor;
+        }
+
+        return $processors;
     }
 }

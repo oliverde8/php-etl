@@ -9,7 +9,7 @@ The `FailSafeConfig` operation handles exceptions within an ETL chain, making yo
 **Key characteristics:**
 - **Catches specified exceptions** and retries automatically
 - **Limits retry attempts** to prevent infinite loops
-- **Continues processing** other items if one fails
+- **Continues processing** other items if one fails, when an `onFailure` chain is configured
 - **Re-throws unhandled exceptions** that aren't in the catch list
 - Essential for production reliability and error resilience
 
@@ -25,7 +25,8 @@ $failSafeConfig = new FailSafeConfig(
     chainConfig: $chainToProtect,           // ChainConfig to wrap
     exceptionsToCatch: [\Exception::class], // Array of exception classes to catch
     nbAttempts: 3,                          // Number of attempts (default: 3)
-    isolateContext: false                   // Optional: isolate the retry loop's context from the parent (default: false)
+    isolateContext: false,                  // Optional: isolate the retry loop's context from the parent (default: false)
+    onFailure: null                         // Optional: ChainConfig receiving items that failed all attempts
 );
 ```
 
@@ -34,6 +35,7 @@ $failSafeConfig = new FailSafeConfig(
 - `exceptionsToCatch`: Array of exception class names to catch and retry
 - `nbAttempts`: Total number of attempts (including first try). Default is 3
 - `isolateContext`: When `true`, the whole retry loop runs against its own clone of the execution context instead of the parent's. Default `false`.
+- `onFailure`: Optional `ChainConfig`. When all attempts fail with a caught exception, the original item is sent to this chain instead of aborting the run. Its output does **not** continue down the main chain. Default `null`: the exception is re-thrown and the run stops.
 
 {% include block/isolate-context-loop.md unit="retry loop" var="failSafeConfig" config="FailSafeConfig" persistNote="between retry attempts on the same item" %}
 
@@ -133,7 +135,7 @@ $chainConfig->addLink(new FailSafeConfig(
 
 ## Example: Continue Processing on Failure
 
-Process a batch of items where some might fail, but others should continue:
+Process a batch of items where some might fail, but others should continue. Failed items go to `onFailure`:
 
 ```php
 use Oliverde8\Component\PhpEtl\OperationConfig\Extract\CsvExtractConfig;
@@ -152,18 +154,18 @@ $processingChain = (new ChainConfig())
         return $item;
     }));
 
-// Failed items are skipped, but processing continues with next items
 $chainConfig
     ->addLink(new CsvExtractConfig())
     ->addLink(new FailSafeConfig(
         chainConfig: $processingChain,
         exceptionsToCatch: [\InvalidArgumentException::class],
-        nbAttempts: 1  // Don't retry validation errors
+        nbAttempts: 1,  // Don't retry validation errors
+        onFailure: (new ChainConfig())->addLink(new CsvFileWriterConfig('rejected-items.csv'))
     ))
     ->addLink(new CsvFileWriterConfig('valid-items.csv'));
 ```
 
-**Result**: Invalid items are skipped, valid items are processed and saved.
+**Result**: Invalid items are written to `rejected-items.csv`, valid items to `valid-items.csv`. Without `onFailure`, the first invalid item stops the whole run.
 
 ## Example: API Retry with Error Logging
 
@@ -329,7 +331,7 @@ exceptionsToCatch: [
 **When Retry Stops:**
 
 - Operation succeeds (no exception thrown)
-- Maximum attempts reached
+- Maximum attempts reached (item is sent to `onFailure` if configured, otherwise the exception is re-thrown)
 - Different exception type is thrown (not in catch list)
 
 ## Common Use Cases
