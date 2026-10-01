@@ -117,9 +117,11 @@ $failSafeConfig = new FailSafeConfig(
 ### Continue Processing on Failure
 
 {% capture description %}
-One of the most powerful features of FailSafe is that it allows the chain to continue processing other items 
-even if one fails. This is critical for batch processing where you don't want a single bad record to stop 
-the entire job.
+By default, an item that fails all its attempts stops the whole run. Give FailSafe an `onFailure` chain to
+send failed items there instead and keep processing the others. This is critical for batch processing where
+you don't want a single bad record to stop the entire job.
+
+Items sent to `onFailure` don't continue down the main chain.
 {% endcapture %}
 {% capture code %}
 ```php
@@ -139,11 +141,12 @@ $processingChain = (new ChainConfig())
     }))
     ->addLink(new CsvFileWriterConfig('valid-records.csv'));
 
-// Failed items are skipped, but processing continues
+// Failed items are written to a reject file, processing continues
 $failSafeConfig = new FailSafeConfig(
     chainConfig: $processingChain,
     exceptionsToCatch: [\InvalidArgumentException::class],
-    nbAttempts: 1  // Don't retry validation errors
+    nbAttempts: 1,  // Don't retry validation errors
+    onFailure: (new ChainConfig())->addLink(new CsvFileWriterConfig('rejected-records.csv'))
 );
 
 $chainConfig

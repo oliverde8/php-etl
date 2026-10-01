@@ -12,6 +12,9 @@ class FailSafeConfig extends AbstractOperationConfig
      * @param bool $isolateContext When true, the wrapped subchain runs against its own clone of the execution
      *                              context, so parameter changes made across retry attempts are not visible
      *                              outside this operation.
+     * @param ChainConfig|null $onFailure Optional sub-chain receiving the item once all attempts failed with a caught
+     *                                     exception, instead of aborting the run. Its output does not continue
+     *                                     down the main chain.
      */
     public function __construct(
         private readonly ChainConfig $chainConfig,
@@ -19,6 +22,7 @@ class FailSafeConfig extends AbstractOperationConfig
         public readonly int $nbAttempts = 3,
         string $flavor = 'default',
         public readonly bool $isolateContext = false,
+        private readonly ?ChainConfig $onFailure = null,
     ) {
         parent::__construct($flavor);
     }
@@ -26,6 +30,11 @@ class FailSafeConfig extends AbstractOperationConfig
     public function getChainConfig(): ChainConfig
     {
         return $this->chainConfig;
+    }
+
+    public function getOnFailureChainConfig(): ?ChainConfig
+    {
+        return $this->onFailure;
     }
 
     #[\Override]

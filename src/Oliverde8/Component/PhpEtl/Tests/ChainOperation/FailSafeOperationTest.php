@@ -68,7 +68,51 @@ class FailSafeOperationTest extends TestCase
         $this->assertEquals([], $results);
     }
 
-    protected function createChain(array $failSafeOperation, array $afterOperations): ChainProcessor
+    public function testToManyFailWithOnFailure()
+    {
+        $failOperation = new CallbackTransformerOperation(new CallBackTransformerConfig(function (ItemInterface $item): void {
+            throw new \Exception("Failure");
+        }));
+        $results = [];
+        $endOperation = new CallbackTransformerOperation(new CallBackTransformerConfig(function (ItemInterface $item) use (&$results) {
+            $results[] = $item->getData();
+            return $item;
+        }));
+        $failed = [];
+        $onFailure = (new ChainConfig())->addLink(new CallBackTransformerConfig(function (ItemInterface $item) use (&$failed) {
+            $failed[] = $item->getData();
+            return $item;
+        }));
+
+        $chain = $this->createChain([$failOperation], [$endOperation], $onFailure);
+        $chain->process(new \ArrayIterator([['var' => 1], ['var' => 2]]), []);
+
+        $this->assertEquals([['var' => 1], ['var' => 2]], $failed);
+        $this->assertEquals([], $results);
+    }
+
+    public function testUncaughtExceptionIgnoresOnFailure()
+    {
+        $failOperation = new CallbackTransformerOperation(new CallBackTransformerConfig(function (ItemInterface $item): void {
+            throw new \LogicException("Failure");
+        }));
+        $failed = [];
+        $onFailure = (new ChainConfig())->addLink(new CallBackTransformerConfig(function (ItemInterface $item) use (&$failed) {
+            $failed[] = $item->getData();
+            return $item;
+        }));
+
+        $chain = $this->createChain([$failOperation], [], $onFailure, [\RuntimeException::class]);
+        $e = null;
+        try {
+            $chain->process(new \ArrayIterator([['var' => 1]]), []);
+        } catch (\Exception $e) {}
+
+        $this->assertInstanceOf(\LogicException::class, $e->getPrevious());
+        $this->assertEquals([], $failed);
+    }
+
+    protected function createChain(array $failSafeOperation, array $afterOperations, ?ChainConfig $onFailure = null, array $exceptionsToCatch = [\Exception::class]): ChainProcessor
     {
         $executionFactory = new ExecutionContextFactory();
 
@@ -91,7 +135,7 @@ class FailSafeOperationTest extends TestCase
 
         $repeatOperation = new FailSafeOperation(
             $chainBuilder,
-            new FailSafeConfig($failSafeChainConfig, [\Exception::class], 2)
+            new FailSafeConfig($failSafeChainConfig, $exceptionsToCatch, 2, onFailure: $onFailure)
         );
 
         array_unshift($afterOperations, $repeatOperation);

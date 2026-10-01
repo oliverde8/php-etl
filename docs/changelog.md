@@ -19,6 +19,7 @@ subTitle: Release history
 - 🌟 `CsvExtractConfig` gains a `compression` option (`'gzip'`) to read `.csv.gz` files directly.
 - 🌟 `CsvExtractConfig` gains a `columns` option to only keep the listed columns.
 - 🌟 Add `CommandCsvExtractConfig` to read CSV from an external command (e.g. xan), for local and remote files.
+- 🌟 #81 - `FailSafeConfig` gains an `onFailure` sub-chain receiving items that failed all attempts, instead of aborting the whole run.
 - 🌟 #83 - Add `ThrottleConfig`/`ThrottleOperation` to enforce a minimum delay (`intervalMs`) between items, e.g. to respect API rate limits.
 - 🔧 Fix - `ExpressionEvaluator` was slow on every item because Symfony's expression cache deep-cloned the parsed expression on each read. Filtering 1M rows went from 5.5s to 1.3s.
 
