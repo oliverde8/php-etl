@@ -20,7 +20,7 @@ class ChainRepeatOperation extends AbstractChainOperation implements DetailedObs
     protected ChainProcessorInterface $chainProcessor;
     protected bool $allowAsynchronous;
     protected string $validationExpression;
-    private readonly bool $isolateContext;
+    private bool $isolateContext = false;
 
     public function __construct(
         ChainBuilderV2 $chainBuilder,

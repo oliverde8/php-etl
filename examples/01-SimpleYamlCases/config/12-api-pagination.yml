@@ -2,7 +2,7 @@ chain:
   repeat-api-call:
     operation: 'repeat'
     options:
-      validationExpr: 'context.getParameter("counter").increment() < 5'
+      validationExpr: 'context["counter"].increment() < 5'
       maxASynchronousItems: 0
       chain:
         get-from-api:

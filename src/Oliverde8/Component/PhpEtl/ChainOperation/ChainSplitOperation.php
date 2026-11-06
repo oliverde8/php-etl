@@ -29,7 +29,7 @@ class ChainSplitOperation extends AbstractChainOperation implements DataChainOpe
      */
     protected array $chainProcessors = [];
 
-    private readonly bool $isolateContext;
+    private bool $isolateContext = false;
 
     public function __construct(ChainBuilderV2 $chainProcessors, ChainSplitConfig $config)
     {
