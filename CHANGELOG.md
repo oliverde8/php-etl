@@ -1,4 +1,4 @@
-# Unreleased
+# 2.1.1
 
 - :wrench: Fix #98 - YAML (`ChainBuilder`) `repeat` and `split` operations crashed with "must not be accessed before initialization" since 2.1.0, because `ChainRepeatOperationV1`/`ChainSplitOperationV1` never set the `isolateContext` property introduced by #33. Thanks @dvasconcelos!
 
