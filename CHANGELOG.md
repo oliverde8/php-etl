@@ -1,3 +1,7 @@
+# Unreleased
+
+- :wrench: Fix #98 - YAML (`ChainBuilder`) `repeat` and `split` operations crashed with "must not be accessed before initialization" since 2.1.0, because `ChainRepeatOperationV1`/`ChainSplitOperationV1` never set the `isolateContext` property introduced by #33. Thanks @dvasconcelos!
+
 # 2.1.0
 
 - :star2: #84 - Rule Engine now uses typed `RuleConfig` classes as an IDE-friendly replacement array-based syntax.
@@ -23,6 +27,7 @@
 - :wrench: Fix #74 - Mermaid static output now renders `Repeat` and `FailSafe` sub-chains instead of drawing them as a single opaque node. Thanks @PuvaanRaaj!
 - :wrench: Fix #44 - Mermaid static output now renders `Merge` branches instead of drawing them as a single opaque node.
 - :wrench: Fix #72 - `ChainRepeatConfig`'s `validationExpression` now correctly supports `context["..."]`, previously always threw at runtime since `ExecutionContext` isn't array-accessible.
+  - :exclamation: **Breaking** `context` is now the array of execution context parameters, not the `ExecutionContext` object. Expressions calling methods on it, such as YAML `validationExpr: 'context.getParameter("counter")'`, must be rewritten as `context["counter"]`.
 
 # 🌟 2.0.0 🌟
 
