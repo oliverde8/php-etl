@@ -4,6 +4,12 @@ title: PHP-ETL - Changelog
 subTitle: Release history
 ---
 
+# 2.1.1
+
+- 🔧 Fix #98 - YAML (`ChainBuilder`) `repeat` and `split` operations crashed with "must not be accessed before initialization" since 2.1.0, because `ChainRepeatOperationV1`/`ChainSplitOperationV1` never set the `isolateContext` property introduced by #33. Thanks @dvasconcelos!
+- 🔧 Fix - 2.1.0 broke `ChainRepeatConfig` `validationExpression`s that called methods on `context` (e.g. YAML `context.getParameter("counter")`) when `context` became the parameters array. `context` is now a read-only `ExpressionContext` supporting both `context["counter"]` and the old method syntax.
+  - ❗ **Deprecation** Calling methods on `context` in a repeat expression (`getParameter()`, `getParameters()`, `setParameter()`, ...) now triggers a deprecation notice. Use `context["..."]` instead.
+
 # 2.1.0
 
 - 🌟 #84 - Rule Engine now uses typed `RuleConfig` classes as an IDE-friendly replacement array-based syntax.
