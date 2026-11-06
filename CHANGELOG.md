@@ -1,6 +1,8 @@
 # 2.1.1
 
 - :wrench: Fix #98 - YAML (`ChainBuilder`) `repeat` and `split` operations crashed with "must not be accessed before initialization" since 2.1.0, because `ChainRepeatOperationV1`/`ChainSplitOperationV1` never set the `isolateContext` property introduced by #33. Thanks @dvasconcelos!
+- :wrench: Fix - 2.1.0 broke `ChainRepeatConfig` `validationExpression`s that called methods on `context` (e.g. YAML `context.getParameter("counter")`) when `context` became the parameters array. `context` is now a read-only `ExpressionContext` supporting both `context["counter"]` and the old method syntax.
+  - :exclamation: **Deprecation** Calling methods on `context` in a repeat expression (`getParameter()`, `getParameters()`, `setParameter()`, ...) now triggers a deprecation notice. Use `context["..."]` instead.
 
 # 2.1.0
 
@@ -27,7 +29,6 @@
 - :wrench: Fix #74 - Mermaid static output now renders `Repeat` and `FailSafe` sub-chains instead of drawing them as a single opaque node. Thanks @PuvaanRaaj!
 - :wrench: Fix #44 - Mermaid static output now renders `Merge` branches instead of drawing them as a single opaque node.
 - :wrench: Fix #72 - `ChainRepeatConfig`'s `validationExpression` now correctly supports `context["..."]`, previously always threw at runtime since `ExecutionContext` isn't array-accessible.
-  - :exclamation: **Breaking** `context` is now the array of execution context parameters, not the `ExecutionContext` object. Expressions calling methods on it, such as YAML `validationExpr: 'context.getParameter("counter")'`, must be rewritten as `context["counter"]`.
 
 # 🌟 2.0.0 🌟
 

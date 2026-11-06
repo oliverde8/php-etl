@@ -126,6 +126,36 @@ class ChainRepeatOperationTest extends TestCase
         $this->assertEquals([['val' => 0], ['val' => 1]], $results);
     }
 
+    public function testValidationExpressionStillSupportsDeprecatedGetParameter()
+    {
+        $callNum = 0;
+        $results = [];
+        $repeatedOperation = new CallbackTransformerOperation(new CallBackTransformerConfig(function (ItemInterface $item) use (&$callNum) {
+            return new DataItem(['val' => $callNum++]);
+        }));
+        $endOperation = new CallbackTransformerOperation(new CallBackTransformerConfig(function (ItemInterface $item) use (&$results) {
+            $results[] = $item->getData();
+            return $item;
+        }));
+
+        $deprecations = [];
+        set_error_handler(static function (int $errno, string $message) use (&$deprecations): bool {
+            $deprecations[] = $message;
+            return true;
+        }, E_USER_DEPRECATED);
+
+        try {
+            $chain = $this->createChain([$repeatedOperation], [$endOperation], 'data["val"] != context.getParameter("limit")');
+            $chain->process(new \ArrayIterator([['var' => 1]]), ['limit' => 2]);
+        } finally {
+            restore_error_handler();
+        }
+
+        $this->assertEquals([['val' => 0], ['val' => 1]], $results);
+        $this->assertNotEmpty($deprecations);
+        $this->assertStringContainsString('context.getParameter()', $deprecations[0]);
+    }
+
     protected function createChain(array $repeatedOperations, array $afterOperations, string $expression, bool $allowAsync = false): ChainProcessor
     {
         $executionFactory = new ExecutionContextFactory();

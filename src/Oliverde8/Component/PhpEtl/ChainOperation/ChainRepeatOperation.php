@@ -5,6 +5,7 @@ namespace Oliverde8\Component\PhpEtl\ChainOperation;
 
 use Oliverde8\Component\PhpEtl\ChainBuilderV2;
 use Oliverde8\Component\PhpEtl\ChainProcessorInterface;
+use Oliverde8\Component\PhpEtl\Expression\ExpressionContext;
 use Oliverde8\Component\PhpEtl\Expression\ExpressionEvaluator;
 use Oliverde8\Component\PhpEtl\Expression\ExpressionEvaluatorInterface;
 use Oliverde8\Component\PhpEtl\Item\DataItemInterface;
@@ -61,7 +62,8 @@ class ChainRepeatOperation extends AbstractChainOperation implements DetailedObs
     public function itemIsValid(ItemInterface $item, ExecutionContext $context): bool
     {
         if ($item instanceof DataItemInterface) {
-            $values = ['data' => $item->getData(), 'context' => $context->getParameters()];
+            // ExpressionContext keeps the pre-2.1 `context.getParameter(...)` syntax working (deprecated).
+            $values = ['data' => $item->getData(), 'context' => new ExpressionContext($context)];
             return $this->expressionEvaluator->evaluate($this->validationExpression, $values);
         }
 
