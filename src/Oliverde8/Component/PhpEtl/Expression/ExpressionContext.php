@@ -17,9 +17,9 @@ use Oliverde8\Component\PhpEtl\Model\File\FileSystemInterface;
  * @implements \ArrayAccess<string, mixed>
  * @implements \IteratorAggregate<string, mixed>
  */
-final class ExpressionContext implements \ArrayAccess, \IteratorAggregate, \Countable
+final readonly class ExpressionContext implements \ArrayAccess, \IteratorAggregate, \Countable
 {
-    public function __construct(private readonly ExecutionContext $context)
+    public function __construct(private ExecutionContext $context)
     {
     }
 

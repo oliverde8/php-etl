@@ -15,6 +15,7 @@ class ExpressionContextTest extends TestCase
     /** @var string[] */
     private array $deprecations = [];
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->deprecations = [];
@@ -24,6 +25,7 @@ class ExpressionContextTest extends TestCase
         }, E_USER_DEPRECATED);
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         restore_error_handler();
